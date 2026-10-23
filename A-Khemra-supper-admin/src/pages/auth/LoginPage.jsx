@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Mail, Lock, LogIn, Loader2, Shield, User } from "lucide-react";
+import { Mail, Lock, LogIn, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "@/store/toastStore";
 
@@ -43,11 +43,6 @@ const LoginPage = () => {
     }
   };
 
-  const handleQuickLogin = (demoEmail, demoPass) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-  };
-
   return (
     <div className="space-y-6 text-stone-900 dark:text-stone-900">
       <div className="text-center space-y-1">
@@ -68,30 +63,6 @@ const LoginPage = () => {
         </div>
       )}
 
-      {/* Quick Demo Login Preset Buttons */}
-      <div className="p-3.5 rounded-xl bg-stone-200/50 dark:bg-stone-800/50 border border-stone-300 dark:border-stone-300 space-y-2">
-        <span className="text-small font-semibold text-stone-700 dark:text-stone-700 block text-center">
-          Demo Accounts
-        </span>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => handleQuickLogin("admin@khemaramorodok.com", "password123")}
-            className="p-2.5 rounded-xl btn-secondary text-small font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <Shield className="w-3.5 h-3.5 text-laterite-600 dark:text-laterite-400" />
-            <span>Admin</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleQuickLogin("sokha@example.com", "password123")}
-            className="p-2.5 rounded-xl btn-secondary text-small font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <User className="w-3.5 h-3.5 text-river-600" />
-            <span>Tourist</span>
-          </button>
-        </div>
-      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

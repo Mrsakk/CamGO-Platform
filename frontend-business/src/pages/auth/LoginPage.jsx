@@ -11,8 +11,6 @@ export const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const showDemoAccounts =
-    import.meta.env.DEV || import.meta.env.VITE_SHOW_DEMO_ACCOUNTS === "true";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,11 +36,6 @@ export const LoginPage = () => {
         err.response?.data?.message || "ព័ត៌មានចូលមិនត្រឹមត្រូវ ឬគណនីត្រូវបានផ្អាក។"
       );
     }
-  };
-
-  const fillQuickLogin = (demoEmail) => {
-    setEmail(demoEmail);
-    setPassword("password123");
   };
 
   return (
@@ -103,24 +96,6 @@ export const LoginPage = () => {
           )}
         </button>
       </form>
-
-      {showDemoAccounts && (
-        <div className="mt-8 border-t border-sage-deep pt-6 dark:border-stone-800">
-        <span className="mb-3 block text-xs font-bold uppercase tracking-[0.14em] text-muted dark:text-stone-400">
-          Quick demo accounts · click to fill
-        </span>
-        <div className="grid grid-cols-1 gap-2">
-          <button
-            type="button"
-            onClick={() => fillQuickLogin("owner@khemaramorodok.com")}
-            className="rounded-control border border-line bg-paper/70 p-3 text-left transition hover:border-brand-400 hover:bg-brand-50 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
-          >
-            <div className="text-xs font-bold text-forest dark:text-white">Business Owner</div>
-            <div className="mt-0.5 truncate text-xs text-muted dark:text-stone-400">owner@khemaramorodok.com</div>
-          </button>
-        </div>
-        </div>
-      )}
     </div>
   );
 };
