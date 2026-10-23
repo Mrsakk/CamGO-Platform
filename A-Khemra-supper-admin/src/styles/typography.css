@@ -1,0 +1,250 @@
+/**
+ * CamGO Travel - Mobile-First Bilingual Typography System (2026)
+ * Khmer: Kantumruy Pro (body, UI, headings) + Moul (Hero headline display only)
+ * English: Inter (body, UI) + Fraunces (Headings)
+ * Exactly 4 core text scale tokens: heading (24px), subheading (18px), body (16px), small (14px) + optional hero (28-32px)
+ * Minimum text anywhere: 14px (0.875rem)
+ */
+
+:root {
+  /* Font Stacks */
+  --font-km: "Kantumruy Pro", "Noto Sans Khmer", "Khmer OS", system-ui, sans-serif;
+  --font-km-display: "Koulen", "Moul", "Kantumruy Pro", serif;
+  --font-km-koulen: "Koulen", "Kantumruy Pro", cursive, sans-serif;
+  --font-en: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-en-display: "Cinzel", "Fraunces", Georgia, serif;
+  --font-en-cinzel: "Cinzel", Georgia, serif;
+
+  --font-family-body: var(--font-en);
+  --font-family-display: var(--font-en-display);
+
+  /* English Default Line Heights */
+  --lh-hero: 1.2;
+  --lh-heading: 1.25;
+  --lh-subheading: 1.3;
+  --lh-body: 1.6;
+  --lh-small: 1.5;
+
+  /* Legacy variable fallbacks */
+  --lh-display: var(--lh-hero);
+  --lh-h1: var(--lh-heading);
+  --lh-h2: var(--lh-heading);
+  --lh-h3: var(--lh-subheading);
+
+  /* Typography ink colors */
+  --ink: #1B1A24;
+  --ink-soft: #5A5566;
+}
+
+/* When language is Khmer, switch font family and ensure >=1.5 (headings) and >=1.8 (body) */
+html[lang="km"] {
+  --font-family-body: var(--font-km);
+  --font-family-display: var(--font-km);
+
+  --lh-hero: 1.5;
+  --lh-heading: 1.5;
+  --lh-subheading: 1.5;
+  --lh-body: 1.8;
+  --lh-small: 1.7;
+
+  --lh-display: 1.5;
+  --lh-h1: 1.5;
+  --lh-h2: 1.5;
+  --lh-h3: 1.5;
+}
+
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: normal;
+}
+
+body {
+  font-family: var(--font-family-body);
+  font-size: 1rem; /* 16px minimum for body */
+  line-height: var(--lh-body);
+  color: var(--ink);
+}
+
+html[lang="km"] body {
+  font-family: var(--font-km);
+  line-height: var(--lh-body);
+}
+
+/* Headings Base Styles */
+h1, .text-heading {
+  font-size: 1.5rem; /* 24px */
+  line-height: var(--lh-heading);
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 1.5rem; /* 24px */
+  line-height: var(--lh-heading);
+  font-weight: 700;
+}
+
+h3, .text-subheading {
+  font-size: 1.125rem; /* 18px */
+  line-height: var(--lh-subheading);
+  font-weight: 600;
+}
+
+/* Paragraph Constraints */
+p, .text-body {
+  font-size: 1rem; /* 16px */
+  line-height: var(--lh-body);
+  font-weight: 400;
+  max-width: 72ch;
+  text-align: left;
+}
+
+/* Buttons and form inputs: 16px minimum (prevents iOS auto-zoom) */
+button, input, select, textarea {
+  font-size: 1rem; /* 16px */
+}
+
+button {
+  font-weight: 600;
+}
+
+/* Helper & Caption Text: 14px minimum */
+small, .text-small {
+  font-size: 0.875rem; /* 14px minimum */
+  line-height: var(--lh-small);
+}
+
+/* Hero Headline (28px - 32px) */
+.text-hero, .text-display {
+  font-size: clamp(1.75rem, 1.5rem + 1vw, 2rem);
+  line-height: var(--lh-hero);
+  font-weight: 700;
+}
+
+/* Legacy Alias Classes */
+.text-h1, .text-h2 {
+  font-size: 1.5rem;
+  line-height: var(--lh-heading);
+  font-weight: 700;
+}
+
+.text-h3 {
+  font-size: 1.125rem;
+  line-height: var(--lh-subheading);
+  font-weight: 600;
+}
+
+/* Khmer-Specific Guardrails */
+/* Never uppercase, letter-space, or italicize Khmer script (breaks diacritics & stacked subscripts) */
+html[lang="km"] *,
+[lang="km"] * {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-style: normal !important;
+}
+
+/* Ensure no text anywhere drops below 14px */
+.text-xs,
+.text-\[9px\],
+.text-\[10px\],
+.text-\[11px\],
+.text-\[12px\],
+.text-\[13px\] {
+  font-size: 0.875rem !important; /* 14px min */
+  line-height: var(--lh-small) !important;
+}
+
+/* Touch-friendly active button pressed state */
+button:active,
+a[role="button"]:active {
+  transform: scale(0.98);
+  transition-duration: 100ms;
+}
+
+/* Reading container */
+.max-w-prose, .prose-reading {
+  max-width: 72ch;
+}
+
+/* ========================================================================= */
+/* 3D TYPOGRAPHY CLASSES & ANIMATIONS                                        */
+/* ========================================================================= */
+.font-koulen {
+  font-family: var(--font-km-koulen) !important;
+  line-height: 1.5 !important;
+  letter-spacing: normal !important;
+}
+
+.font-cinzel {
+  font-family: var(--font-en-cinzel) !important;
+  letter-spacing: 0.03em;
+}
+
+/* 3D Chiseled Sandstone Relief Text */
+.text-3d-stone {
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85),
+    0 2px 1px rgba(43, 33, 24, 0.25),
+    0 4px 10px rgba(43, 33, 24, 0.2);
+}
+
+.dark .text-3d-stone {
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.7),
+    0 6px 14px rgba(0, 0, 0, 0.9);
+}
+
+/* 3D Extruded Laterite Text */
+.text-3d-laterite {
+  color: var(--laterite-600);
+  text-shadow:
+    0 1px 0 #8A3520,
+    0 2px 0 #732C1A,
+    0 3px 0 #5C2314,
+    0 4px 6px rgba(168, 68, 42, 0.35),
+    0 8px 16px rgba(43, 33, 24, 0.2);
+}
+
+.dark .text-3d-laterite {
+  text-shadow:
+    0 1px 0 #B54D31,
+    0 2px 0 #8A3520,
+    0 3px 0 #5C2314,
+    0 4px 12px rgba(208, 105, 74, 0.5);
+}
+
+/* 3D Floating Animation */
+@keyframes float3d {
+  0%, 100% {
+    transform: translateY(0px) rotateX(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotateX(2deg);
+  }
+}
+
+.animate-float-3d {
+  animation: float3d 4s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 20s linear infinite;
+}
+
+

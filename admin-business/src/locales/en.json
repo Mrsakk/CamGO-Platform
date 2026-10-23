@@ -1,0 +1,46 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "businesses": "Businesses",
+    "create_business": "Add Business",
+    "reviews": "Review Moderation",
+    "categories": "Categories",
+    "stats": "Analytics & Reports",
+    "audit_logs": "Audit Logs",
+    "logout": "Logout",
+    "travel_admin": "Travel Admin Panel"
+  },
+  "dashboard": {
+    "title": "Tourism Business Directory Admin",
+    "subtitle": "Manage Cambodian local businesses, verified credentials, and customer inquiries",
+    "total_businesses": "Total Businesses",
+    "approved": "Approved",
+    "pending": "Pending Review",
+    "draft": "Draft",
+    "verified": "Verified Badge",
+    "contacts_7d": "Inquiries (Last 7d)",
+    "contacts_30d": "Inquiries (Last 30d)",
+    "views_30d": "Profile Views (Last 30d)",
+    "top_businesses": "Top Inquired Businesses",
+    "by_category": "Businesses by Category",
+    "by_province": "Businesses by Province",
+    "quick_actions": "Quick Actions",
+    "add_new": "Create New Business",
+    "moderate_reviews": "Moderate Pending Reviews"
+  },
+  "common": {
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search businesses...",
+    "status": "Status",
+    "actions": "Actions",
+    "loading": "Loading...",
+    "confirm_delete": "Are you sure you want to delete this record?",
+    "success": "Success",
+    "error": "Error",
+    "verified": "Verified",
+    "unverified": "Unverified"
+  }
+}

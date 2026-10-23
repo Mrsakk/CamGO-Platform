@@ -1,0 +1,924 @@
+@import './styles/typography.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+  /* ================================================================= */
+  /* ANGKOR SANDSTONE & BAS-RELIEF TOKENS                              */
+  /* ================================================================= */
+  :root,
+  [data-theme="sandstone"] {
+    /* stone surfaces - Clean LightLight Palette & Bold Black Text */
+    --stone-50: #FAFAF9;
+    /* page background */
+    --stone-100: #FFFFFF;
+    /* panel / card */
+    --stone-200: #E7E5E4;
+    /* borders, dividers */
+    --stone-300: #D6D3D1;
+    /* stronger borders */
+    --stone-500: #57534E;
+    /* muted icons / labels */
+    --stone-700: #27272A;
+    /* secondary text */
+    --stone-800: #18181B;
+    --stone-850: #111827;
+    --stone-900: #0A0A0A;
+    /* main text: bold deep black */
+    --stone-950: #000000;
+
+    /* accents */
+    --laterite-600: #A8442A;
+    /* primary action (white text AA) */
+    --laterite-700: #8A3520;
+    /* hover/pressed */
+    --moss-600: #4F6B3A;
+    /* success, nature tags */
+    --gold-500: #C9972B;
+    /* small highlights only */
+    --river-600: #2F6F8F;
+    /* links, info */
+    --danger-600: #B3261E;
+
+    /* relief */
+    --relief-raise: inset 1px 1px 0 rgba(255, 255, 255, 0.75), 0 1px 2px rgba(43, 33, 24, 0.12), 0 8px 20px -10px rgba(43, 33, 24, 0.22);
+    --relief-sink: inset 1px 2px 4px rgba(43, 33, 24, 0.14), inset -1px -1px 0 rgba(255, 255, 255, 0.6);
+    --radius-card: 16px;
+    --radius-control: 12px;
+
+    /* legacy aliases for compatibility */
+    --paper: var(--stone-50);
+    --paper-2: var(--stone-100);
+    --sandstone: var(--stone-200);
+    --ink: var(--stone-900);
+    --ink-soft: var(--stone-700);
+    --color-primary: 168 68 42;
+    /* Laterite RGB */
+    --color-teal: 79 107 58;
+    /* Moss RGB */
+    --color-temple: 47 111 143;
+    /* River RGB */
+  }
+
+  .dark,
+  [data-theme="sandstone"].dark,
+  [data-theme="sandstone"] .dark {
+    /* Dark Theme Surface Palette */
+    --stone-50: #1e1e1e;
+    --stone-100: #2a2a2a;
+    --stone-200: #323232;
+    --stone-300: #363537;
+    --stone-500: #8a8690;
+    --stone-700: #bab6c0;
+    --stone-800: #323232;
+    --stone-850: #262626;
+    --stone-900: #f7f1ff;
+    --stone-950: #1e1e1e;
+
+    --laterite-600: #fd9353;
+    --laterite-700: #fd9353;
+    --moss-600: #7bd88f;
+    --gold-500: #fce566;
+    --river-600: #5ad4e6;
+    --danger-600: #fc618d;
+
+    --relief-raise: inset 1px 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.5), 0 8px 20px -10px rgba(0, 0, 0, 0.7);
+    --relief-sink: inset 1px 2px 4px rgba(0, 0, 0, 0.6), inset -1px -1px 0 rgba(255, 255, 255, 0.05);
+
+    --paper: var(--stone-50);
+    --paper-2: var(--stone-100);
+    --sandstone: var(--stone-200);
+    --ink: var(--stone-900);
+    --ink-soft: var(--stone-700);
+    --color-primary: 253 147 83;
+  }
+
+  /* Legacy Golden Silk Blueprint theme scoping */
+  [data-theme="blueprint"] {
+    --paper: #FBF5E9;
+    --paper-2: #F6EBD3;
+    --sandstone: #E9D8B4;
+    --gold-300: #F2D27A;
+    --gold-500: #D9A21B;
+    --gold-700: #8A5F08;
+    --saffron: #F28C28;
+    --rose: #D6336C;
+    --teal: #0E7C86;
+    --indigo: #1F2A6B;
+    --ink: #1B1A24;
+    --ink-soft: #5A5566;
+    --blueprint: #0F1B3D;
+    --blueprint-line: #5E7BC4;
+    --blueprint-gold: #F2C14E;
+  }
+
+  [data-theme="blueprint"].dark,
+  [data-theme="blueprint"] .dark {
+    --paper: #0B101D;
+    --paper-2: #0F1B3D;
+    --sandstone: #192548;
+    --ink: #FBF5E9;
+    --ink-soft: #A3A8BC;
+    --blueprint: #0A0F1E;
+    --blueprint-line: #5E7BC4;
+    --blueprint-gold: #F2C14E;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    background-color: var(--stone-50);
+    color: var(--stone-900);
+  }
+
+  body {
+    min-width: 320px;
+    overflow-x: hidden;
+    background-color: var(--stone-50);
+    color: var(--stone-900);
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Remove 300ms tap delay on mobile controls */
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #27272a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Leaflet map styles container */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  border-radius: 0.25rem;
+}
+
+/* Swiss / Editorial Magazine Design Tokens */
+.hairline-b {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.dark .hairline-b {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hairline-t {
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.dark .hairline-t {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hairline-r {
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.dark .hairline-r {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hairline-border {
+  border: 1px solid rgba(15, 23, 42, 0.09);
+}
+
+.dark .hairline-border {
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+/* Swiss Grid Crosshair Marker */
+.swiss-crosshair {
+  position: relative;
+}
+
+.swiss-crosshair::before,
+.swiss-crosshair::after {
+  content: '';
+  position: absolute;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+/* Editorial Drop Cap */
+.editorial-dropcap::first-letter {
+  float: left;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 3.5rem;
+  line-height: 0.85;
+  padding-right: 0.6rem;
+  padding-top: 0.2rem;
+  font-weight: 700;
+  color: #D4A017;
+}
+
+/* Magazine Masthead Strip Animation */
+@keyframes tickerSlide {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: tickerSlide 35s linear infinite;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+/* Glassmorphism helpers */
+.glass-nav {
+  background: rgba(248, 247, 244, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.dark .glass-nav {
+  background: rgba(12, 15, 20, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.dark .glass-card {
+  background: rgba(18, 21, 27, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* 35mm Darkroom Film Aesthetic */
+.film-frame {
+  position: relative;
+  border-top: 14px solid #14171e;
+  border-bottom: 14px solid #14171e;
+}
+
+.film-frame::before {
+  content: "■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■";
+  position: absolute;
+  top: -12px;
+  left: 6px;
+  right: 6px;
+  font-family: monospace;
+  font-size: 8px;
+  letter-spacing: 12px;
+  color: #4b5563;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.film-frame::after {
+  content: "■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■";
+  position: absolute;
+  bottom: -12px;
+  left: 6px;
+  right: 6px;
+  font-family: monospace;
+  font-size: 8px;
+  letter-spacing: 12px;
+  color: #4b5563;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Magazine paper texture */
+.paper-texture {
+  background-color: #FAF8F5;
+  background-image: radial-gradient(#e5dfd5 0.75px, transparent 0.75px);
+  background-size: 16px 16px;
+}
+
+.dark .paper-texture {
+  background-color: #0E1015;
+  background-image: radial-gradient(#1e222d 0.75px, transparent 0.75px);
+  background-size: 16px 16px;
+}
+
+/* ================================================================= */
+/* KHMER SILK & GOLDEN HOUR + KHMER ARCHITECTURAL BLUEPRINT TOKENS   */
+/* (រចនាបថសូត្រខ្មែរ រស្មីពណ៌មាស និងប្លង់ស្ថាបត្យកម្មខ្មែរ)           */
+/* ================================================================= */
+
+/* 1. Khmer Architectural Blueprint Grid (គំនូរប្លង់ស្ថាបត្យកម្ម) */
+.blueprint-grid {
+  background-size: 24px 24px;
+  background-image:
+    linear-gradient(to right, rgba(217, 119, 6, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(217, 119, 6, 0.07) 1px, transparent 1px);
+}
+
+.dark .blueprint-grid {
+  background-image:
+    linear-gradient(to right, rgba(245, 158, 11, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(245, 158, 11, 0.09) 1px, transparent 1px);
+}
+
+.blueprint-major-grid {
+  background-size: 96px 96px;
+  background-image:
+    linear-gradient(to right, rgba(217, 119, 6, 0.14) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(217, 119, 6, 0.14) 1px, transparent 1px);
+}
+
+.dark .blueprint-major-grid {
+  background-image:
+    linear-gradient(to right, rgba(245, 158, 11, 0.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(245, 158, 11, 0.18) 1px, transparent 1px);
+}
+
+/* 2. Khmer Silk Texture (សូត្រខ្មែរ / ហូលពិតាន / គោមផ្កាចន្ទន៍) */
+.silk-weave-pattern {
+  background-color: #FAF7F0;
+  background-image:
+    radial-gradient(#ecd5b0 0.8px, transparent 0.8px),
+    repeating-linear-gradient(45deg, rgba(245, 158, 11, 0.03) 0, rgba(245, 158, 11, 0.03) 1px, transparent 0, transparent 8px),
+    repeating-linear-gradient(-45deg, rgba(217, 119, 6, 0.03) 0, rgba(217, 119, 6, 0.03) 1px, transparent 0, transparent 8px);
+}
+
+.dark .silk-weave-pattern {
+  background-color: #0A0D15;
+  background-image:
+    radial-gradient(#252219 0.8px, transparent 0.8px),
+    repeating-linear-gradient(45deg, rgba(245, 158, 11, 0.04) 0, rgba(245, 158, 11, 0.04) 1px, transparent 0, transparent 8px),
+    repeating-linear-gradient(-45deg, rgba(217, 119, 6, 0.04) 0, rgba(217, 119, 6, 0.04) 1px, transparent 0, transparent 8px);
+}
+
+/* 3. Golden Hour Radiance (រស្មីពណ៌មាស / ពន្លឺថ្ងៃរៀបលិច) */
+.golden-hour-glow {
+  box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.28), 0 0 15px -3px rgba(217, 119, 6, 0.2);
+}
+
+.golden-hour-text {
+  background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 45%, #D97706 75%, #92400E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .golden-hour-text {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FBBF24 45%, #F59E0B 75%, #D97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.golden-hour-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(254, 249, 238, 0.98) 100%);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  box-shadow: 0 4px 20px -2px rgba(217, 119, 6, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .golden-hour-card {
+  background: linear-gradient(180deg, rgba(16, 21, 33, 0.95) 0%, rgba(10, 13, 21, 0.98) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  box-shadow: 0 4px 25px -2px rgba(0, 0, 0, 0.6);
+}
+
+.golden-hour-card:hover {
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 12px 32px -4px rgba(245, 158, 11, 0.22);
+  transform: translateY(-3px);
+}
+
+/* 4. Architectural Blueprint Frame & Callout */
+.blueprint-frame {
+  position: relative;
+  border: 1px solid rgba(217, 119, 6, 0.35);
+}
+
+.dark .blueprint-frame {
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.blueprint-frame::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #F59E0B;
+  border-left: 2px solid #F59E0B;
+}
+
+.blueprint-frame::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid #F59E0B;
+  border-right: 2px solid #F59E0B;
+}
+
+/* 5. Silk Thread Divider */
+.silk-thread {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.3) 15%, #F59E0B 50%, rgba(245, 158, 11, 0.3) 85%, transparent 100%);
+}
+
+/* ================================================================= */
+/* NEW LUXURY KHMER SILK & GOLDEN HOUR DESIGN SYSTEM                 */
+/* (រចនាបថសូត្រខ្មែរ រលោងស្រទន់ និងរស្មីសុវណ្ណភូមិថ្មីស្រឡាង)            */
+/* ================================================================= */
+
+/* Silk Glass Panel - Curved, translucent, with golden rim */
+.silk-glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  box-shadow: 0 15px 40px -10px rgba(217, 119, 6, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+}
+
+.dark .silk-glass {
+  background: rgba(12, 16, 26, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(245, 158, 11, 0.15);
+}
+
+/* Golden Hour Ambient Sunset Aura */
+.golden-hour-aura {
+  background: radial-gradient(circle at 50% 10%, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.08) 40%, transparent 75%);
+}
+
+.dark .golden-hour-aura {
+  background: radial-gradient(circle at 50% 10%, rgba(245, 158, 11, 0.25) 0%, rgba(180, 83, 9, 0.12) 45%, transparent 80%);
+}
+
+/* Luxury Silk Card - Modern rounded curves with silky depth */
+.silk-card-luxury {
+  border-radius: 1.5rem;
+  background: linear-gradient(175deg, rgba(255, 255, 255, 0.98) 0%, rgba(254, 250, 242, 0.95) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  box-shadow: 0 10px 30px -5px rgba(217, 119, 6, 0.08);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .silk-card-luxury {
+  background: linear-gradient(175deg, rgba(17, 23, 37, 0.96) 0%, rgba(10, 14, 23, 0.98) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.7);
+}
+
+.silk-card-luxury:hover {
+  transform: translateY(-5px);
+  border-color: rgba(245, 158, 11, 0.55);
+  box-shadow: 0 22px 45px -8px rgba(245, 158, 11, 0.25);
+}
+
+/* Royal Silk Ribbon Badge */
+.silk-ribbon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1rem;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, rgba(254, 243, 199, 0.9) 0%, rgba(253, 230, 138, 0.9) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #92400E;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+
+.dark .silk-ribbon {
+  background: linear-gradient(90deg, rgba(120, 53, 15, 0.45) 0%, rgba(180, 83, 9, 0.35) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #FDE68A;
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.2);
+}
+
+/* Shimmering Gold Accent */
+@keyframes goldShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.gold-shimmer-text {
+  background: linear-gradient(90deg, #8A5F08 0%, #D9A21B 25%, #F28C28 50%, #D9A21B 75%, #8A5F08 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: goldShimmer 6s linear infinite;
+}
+
+.dark .gold-shimmer-text {
+  background: linear-gradient(90deg, #F59E0B 0%, #FCD34D 25%, #FFFBEB 50%, #FCD34D 75%, #F59E0B 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: goldShimmer 6s linear infinite;
+}
+
+/* Golden Hour sunset glow highlight */
+.golden-sun-orb {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.08) 50%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Golden Silk Blueprint - Architectural grid & drafting markers */
+.blueprint-grid-subtle {
+  background-image:
+    linear-gradient(to right, rgba(217, 162, 27, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(217, 162, 27, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.dark .blueprint-grid-subtle {
+  background-image:
+    linear-gradient(to right, rgba(94, 123, 196, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(94, 123, 196, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.blueprint-border {
+  border: 1px solid rgba(217, 162, 27, 0.28);
+}
+
+.dark .blueprint-border {
+  border: 1px solid rgba(94, 123, 196, 0.28);
+}
+
+.blueprint-crop-box {
+  position: relative;
+}
+
+.blueprint-crop-box::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #D9A21B;
+  border-left: 2px solid #D9A21B;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.blueprint-crop-box::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid #D9A21B;
+  border-right: 2px solid #D9A21B;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.dark .blueprint-crop-box::before,
+.dark .blueprint-crop-box::after {
+  border-color: #F2C14E;
+}
+
+.golden-silk-surface {
+  background: linear-gradient(180deg, rgba(253, 249, 240, 0.96) 0%, rgba(246, 235, 211, 0.92) 100%);
+}
+
+.dark .golden-silk-surface {
+  background: linear-gradient(180deg, rgba(15, 27, 61, 0.9) 0%, rgba(11, 16, 29, 0.95) 100%);
+}
+
+/* Custom Native Select and Option Styling */
+select {
+  background-color: transparent;
+  color: inherit;
+}
+
+select option {
+  background-color: #FDF9F0;
+  color: #1B1A24;
+  font-family: var(--font-km);
+  font-size: 15px;
+  padding: 10px 14px;
+}
+
+.dark select option {
+  background-color: #0F1B3D;
+  color: #F1F5F9;
+}
+
+select option:checked {
+  background-color: var(--laterite-600) !important;
+  color: #FFFFFF !important;
+  font-weight: 700;
+}
+
+/* ================================================================= */
+/* ANGKOR SANDSTONE & BAS-RELIEF COMPONENT UTILITIES                 */
+/* ================================================================= */
+
+/* 1. Stone Surface Grain Wrapper (faint SVG noise <= 4% opacity) */
+.stone-grain {
+  position: relative;
+  background-color: var(--stone-50);
+  color: var(--stone-900);
+}
+
+.stone-grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.035;
+  /* <= 4% */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* 2. Relief Panels */
+.panel-raised {
+  background-color: var(--stone-100);
+  border: 1px solid var(--stone-200);
+  border-radius: var(--radius-card);
+  box-shadow: var(--relief-raise);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.panel-raised-hover:hover {
+  transform: translateY(-2px);
+  border-color: var(--stone-300);
+  box-shadow: 0 4px 12px -2px rgba(43, 33, 24, 0.16), 0 12px 24px -10px rgba(43, 33, 24, 0.22);
+}
+
+.dark .panel-raised-hover:hover {
+  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.7), 0 14px 28px -10px rgba(0, 0, 0, 0.85);
+}
+
+/* 3. Carved-In Inputs / Search Fields */
+.input-carved {
+  background-color: var(--stone-50);
+  color: var(--stone-900);
+  border: 1px solid var(--stone-300);
+  border-radius: var(--radius-control);
+  box-shadow: var(--relief-sink);
+  min-height: 48px;
+  font-size: 1rem;
+  padding: 0.625rem 1rem;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.input-carved:focus,
+.input-carved:focus-within {
+  outline: none;
+  border-color: var(--river-600);
+  box-shadow: 0 0 0 2px rgba(47, 111, 143, 0.25), var(--relief-sink);
+}
+
+/* 4. Angkor Sandstone Action Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  background-color: var(--laterite-600);
+  color: #FFFFFF !important;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius-control);
+  box-shadow: var(--relief-raise);
+  transition: all 120ms ease;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--laterite-700);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  box-shadow: var(--relief-sink) !important;
+  transform: translateY(1px) scale(0.99) !important;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  background-color: var(--stone-100);
+  color: var(--stone-900);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--stone-300);
+  box-shadow: var(--relief-raise);
+  transition: all 120ms ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-secondary:hover {
+  background-color: var(--stone-200);
+}
+
+.btn-secondary:active {
+  box-shadow: var(--relief-sink) !important;
+  transform: translateY(1px) scale(0.99) !important;
+}
+
+/* 5. Chips / Filter Tablets */
+.chip-tablet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 40px;
+  padding: 0.4rem 0.875rem;
+  border-radius: 9999px;
+  background-color: var(--stone-100);
+  border: 1px solid var(--stone-200);
+  color: var(--stone-700);
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: var(--relief-raise);
+  transition: all 120ms ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chip-tablet:hover {
+  border-color: var(--stone-300);
+  color: var(--stone-900);
+}
+
+.chip-tablet-active {
+  border-color: var(--laterite-600) !important;
+  background-color: rgba(168, 68, 42, 0.08) !important;
+  color: var(--laterite-600) !important;
+  font-weight: 600;
+}
+
+.dark .chip-tablet-active {
+  background-color: rgba(208, 105, 74, 0.16) !important;
+  color: var(--laterite-600) !important;
+}
+
+/* 6. Stepped Temple Lintel Frame Moulding */
+.lintel-frame {
+  position: relative;
+  border: 1px solid var(--stone-300);
+  padding: 4px;
+  background-color: var(--stone-100);
+  border-radius: var(--radius-card);
+  box-shadow: var(--relief-raise);
+}
+
+.lintel-frame-inner {
+  border: 1px solid var(--stone-300);
+  border-radius: calc(var(--radius-card) - 4px);
+  overflow: hidden;
+  position: relative;
+}
+
+/* 7. Subtle Focus Ring for Accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--river-600) !important;
+  outline-offset: 2px !important;
+}
+
+/* 8. Mobile Safe Area & Responsiveness Helpers */
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-left {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.safe-right {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.overscroll-contain {
+  overscroll-behavior: contain;
+}
+
+.overscroll-y-contain {
+  overscroll-behavior-y: contain;
+}
+
+.overscroll-x-contain {
+  overscroll-behavior-x: contain;
+}
+
+/* Prevent long text from causing horizontal overflow */
+.break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* 9. Off-canvas Left Slide-in Drawer Animation */
+@keyframes slideFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0.6;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-left {
+  animation: slideFromLeft 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 10. Universal Scrollbar Suppression */
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none !important;
+  /* IE and Edge */
+  scrollbar-width: none !important;
+  /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}

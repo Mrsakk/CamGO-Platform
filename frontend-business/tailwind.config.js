@@ -1,0 +1,127 @@
+/** @type {import('tailwindcss').Config} */
+const gold = {
+  50: '#FBF7EC',
+  100: '#F6EED8',
+  200: '#ECDCB0',
+  300: '#E5C879',
+  400: '#DFB94B',
+  500: '#D4A017',
+  600: '#B88912',
+  700: '#926B10',
+  800: '#6D4F11',
+  900: '#4A350E',
+  950: '#251A06',
+};
+
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        brand: gold,
+        gold,
+        forest: {
+          DEFAULT: '#1A1D21',
+          soft: '#2B323C',
+          dark: '#1A1D21',
+        },
+        navy: {
+          DEFAULT: '#1A1D21',
+          soft: '#222831',
+          dark: '#0B0D10',
+        },
+        lime: '#2DD4BF',
+        sage: '#F2EEE6',
+        'sage-deep': '#E7E1D5',
+        paper: '#FAF8F4',
+        cream: '#FFFFFF',
+        ink: {
+          DEFAULT: '#1A1D21',
+          soft: '#3A424D',
+        },
+        line: '#E7E1D5',
+        muted: '#5B626B',
+        teal: {
+          50: '#ECFDF9',
+          100: '#CCFBF1',
+          200: '#99F6E4',
+          300: '#5EEAD4',
+          400: '#2DD4BF',
+          500: '#14B8A6',
+          600: '#0F766E',
+          700: '#115E59',
+          800: '#134E4A',
+          900: '#134E4A',
+          950: '#042F2E',
+        },
+        lotus: {
+          300: '#F9A8D4',
+          400: '#F472B6',
+          500: '#E11D74',
+          600: '#BE185D',
+        },
+        danger: {
+          50: '#FEF3F2',
+          100: '#FEE4E2',
+          300: '#FDA29B',
+          500: '#F97066',
+          600: '#B42318',
+          700: '#912018',
+        },
+        stone: {
+          50: '#FAF8F4',
+          100: '#F4F1EA',
+          200: '#E7E1D5',
+          300: '#D4CCBF',
+          400: '#A39B8D',
+          500: '#7C7568',
+          600: '#5B626B',
+          700: '#3A424D',
+          750: '#2B323C',
+          800: '#222831',
+          850: '#222831',
+          900: '#14171B',
+          950: '#0B0D10',
+        },
+      },
+      fontFamily: {
+        km: ['"Kantumruy Pro Variable"', '"Kantumruy Pro"', 'sans-serif'],
+        en: ['"Inter Variable"', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['"Kantumruy Pro Variable"', '"Inter Variable"', 'sans-serif'],
+        serif: ['"Kantumruy Pro Variable"', '"Inter Variable"', 'sans-serif'],
+      },
+      borderRadius: {
+        card: 'var(--radius-card, 1rem)',
+        control: 'var(--radius-control, 0.75rem)',
+        '4xl': '1.5rem',
+        '5xl': '2rem',
+      },
+      boxShadow: {
+        premium: '0 6px 24px rgba(26, 29, 33, 0.08)',
+        'premium-lg': '0 10px 32px rgba(26, 29, 33, 0.10)',
+        gold: '0 6px 24px rgba(26, 29, 33, 0.10)',
+      },
+      maxWidth: {
+        content: '1120px',
+      },
+      screens: {
+        xs: '360px',
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
+      },
+      minHeight: {
+        touch: '44px',
+      },
+      minWidth: {
+        touch: '44px',
+      },
+    },
+  },
+  plugins: [],
+}

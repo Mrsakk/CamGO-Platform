@@ -1,0 +1,290 @@
+{
+  "app_name": "CamGO Business",
+  "app_tagline": "Direct contact directory for Cambodia's local tourism businesses",
+  "nav": {
+    "home": "Home",
+    "directory": "Directory",
+    "map": "Map",
+    "about": "About",
+    "contact": "Contact",
+    "pricing": "Pricing",
+    "list_business": "List your business",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "travel_site": "Visit CamGO Travel"
+  },
+  "search": {
+    "placeholder": "Search hotels, restaurants, cafes, tour guides...",
+    "province_placeholder": "Select province",
+    "all_provinces": "All Provinces & Cities",
+    "all_categories": "All Categories",
+    "button": "Search",
+    "results_count": "Found {{count}} businesses",
+    "filter_drawer_title": "Filters",
+    "clear_filters": "Clear Filters",
+    "apply_filters": "Apply Filters",
+    "active_filters": "Active filters",
+    "updating_results": "Updating results...",
+    "verified_only": "Verified Businesses Only",
+    "open_now_only": "Open Now",
+    "price_level": "Price Range",
+    "sort_by": "Sort By",
+    "sort_relevance": "Most Relevant",
+    "sort_rating": "Highest Rated",
+    "sort_newest": "Newly Added",
+    "sort_distance": "Nearest to Me",
+    "show_map": "Show Map",
+    "hide_map": "Hide Map"
+  },
+  "home": {
+    "eyebrow": "Cambodia direct directory",
+    "hero_title": "Direct Contact with Cambodia's Best Tourism Businesses",
+    "hero_subtitle": "Zero booking fees. No commissions. Call or chat directly with authentic local guesthouses, restaurants, guides, and crafts.",
+    "hero_form": {
+      "label": "Email address for travel updates",
+      "placeholder": "Enter your email",
+      "cta": "Get updates",
+      "loading": "Sending...",
+      "note": "One short email a month. Verified places, no spam.",
+      "success": "You're on the list. Watch your inbox for the next guide.",
+      "error": "We couldn't save your email. Please try again.",
+      "subject": "CamGO travel updates signup",
+      "message": "Please add {{email}} to the CamGO travel updates list."
+    },
+    "trust_kyc": "KYC verified",
+    "trust_zero_commission": "Zero commission",
+    "trust_direct": "Direct contact",
+    "popular": "Popular",
+    "featured_label": "Featured",
+    "verified_label": "Verified",
+    "categories_eyebrow": "Browse by category",
+    "categories_title": "Explore by Category",
+    "verified_eyebrow": "KYC reviewed",
+    "verified_title": "Verified Businesses",
+    "verified_subtitle": "Locally licensed and verified businesses with guaranteed direct contact.",
+    "new_eyebrow": "Just joined",
+    "new_title": "Newly Joined Businesses",
+    "provinces_eyebrow": "Explore by province",
+    "provinces_title": "Popular Destinations & Provinces",
+    "owners_eyebrow": "For tourism owners",
+    "loading": "Loading businesses...",
+    "view_all": "View All",
+    "direct_contact_banner": {
+      "title": "Are you a local tourism business owner?",
+      "subtitle": "Get listed on CamGO directory for free to receive direct bookings and calls from tourists.",
+      "cta": "Contact Staff to Register"
+    }
+  },
+  "pricing": {
+    "meta_title": "Pricing | CamGO Business",
+    "meta_description": "Honest plans for Cambodian tourism businesses. Start free, upgrade to Pro for $10 per month or Premium for $25 per month. No commissions.",
+    "eyebrow": "Plans for local businesses",
+    "title": "Honest pricing. No commissions.",
+    "subtitle": "Start free and add visibility when you are ready. Every plan keeps your direct contact channels and never takes a cut of your bookings.",
+    "note_commission": "0% commission",
+    "note_kyc": "KYC verification is free",
+    "popular": "Most popular",
+    "cta_primary": "Start with Pro",
+    "cta_secondary": "Request this plan",
+    "payment_note": "Prices are in USD. Payments are recorded manually by staff after KHQR Bakong or bank transfer. No card is charged on this website, and plans activate only after payment is confirmed.",
+    "plans": [
+      {
+        "name": "Free",
+        "tagline": "Start with the essentials",
+        "price": "$0",
+        "period": "forever",
+        "description": "A clear, honest listing with the contact details travellers need.",
+        "features": [
+          "Business profile with photos",
+          "Direct call and chat links",
+          "Map location and opening hours",
+          "Customer reviews and replies"
+        ]
+      },
+      {
+        "name": "Pro",
+        "tagline": "For growing businesses",
+        "price": "$10",
+        "period": "/ month",
+        "description": "More room for your story, services, and customer conversations.",
+        "features": [
+          "Everything in Free",
+          "More photos and service listings",
+          "Lead inbox and CSV export",
+          "Team member access",
+          "30-day Pro trial, once per business"
+        ]
+      },
+      {
+        "name": "Premium",
+        "tagline": "For standout visibility",
+        "price": "$25",
+        "period": "/ month",
+        "description": "Stronger placement for businesses that want to be found first.",
+        "features": [
+          "Everything in Pro",
+          "Featured placement in the directory",
+          "Priority category visibility",
+          "Partner tools and monthly reporting"
+        ]
+      }
+    ],
+    "cards": {
+      "included": {
+        "title": "Direct contact, always included",
+        "copy": "Every plan includes call, Telegram, WhatsApp, email, and map links. We never hide your contact details behind a booking fee."
+      },
+      "trial": {
+        "title": "One 30-day Pro trial",
+        "copy": "Eligible businesses can try Pro once for 30 days. When the trial ends, you can request a paid plan or continue on Free without losing your data."
+      },
+      "verified": {
+        "title": "The badge is not for sale",
+        "copy": "KYC verification is a separate, free review. A paid plan never grants a verified badge; only a completed KYC review does."
+      }
+    },
+    "faq": {
+      "eyebrow": "Common questions",
+      "title": "What owners ask before joining",
+      "items": [
+        {
+          "question": "Do you take a commission from my bookings?",
+          "answer": "No. CamGO Business is a directory, not a booking platform. Travellers contact you directly, and you keep 100% of what you earn."
+        },
+        {
+          "question": "Does a paid plan include the verified badge?",
+          "answer": "No. The verified badge is awarded only after a free KYC document review. Plans control visibility and extra tools, not trust badges."
+        },
+        {
+          "question": "How do I pay for Pro or Premium?",
+          "answer": "Our team confirms payment by KHQR Bakong or bank transfer and records it manually. Your plan activates once the payment is verified."
+        },
+        {
+          "question": "Can I change plans later?",
+          "answer": "Yes. You can request a different plan from the owner portal. Staff will confirm the change and any payment before it takes effect."
+        },
+        {
+          "question": "How do I get an owner account?",
+          "answer": "Business accounts are created by CamGO staff after we verify your business. Use the list-your-business form and our team will guide you through setup."
+        }
+      ]
+    },
+    "final": {
+      "eyebrow": "Ready when you are",
+      "title": "Start with a free listing.",
+      "copy": "Send your business details and our team will help you choose the right plan. No commission, no pressure.",
+      "cta": "Request a listing"
+    }
+  },
+  "list_business": {
+    "meta_title": "List your business | CamGO Business",
+    "meta_description": "Join Cambodia's direct tourism directory. Request a listing for your guesthouse, restaurant, tour, transport, spa, or craft business.",
+    "eyebrow": "Join the directory",
+    "title": "Put your business in front of travellers who contact you directly.",
+    "subtitle": "CamGO Business is a directory for licensed Cambodian tourism businesses. We create owner accounts with you, help you prepare an honest profile, and never take a commission.",
+    "benefits": {
+      "no_commission": "Keep 100% of your earnings. We do not process bookings or charge commission.",
+      "direct_contact": "Travellers call, message, or email you directly from your listing.",
+      "free_start": "Start on the Free plan. Upgrade only when you need more visibility or tools."
+    },
+    "note_title": "Accounts are created by our team",
+    "note_copy": "To keep listings accurate, there is no self-signup. Send the form below and staff will contact you to verify your business before creating your owner account.",
+    "pricing_link": "See plans and pricing",
+    "directory_link": "Browse the directory",
+    "form": {
+      "title": "Request a listing review",
+      "copy": "Tell us about your business. We usually reply within one business day.",
+      "business_name": "Business name",
+      "business_placeholder": "Your business name",
+      "owner_name": "Your name",
+      "owner_placeholder": "Owner or manager name",
+      "email": "Email",
+      "phone": "Phone or Telegram",
+      "message": "Tell us about your business",
+      "message_placeholder": "Category, province, years open, and anything we should know",
+      "subject": "Business listing request",
+      "submit": "Send listing request",
+      "sending": "Sending...",
+      "error": "Could not send your request. Please try again.",
+      "success_title": "Request received",
+      "success_copy": "Our team will review your details and contact you about verification and account setup.",
+      "send_another": "Send another request",
+      "privacy": "We use these details only to review your listing request."
+    },
+    "steps": [
+      {
+        "title": "Send your details",
+        "copy": "Share your business name, location, category, and the best way to reach you."
+      },
+      {
+        "title": "Verify the business",
+        "copy": "Staff confirm your licence, contact channels, and that the listing is genuinely yours."
+      },
+      {
+        "title": "Set up your account",
+        "copy": "We create your owner account and send a secure setup link by email."
+      },
+      {
+        "title": "Publish and grow",
+        "copy": "Complete your profile, add photos, and choose a plan when you are ready."
+      }
+    ],
+    "how_eyebrow": "How it works",
+    "how_title": "From first message to live listing",
+    "how_copy": "We keep the process small and human. Most listings can be reviewed once the required details are ready.",
+    "prepare_title": "What to prepare",
+    "checklist": [
+      "Business name, category, and province",
+      "A phone number and Telegram or WhatsApp contact",
+      "Two to five clear photos of the business",
+      "Opening hours and a short, honest description",
+      "Business licence or registration details for KYC"
+    ],
+    "visit_title": "Prefer to talk?",
+    "visit_copy": "Call or visit our team if you would rather ask questions in person. We can explain the plans and the KYC review without jargon.",
+    "visit_address": "No. 88, Preah Norodom Blvd, Daun Penh, Phnom Penh",
+    "contact_link": "Open contact page"
+  },
+  "business": {
+    "open_now": "Open Now",
+    "closed_now": "Closed",
+    "verified": "Verified",
+    "reviews_count": "{{count}} reviews",
+    "price_1": "Budget ($)",
+    "price_2": "Moderate ($$)",
+    "price_3": "Upscale ($$$)",
+    "price_4": "Luxury ($$$$)",
+    "call_now": "Call Now",
+    "chat_telegram": "Telegram Chat",
+    "chat_whatsapp": "WhatsApp Chat",
+    "chat_messenger": "Facebook Messenger",
+    "send_email": "Send Email",
+    "get_directions": "Get Directions",
+    "visit_website": "Visit Website",
+    "opening_hours": "Opening Hours",
+    "today": "Today",
+    "contact_info": "Direct Contact Channels",
+    "location": "Location & Directions",
+    "nearby_destinations": "Nearby Travel Destinations",
+    "view_destination": "Explore destination",
+    "km_away": "{{distance}} km away",
+    "reviews_title": "Visitor Reviews & Ratings",
+    "write_review": "Write a Review",
+    "empty_reviews": "No reviews yet. Be the first visitor to share your experience!",
+    "review_form": {
+      "title": "Share Your Experience",
+      "name_label": "Your Name (public display)",
+      "rating_label": "Your Rating",
+      "comment_label": "Your Review (minimum 10 characters)",
+      "submit": "Submit Review",
+      "success": "Thank you! Your review has been submitted for staff moderation."
+    }
+  },
+  "footer": {
+    "desc": "CamGO Business connects independent travelers directly with authentic Cambodian tourism enterprises without intermediaries or commissions.",
+    "links": "Quick Links",
+    "contact_us": "Contact Us",
+    "rights": "All rights reserved.",
+    "no_booking_notice": "We do not process payments or charge booking commissions. All interactions are held directly between travelers and local businesses."
+  }
+}

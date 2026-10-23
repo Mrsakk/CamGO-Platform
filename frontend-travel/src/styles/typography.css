@@ -1,0 +1,257 @@
+/**
+ * CamGO Travel - Unified Bilingual Typography System
+ * Exactly 2 Core Fonts:
+ *   - 1 Khmer Font: Kantumruy Pro (400, 600, 700)
+ *   - 1 English Font: Inter (400, 500, 600, 700)
+ *
+ * Balanced Scale (NOT too big - កុំអោយធំពេក):
+ *   - text-hero: clamp(1.75rem, 1.45rem + 1vw, 2.25rem) [28px -> 36px]
+ *   - text-title (h1): clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem) [22px -> 28px]
+ *   - text-heading (h2): clamp(1.2rem, 1.1rem + 0.4vw, 1.45rem) [19px -> 23px]
+ *   - text-subheading (h3): clamp(1.05rem, 1rem + 0.2vw, 1.2rem) [16.8px -> 19px]
+ *   - text-body (p): 1rem [16px]
+ *   - text-small (badges, captions, controls): 0.875rem [14px floor]
+ */
+
+:root {
+  /* 1. EXACTLY 2 CORE FONT FAMILIES */
+  --font-km: "Kantumruy Pro", "Noto Sans Khmer", "Khmer OS", system-ui, sans-serif;
+  --font-en: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Semantic stacks: English first for default Latin, Kantumruy Pro handles Khmer glyphs */
+  --font-family-body: "Inter", "Kantumruy Pro", system-ui, sans-serif;
+  --font-family-heading: "Inter", "Kantumruy Pro", system-ui, sans-serif;
+  --font-family-display: "Inter", "Kantumruy Pro", system-ui, sans-serif;
+
+  /* 2. DEFAULT ENGLISH LINE HEIGHTS */
+  --lh-hero: 1.25;
+  --lh-title: 1.3;
+  --lh-heading: 1.35;
+  --lh-subheading: 1.4;
+  --lh-body: 1.6;
+  --lh-small: 1.5;
+
+  /* Legacy variable aliases */
+  --lh-display: var(--lh-hero);
+  --lh-h1: var(--lh-title);
+  --lh-h2: var(--lh-heading);
+  --lh-h3: var(--lh-subheading);
+
+  /* Semantic Ink Colors - Bold Black Text (អក្សរខ្មៅដិត) */
+  --ink: #0A0A0A;
+  --ink-soft: #27272A;
+}
+
+/* 3. KHMER TYPOGRAPHY RULES (html[lang="km"]) */
+/* Single Khmer font: Kantumruy Pro with appropriate line-heights for stacked vowels */
+html[lang="km"] {
+  --font-family-body: "Kantumruy Pro", "Inter", system-ui, sans-serif;
+  --font-family-heading: "Kantumruy Pro", "Inter", system-ui, sans-serif;
+  --font-family-display: "Kantumruy Pro", "Inter", system-ui, sans-serif;
+
+  --lh-hero: 1.4;
+  --lh-title: 1.45;
+  --lh-heading: 1.45;
+  --lh-subheading: 1.5;
+  --lh-body: 1.75;
+  --lh-small: 1.65;
+
+  --lh-display: 1.4;
+  --lh-h1: 1.45;
+  --lh-h2: 1.45;
+  --lh-h3: 1.5;
+}
+
+/* Base Document Setup */
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: normal;
+  font-synthesis: none; /* Disallow browser faux bold or faux italic */
+}
+
+body {
+  font-family: var(--font-family-body);
+  font-size: 1rem;
+  line-height: var(--lh-body);
+  color: var(--ink);
+  margin: 0;
+}
+
+html[lang="km"] body {
+  font-family: var(--font-km);
+  line-height: var(--lh-body);
+}
+
+/* ========================================================================= */
+/* 4. BALANCED SCALE (NOT TOO BIG - កុំអោយធំពេក)                               */
+/* ========================================================================= */
+
+/* Token 1: text-hero (Home Hero Headline: 28px mobile -> 36px desktop, 700) */
+.text-hero {
+  font-size: clamp(1.75rem, 1.45rem + 1vw, 2.25rem);
+  line-height: var(--lh-hero);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Token 2: text-title (Page Title / H1: 22px mobile -> 28px desktop, 700) */
+.text-title,
+h1:not(.text-hero) {
+  font-size: clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem);
+  line-height: var(--lh-title);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Token 3: text-heading (Section Title / H2: 19px mobile -> 23px desktop, 700) */
+.text-heading,
+h2 {
+  font-size: clamp(1.2rem, 1.1rem + 0.4vw, 1.45rem);
+  line-height: var(--lh-heading);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Token 4: text-subheading (Card Title, Group Label / H3: 16.8px mobile -> 19px desktop, 700) */
+.text-subheading,
+h3 {
+  font-size: clamp(1.05rem, 1rem + 0.2vw, 1.2rem);
+  line-height: var(--lh-subheading);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Token 5: text-body (Paragraphs, descriptions: 16px, 400) */
+.text-body,
+p:not(.text-small):not(.text-subheading) {
+  font-size: 1rem;
+  line-height: var(--lh-body);
+  font-weight: 400;
+  text-align: left;
+}
+
+/* Token 6: text-small (Badges, labels, buttons, captions: 14px floor, 400 - 600) */
+.text-small,
+small {
+  font-size: 0.875rem !important; /* 14px floor */
+  line-height: var(--lh-small);
+}
+
+/* ========================================================================= */
+/* 5. OVERSIZED CLASS CEILINGS (PREVENTS ACCIDENTAL 48px - 60px BLOAT)        */
+/* ========================================================================= */
+
+.text-6xl,
+.text-5xl {
+  font-size: clamp(1.75rem, 1.45rem + 1vw, 2.25rem) !important;
+  line-height: var(--lh-hero) !important;
+}
+
+.text-4xl {
+  font-size: clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem) !important;
+  line-height: var(--lh-title) !important;
+}
+
+.text-3xl {
+  font-size: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem) !important;
+  line-height: var(--lh-heading) !important;
+}
+
+.text-2xl {
+  font-size: clamp(1.125rem, 1.05rem + 0.3vw, 1.3rem) !important;
+  line-height: var(--lh-heading) !important;
+}
+
+/* ========================================================================= */
+/* 6. FORM CONTROLS & BUTTON RULES (16px MINIMUM FOR TOUCH)                  */
+/* ========================================================================= */
+
+button, input, select, textarea {
+  font-size: 1rem !important; /* 16px minimum prevents iOS auto-zoom */
+}
+
+button {
+  font-weight: 600;
+  line-height: normal;
+}
+
+.max-w-prose,
+.prose-reading {
+  max-width: 72ch;
+}
+
+/* ========================================================================= */
+/* 7. STRICT KHMER GUARDRAILS (NO UPPERCASE, NO ITALIC, NO LETTER SPACING)   */
+/* ========================================================================= */
+
+/* Stacked subscripts and dependent vowels require clean normal flow */
+html[lang="km"] *,
+[lang="km"] * {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-style: normal !important;
+}
+
+/* Hard floor for microscopic classes */
+.text-xs,
+.text-\[9px\],
+.text-\[10px\],
+.text-\[11px\],
+.text-\[12px\],
+.text-\[13px\] {
+  font-size: 0.875rem !important; /* 14px floor */
+  line-height: var(--lh-small) !important;
+}
+
+/* Tabular numbers for dates, prices, ratings, counts, and currencies */
+.tabular-nums,
+.font-mono,
+[data-tabular-nums="true"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ========================================================================= */
+/* 8. COMPLETE REMOVAL OF KOULEN & CINZEL (MAPPED STRICTLY TO 2 CORE FONTS)  */
+/* ========================================================================= */
+
+/* Any element with font-koulen uses Kantumruy Pro (Khmer) or Inter (English) */
+.font-koulen {
+  font-family: var(--font-family-heading) !important;
+  line-height: var(--lh-heading) !important;
+  letter-spacing: normal !important;
+}
+
+/* Any legacy font-cinzel or font-serif strictly maps to body stack */
+.font-cinzel,
+.font-serif {
+  font-family: var(--font-family-body) !important;
+  font-style: normal !important;
+  letter-spacing: normal !important;
+}
+
+/* Legacy Display & Header Aliases */
+.text-display {
+  font-size: clamp(1.75rem, 1.45rem + 1vw, 2.25rem);
+  line-height: var(--lh-hero);
+  font-weight: 700;
+}
+
+.text-h1 {
+  font-size: clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem);
+  line-height: var(--lh-title);
+  font-weight: 700;
+}
+
+.text-h2 {
+  font-size: clamp(1.2rem, 1.1rem + 0.4vw, 1.45rem);
+  line-height: var(--lh-heading);
+  font-weight: 700;
+}
+
+.text-h3 {
+  font-size: clamp(1.05rem, 1rem + 0.2vw, 1.2rem);
+  line-height: var(--lh-subheading);
+  font-weight: 600;
+}

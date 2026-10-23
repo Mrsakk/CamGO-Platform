@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="km">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAFAF9" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1e1e1e" />
+  <title>CamGO Travel | Explore Cambodia</title>
+  <meta name="description"
+    content="CamGO Travel is your ultimate tourism gateway to Cambodia. Discover ancient Angkor temples, pristine tropical islands, and authentic cultural heritage." />
+  <meta name="keywords"
+    content="Cambodia, Angkor Wat, Siem Reap, Phnom Penh, Koh Rong, Cambodian Tourism, Khmer Heritage, Travel Cambodia" />
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="CamGO Travel - Explore Cambodia" />
+  <meta property="og:description"
+    content="Discover the wonder of Cambodia. Ancient temples, tropical islands, and authentic culture." />
+  <meta property="og:image"
+    content="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80" />
+
+  <!-- Start loading Home aggregated data before JavaScript finishes parsing -->
+  <link rel="preload" href="/api/v1/home" as="fetch" crossorigin="anonymous" />
+
+  <!-- 2 Unified Core Font Families: Kantumruy Pro (Khmer) & Inter (English) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Kantumruy+Pro:wght@400;600;700&display=swap" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Kantumruy+Pro:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Leaflet CSS for OpenStreetMap integration -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+</head>
+
+<body
+  class="bg-[#FAFAF9] dark:bg-[#1e1e1e] text-stone-900 font-sans antialiased selection:bg-amber-500 selection:text-stone-950 transition-colors duration-200 min-w-[320px] min-h-[100dvh] overflow-x-hidden">
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>

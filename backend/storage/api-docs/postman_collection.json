@@ -1,0 +1,1849 @@
+{
+	"info": {
+		"_postman_id": "camgo-travel-v1",
+		"name": "CamGO Travel API (v1)",
+		"description": "CamGO API collection for Travel and Business. Public directory, tourist auth/reviews, owner portal (/business/me), and staff admin (/admin/business).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register Tourist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Sokha Explorer\",\n    \"email\": \"sokha.test@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"country\": \"Cambodia\",\n    \"phone\": \"+855 12 999 888\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Tourist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sokha@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@khemaramorodok.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Current User (Me)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Public Destinations",
+			"item": [
+				{
+					"name": "List Destinations (Filters, Sort, Search)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/destinations?province=siem-reap&category=temples-heritage&sort=popular&per_page=12",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"destinations"
+							],
+							"query": [
+								{
+									"key": "province",
+									"value": "siem-reap"
+								},
+								{
+									"key": "category",
+									"value": "temples-heritage"
+								},
+								{
+									"key": "sort",
+									"value": "popular"
+								},
+								{
+									"key": "per_page",
+									"value": "12"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Featured Destinations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/destinations/featured",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"destinations",
+								"featured"
+							]
+						}
+					}
+				},
+				{
+					"name": "Popular Destinations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/destinations/popular",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"destinations",
+								"popular"
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Suggestions Autocomplete",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/destinations/suggestions?q=angkor",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"destinations",
+								"suggestions"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "angkor"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Destination Detail by Slug",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/destinations/angkor-wat",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"destinations",
+								"angkor-wat"
+							]
+						}
+					}
+				},
+				{
+					"name": "Destination Reviews",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/destinations/1/reviews",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"destinations",
+								"1",
+								"reviews"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Provinces & Categories",
+			"item": [
+				{
+					"name": "List All 25 Provinces",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/provinces",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"provinces"
+							]
+						}
+					}
+				},
+				{
+					"name": "Show Single Province & Destinations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/provinces/siem-reap",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"provinces",
+								"siem-reap"
+							]
+						}
+					}
+				},
+				{
+					"name": "List 7 Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Tourist Actions",
+			"item": [
+				{
+					"name": "Toggle Favorite Destination",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/destinations/1/favorite",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"destinations",
+								"1",
+								"favorite"
+							]
+						}
+					}
+				},
+				{
+					"name": "Submit Destination Review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 5,\n    \"comment\": \"Incredible experience, breathtaking views and deeply enriching history.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/destinations/1/reviews",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"destinations",
+								"1",
+								"reviews"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin Management",
+			"item": [
+				{
+					"name": "Dashboard Stats & Charts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/dashboard/stats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"dashboard",
+								"stats"
+							]
+						}
+					}
+				},
+				{
+					"name": "Admin List Destinations",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/destinations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"destinations"
+							]
+						}
+					}
+				},
+				{
+					"name": "Admin Reviews Moderation List",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/reviews?status=pending",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"reviews"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "pending"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Approve Review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/reviews/1/approve",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"reviews",
+								"1",
+								"approve"
+							]
+						}
+					}
+				},
+				{
+					"name": "Admin Users List",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"users"
+							]
+						}
+					}
+				},
+				{
+					"name": "Audit Logs",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/audit-logs",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"audit-logs"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Business — Public Directory",
+			"item": [
+				{
+					"name": "Home",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/home",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"home"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Businesses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/businesses?page=1&per_page=12&sort=recommended",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"businesses?page=1&per_page=12&sort=recommended"
+							]
+						}
+					}
+				},
+				{
+					"name": "Business Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/businesses/angkor-boutique-hotel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"businesses",
+								"angkor-boutique-hotel"
+							]
+						}
+					}
+				},
+				{
+					"name": "Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"categories"
+							]
+						}
+					}
+				},
+				{
+					"name": "Provinces",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/provinces",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"provinces"
+							]
+						}
+					}
+				},
+				{
+					"name": "Submit Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/businesses/angkor-boutique-hotel/leads",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"businesses",
+								"angkor-boutique-hotel",
+								"leads"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Sokha Explorer\",\n  \"email\": \"sokha.test@example.com\",\n  \"phone\": \"+855 12 999 888\",\n  \"message\": \"Do you have availability in December?\",\n  \"preferred_contact\": \"email\"\n}"
+						}
+					}
+				},
+				{
+					"name": "List Reviews",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/businesses/angkor-boutique-hotel/reviews?page=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"businesses",
+								"angkor-boutique-hotel",
+								"reviews?page=1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Submit Review (tourist token)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/businesses/angkor-boutique-hotel/reviews",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"businesses",
+								"angkor-boutique-hotel",
+								"reviews"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rating\": 5,\n  \"title\": \"Wonderful stay\",\n  \"body\": \"Warm welcome and a great location.\"\n}"
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Business — Owner Portal",
+			"item": [
+				{
+					"name": "Owner Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"owner@khemaramorodok.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"description": "Sets {{token}} from the owner login response."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"const token = json?.token || json?.data?.token;",
+									"if (token) pm.collectionVariables.set(\"token\", token);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "My Business",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/business",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"business"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update My Business",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/business",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"business"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name_en\": \"Angkor Boutique Hotel\",\n  \"short_description_en\": \"Boutique stay in Siem Reap.\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/stats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"stats"
+							]
+						}
+					}
+				},
+				{
+					"name": "Branches",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/branches",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"branches"
+							]
+						}
+					}
+				},
+				{
+					"name": "Leads",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/leads?page=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"leads?page=1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Lead Note",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/leads/1/notes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"leads",
+								"1",
+								"notes"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"note\": \"Called the guest and shared availability.\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Reviews",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/reviews?page=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"reviews?page=1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Reply To Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/reviews/1/reply",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"reviews",
+								"1",
+								"reply"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reply\": \"Thank you for staying with us.\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/notifications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"notifications"
+							]
+						}
+					}
+				},
+				{
+					"name": "Subscription",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/subscription",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"subscription"
+							]
+						}
+					}
+				},
+				{
+					"name": "Available Plans",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/plans",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"plans"
+							]
+						}
+					}
+				},
+				{
+					"name": "Request Plan Upgrade",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/subscription/request",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"subscription",
+								"request"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_id\": 2,\n  \"billing_cycle\": \"monthly\",\n  \"contact_note\": \"Please contact us for KHQR payment.\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Verifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/verifications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"verifications"
+							]
+						}
+					}
+				},
+				{
+					"name": "Team",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/me/team",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"me",
+								"team"
+							]
+						}
+					}
+				},
+				{
+					"name": "Team (legacy UI endpoint)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/business/owner/team",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"business",
+								"owner",
+								"team"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Business — Staff Admin",
+			"item": [
+				{
+					"name": "Admin Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@khemaramorodok.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"description": "Sets {{adminToken}} from the admin login response."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"const token = json?.token || json?.data?.token;",
+									"if (token) pm.collectionVariables.set(\"adminToken\", token);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List Businesses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/businesses?page=1&per_page=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"businesses?page=1&per_page=20"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Business",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/businesses",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"businesses"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name_en\": \"New Partner Business\",\n  \"name_km\": \"\",\n  \"category_id\": 1,\n  \"province_id\": 1,\n  \"owner_name\": \"New Owner\",\n  \"owner_email\": \"new.owner@example.com\",\n  \"owner_phone\": \"+855 12 000 000\",\n  \"status\": \"pending\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Plans",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/billing/plans",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"billing",
+								"plans"
+							]
+						}
+					}
+				},
+				{
+					"name": "Subscriptions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/billing/subscriptions?page=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"billing",
+								"subscriptions?page=1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Activate Subscription",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/billing/businesses/1/activate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"billing",
+								"businesses",
+								"1",
+								"activate"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_id\": 2,\n  \"billing_cycle\": \"monthly\",\n  \"starts_at\": \"2026-10-23\",\n  \"ends_at\": \"2026-11-22\",\n  \"amount_cents\": 1000\n}"
+						}
+					}
+				},
+				{
+					"name": "Record Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/billing/payments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"billing",
+								"payments"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"subscription_id\": 1,\n  \"amount_cents\": 1000,\n  \"method\": \"khqr\",\n  \"reference\": \"KHQR-20261023-001\",\n  \"paid_at\": \"2026-10-23\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Void Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/billing/payments/1/void",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"billing",
+								"payments",
+								"1",
+								"void"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"void_reason\": \"Duplicate entry\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Verifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/verifications?status=pending",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"verifications?status=pending"
+							]
+						}
+					}
+				},
+				{
+					"name": "Approve Verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/verifications/1/approve",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"verifications",
+								"1",
+								"approve"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"note\": \"Documents verified.\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Invoices",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/invoices?page=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"invoices?page=1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Featured Slots",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/featured-slots",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"featured-slots"
+							]
+						}
+					}
+				},
+				{
+					"name": "Partner Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/partner-requests?page=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"partner-requests?page=1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Metrics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/business/stats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"business",
+								"stats"
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}

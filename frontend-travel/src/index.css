@@ -1,0 +1,1199 @@
+@import './styles/typography.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ================================================================= */
+  /* ANGKOR SANDSTONE & BAS-RELIEF TOKENS                              */
+  /* ================================================================= */
+  :root,
+  [data-theme="sandstone"] {
+    /* stone surfaces - Clean LightLight Palette & Bold Black Text */
+    --stone-50: #FAFAF9;   /* page background: clean luminous LightLight */
+    --stone-100: #FFFFFF;  /* panel / card: pure bright white */
+    --stone-200: #E7E5E4;  /* borders, dividers: clean crisp border */
+    --stone-300: #D6D3D1;  /* stronger borders */
+    --stone-400: #78716C;
+    --stone-500: #57534E;  /* muted icons / labels */
+    --stone-600: #3F3F46;  /* secondary text */
+    --stone-700: #27272A;  /* bold dark charcoal */
+    --stone-800: #18181B;  /* rich dark black */
+    --stone-900: #0A0A0A;  /* main text: bold deep black */
+    --stone-950: #000000;  /* pitch black */
+
+    /* accents */
+    --laterite-600: #A8442A;  /* primary action (white text AA) */
+    --laterite-700: #8A3520;  /* hover/pressed */
+    --moss-600: #4F6B3A;      /* success, nature tags */
+    --gold-500: #C9972B;      /* small highlights only */
+    --river-600: #2F6F8F;     /* links, info */
+    --danger-600: #B3261E;
+
+    /* clean modern shadows */
+    --relief-raise: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+    --relief-sink: inset 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+    --radius-card: 16px;
+    --radius-control: 12px;
+
+    /* semantic tokens */
+    --paper: #FAFAF9;
+    --paper-2: #FFFFFF;
+    --sandstone: #F5F5F4;
+    --ink: #0A0A0A;
+    --ink-soft: #27272A;
+    --color-primary: 168 68 42; /* Laterite RGB */
+    --color-teal: 79 107 58;    /* Moss RGB */
+    --color-temple: 47 111 143; /* River RGB */
+  }
+
+  .dark,
+  html.dark,
+  [data-theme="sandstone"].dark,
+  [data-theme="sandstone"] .dark {
+    /* Dark Theme Surface Palette */
+    --stone-50: #1e1e1e;
+    --stone-100: #2a2a2a;
+    --stone-200: #323232;
+    --stone-300: #363537;
+    --stone-400: #bab6c0;
+    --stone-500: #8a8690;
+    --stone-600: #69676c;
+    --stone-700: #403e41;
+    --stone-800: #323232;
+    --stone-900: #2a2a2a;
+    --stone-950: #1e1e1e;
+
+    /* Monokai Pro (Filter Spectrum) Signature Accents */
+    --laterite-600: #fd9353;  /* Monokai Pro Spectrum Coral Orange (Primary Action) */
+    --laterite-700: #fa7f36;  /* Monokai Pro Spectrum Orange Hover */
+    --moss-600: #7bd88f;      /* Monokai Pro Spectrum Green (Nature / Success) */
+    --gold-500: #fce566;      /* Monokai Pro Spectrum Yellow (Gold / Highlight) */
+    --river-600: #5ad4e6;     /* Monokai Pro Spectrum Cyan (Links / Info) */
+    --danger-600: #fc618d;    /* Monokai Pro Spectrum Red (Danger / Alert) */
+
+    --relief-raise: 0 1px 3px 0 rgba(0, 0, 0, 0.45), 0 1px 2px -1px rgba(0, 0, 0, 0.35);
+    --relief-sink: inset 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+
+    /* semantic tokens in dark mode */
+    --paper: #1e1e1e;
+    --paper-2: #2a2a2a;
+    --sandstone: #323232;
+    --ink: #f7f1ff;           /* Monokai Pro Spectrum crisp foreground text */
+    --ink-soft: #bab6c0;      /* Monokai Pro Spectrum secondary text */
+    --color-primary: 253 147 83; /* Monokai Pro Spectrum Orange RGB */
+  }
+
+  /* Legacy Golden Silk Blueprint theme scoping */
+  [data-theme="blueprint"] {
+    --paper: #FBF5E9;
+    --paper-2: #F6EBD3;
+    --sandstone: #E9D8B4;
+    --gold-300: #F2D27A;
+    --gold-500: #D9A21B;
+    --gold-700: #8A5F08;
+    --saffron: #F28C28;
+    --rose: #D6336C;
+    --teal: #0E7C86;
+    --indigo: #1F2A6B;
+    --ink: #1B1A24;
+    --ink-soft: #5A5566;
+    --blueprint: #0F1B3D;
+    --blueprint-line: #5E7BC4;
+    --blueprint-gold: #F2C14E;
+  }
+  [data-theme="blueprint"].dark,
+  [data-theme="blueprint"] .dark {
+    --paper: #0B101D;
+    --paper-2: #0F1B3D;
+    --sandstone: #192548;
+    --ink: #FBF5E9;
+    --ink-soft: #A3A8BC;
+    --blueprint: #0A0F1E;
+    --blueprint-line: #5E7BC4;
+    --blueprint-gold: #F2C14E;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    background-color: #FAFAF9;
+    color: #0A0A0A;
+  }
+  html.dark,
+  .dark html {
+    background-color: #1e1e1e;
+    color: #f7f1ff;
+  }
+
+  body {
+    min-width: 320px;
+    overflow-x: hidden;
+    background-color: #FAFAF9;
+    color: #0A0A0A;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  html.dark body,
+  .dark body {
+    background-color: #1e1e1e;
+    color: #f7f1ff;
+  }
+
+  /* Remove 300ms tap delay on mobile controls */
+  button, a, input, select, textarea, [role="button"] {
+    touch-action: manipulation;
+  }
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #363537;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #49474b;
+}
+
+/* Leaflet map styles container */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  border-radius: 0.25rem;
+}
+
+/* Leaflet Dark Theme for Monokai Pro (Filter Spectrum) Palette */
+.dark .leaflet-popup-content-wrapper,
+html.dark .leaflet-popup-content-wrapper,
+[data-theme="sandstone"].dark .leaflet-popup-content-wrapper {
+  background-color: #2a2a2a !important;
+  color: #f7f1ff !important;
+  border: 1px solid #363537 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark .leaflet-popup-tip,
+html.dark .leaflet-popup-tip,
+[data-theme="sandstone"].dark .leaflet-popup-tip {
+  background-color: #2a2a2a !important;
+}
+
+.dark .leaflet-bar a,
+html.dark .leaflet-bar a,
+[data-theme="sandstone"].dark .leaflet-bar a {
+  background-color: #2a2a2a !important;
+  color: #f7f1ff !important;
+  border-color: #363537 !important;
+}
+
+.dark .leaflet-bar a:hover,
+html.dark .leaflet-bar a:hover,
+[data-theme="sandstone"].dark .leaflet-bar a:hover {
+  background-color: #323232 !important;
+  color: #f7f1ff !important;
+}
+
+/* Swiss / Editorial Magazine Design Tokens */
+.hairline-b {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+.dark .hairline-b {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hairline-t {
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+.dark .hairline-t {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hairline-r {
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+}
+.dark .hairline-r {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hairline-border {
+  border: 1px solid rgba(15, 23, 42, 0.09);
+}
+.dark .hairline-border {
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+/* Swiss Grid Crosshair Marker */
+.swiss-crosshair {
+  position: relative;
+}
+.swiss-crosshair::before, .swiss-crosshair::after {
+  content: '';
+  position: absolute;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+/* Editorial Drop Cap */
+.editorial-dropcap::first-letter {
+  float: left;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 3.5rem;
+  line-height: 0.85;
+  padding-right: 0.6rem;
+  padding-top: 0.2rem;
+  font-weight: 700;
+  color: #D4A017;
+}
+
+/* Magazine Masthead Strip Animation */
+@keyframes tickerSlide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-ticker {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: tickerSlide 35s linear infinite;
+}
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+/* Infinite Testimonial Marquee Animation */
+@keyframes marqueeLeft {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee-left {
+  display: flex !important;
+  width: max-content !important;
+  animation: marqueeLeft 32s linear infinite !important;
+  will-change: transform;
+}
+
+.animate-marquee-left:hover {
+  animation-play-state: paused;
+}
+
+/* Floating Animations for Layered Atlas Showcase */
+@keyframes floatGentle1 {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes floatGentle2 {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+@keyframes floatGentle3 {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float-1 {
+  animation: floatGentle1 6.5s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: floatGentle2 7.5s ease-in-out infinite;
+}
+
+.animate-float-3 {
+  animation: floatGentle3 8.5s ease-in-out 1s infinite;
+}
+
+/* Glassmorphism helpers */
+.glass-nav {
+  background: rgba(248, 247, 244, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.dark .glass-nav {
+  background: rgba(34, 34, 34, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.dark .glass-card {
+  background: rgba(42, 42, 42, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #363537;
+}
+
+/* 35mm Darkroom Film Aesthetic */
+.film-frame {
+  position: relative;
+  border-top: 14px solid #14171e;
+  border-bottom: 14px solid #14171e;
+}
+
+.film-frame::before {
+  content: "■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■";
+  position: absolute;
+  top: -12px;
+  left: 6px;
+  right: 6px;
+  font-family: monospace;
+  font-size: 8px;
+  letter-spacing: 12px;
+  color: #4b5563;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.film-frame::after {
+  content: "■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■";
+  position: absolute;
+  bottom: -12px;
+  left: 6px;
+  right: 6px;
+  font-family: monospace;
+  font-size: 8px;
+  letter-spacing: 12px;
+  color: #4b5563;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Magazine paper texture */
+.paper-texture {
+  background-color: #FAFAF9;
+  background-image: radial-gradient(#e5e7eb 0.75px, transparent 0.75px);
+  background-size: 16px 16px;
+}
+.dark .paper-texture {
+  background-color: #1e1e1e;
+  background-image: radial-gradient(#363537 0.75px, transparent 0.75px);
+  background-size: 16px 16px;
+}
+
+/* ================================================================= */
+/* KHMER SILK & GOLDEN HOUR + KHMER ARCHITECTURAL BLUEPRINT TOKENS   */
+/* (រចនាបថសូត្រខ្មែរ រស្មីពណ៌មាស និងប្លង់ស្ថាបត្យកម្មខ្មែរ)           */
+/* ================================================================= */
+
+/* 1. Khmer Architectural Blueprint Grid (គំនូរប្លង់ស្ថាបត្យកម្ម) */
+.blueprint-grid {
+  background-size: 24px 24px;
+  background-image: 
+    linear-gradient(to right, rgba(217, 119, 6, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(217, 119, 6, 0.07) 1px, transparent 1px);
+}
+
+.dark .blueprint-grid {
+  background-image: 
+    linear-gradient(to right, rgba(245, 158, 11, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(245, 158, 11, 0.09) 1px, transparent 1px);
+}
+
+.blueprint-major-grid {
+  background-size: 96px 96px;
+  background-image: 
+    linear-gradient(to right, rgba(217, 119, 6, 0.14) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(217, 119, 6, 0.14) 1px, transparent 1px);
+}
+
+.dark .blueprint-major-grid {
+  background-image: 
+    linear-gradient(to right, rgba(245, 158, 11, 0.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(245, 158, 11, 0.18) 1px, transparent 1px);
+}
+
+/* 2. Khmer Silk Texture (សូត្រខ្មែរ / ហូលពិតាន / គោមផ្កាចន្ទន៍) */
+.silk-weave-pattern {
+  background-color: #FAF7F0;
+  background-image: 
+    radial-gradient(#ecd5b0 0.8px, transparent 0.8px),
+    repeating-linear-gradient(45deg, rgba(245, 158, 11, 0.03) 0, rgba(245, 158, 11, 0.03) 1px, transparent 0, transparent 8px),
+    repeating-linear-gradient(-45deg, rgba(217, 119, 6, 0.03) 0, rgba(217, 119, 6, 0.03) 1px, transparent 0, transparent 8px);
+}
+
+.dark .silk-weave-pattern {
+  background-color: #0A0D15;
+  background-image: 
+    radial-gradient(#252219 0.8px, transparent 0.8px),
+    repeating-linear-gradient(45deg, rgba(245, 158, 11, 0.04) 0, rgba(245, 158, 11, 0.04) 1px, transparent 0, transparent 8px),
+    repeating-linear-gradient(-45deg, rgba(217, 119, 6, 0.04) 0, rgba(217, 119, 6, 0.04) 1px, transparent 0, transparent 8px);
+}
+
+/* 3. Golden Hour Radiance (រស្មីពណ៌មាស / ពន្លឺថ្ងៃរៀបលិច) */
+.golden-hour-glow {
+  box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.28), 0 0 15px -3px rgba(217, 119, 6, 0.2);
+}
+
+.golden-hour-text {
+  background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 45%, #D97706 75%, #92400E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .golden-hour-text {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FBBF24 45%, #F59E0B 75%, #D97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.golden-hour-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(254, 249, 238, 0.98) 100%);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  box-shadow: 0 4px 20px -2px rgba(217, 119, 6, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .golden-hour-card {
+  background: linear-gradient(180deg, rgba(42, 42, 42, 0.96) 0%, rgba(34, 34, 34, 0.98) 100%);
+  border: 1px solid rgba(253, 147, 83, 0.28);
+  box-shadow: 0 4px 25px -2px rgba(0, 0, 0, 0.6);
+}
+
+.golden-hour-card:hover {
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 12px 32px -4px rgba(245, 158, 11, 0.22);
+  transform: translateY(-3px);
+}
+
+/* 4. Architectural Blueprint Frame & Callout */
+.blueprint-frame {
+  position: relative;
+  border: 1px solid rgba(217, 119, 6, 0.35);
+}
+.dark .blueprint-frame {
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.blueprint-frame::before {
+  content: "";
+  position: absolute;
+  top: -1px; left: -1px; width: 10px; height: 10px;
+  border-top: 2px solid #F59E0B;
+  border-left: 2px solid #F59E0B;
+}
+
+.blueprint-frame::after {
+  content: "";
+  position: absolute;
+  bottom: -1px; right: -1px; width: 10px; height: 10px;
+  border-bottom: 2px solid #F59E0B;
+  border-right: 2px solid #F59E0B;
+}
+
+/* 5. Silk Thread Divider */
+.silk-thread {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.3) 15%, #F59E0B 50%, rgba(245, 158, 11, 0.3) 85%, transparent 100%);
+}
+
+/* ================================================================= */
+/* NEW LUXURY KHMER SILK & GOLDEN HOUR DESIGN SYSTEM                 */
+/* (រចនាបថសូត្រខ្មែរ រលោងស្រទន់ និងរស្មីសុវណ្ណភូមិថ្មីស្រឡាង)            */
+/* ================================================================= */
+
+/* Silk Glass Panel - Curved, translucent, with golden rim */
+.silk-glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  box-shadow: 0 15px 40px -10px rgba(217, 119, 6, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+}
+
+.dark .silk-glass {
+  background: rgba(34, 34, 34, 0.86);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(253, 147, 83, 0.25);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(253, 147, 83, 0.15);
+}
+
+/* Golden Hour Ambient Sunset Aura */
+.golden-hour-aura {
+  background: radial-gradient(circle at 50% 10%, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.08) 40%, transparent 75%);
+}
+
+.dark .golden-hour-aura {
+  background: radial-gradient(circle at 50% 10%, rgba(245, 158, 11, 0.25) 0%, rgba(180, 83, 9, 0.12) 45%, transparent 80%);
+}
+
+/* Luxury Silk Card - Modern rounded curves with silky depth */
+.silk-card-luxury {
+  border-radius: 1.5rem;
+  background: linear-gradient(175deg, rgba(255, 255, 255, 0.98) 0%, rgba(254, 250, 242, 0.95) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  box-shadow: 0 10px 30px -5px rgba(217, 119, 6, 0.08);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .silk-card-luxury {
+  background: linear-gradient(175deg, rgba(42, 42, 42, 0.96) 0%, rgba(34, 34, 34, 0.98) 100%);
+  border: 1px solid #363537;
+  box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.7);
+}
+
+.silk-card-luxury:hover {
+  transform: translateY(-5px);
+  border-color: rgba(245, 158, 11, 0.55);
+  box-shadow: 0 22px 45px -8px rgba(245, 158, 11, 0.25);
+}
+
+/* Royal Silk Ribbon Badge */
+.silk-ribbon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1rem;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, rgba(254, 243, 199, 0.9) 0%, rgba(253, 230, 138, 0.9) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #92400E;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+
+.dark .silk-ribbon {
+  background: linear-gradient(90deg, rgba(253, 147, 83, 0.25) 0%, rgba(252, 229, 102, 0.2) 100%);
+  border: 1px solid rgba(253, 147, 83, 0.45);
+  color: #fce566;
+  box-shadow: 0 2px 12px rgba(253, 147, 83, 0.2);
+}
+
+/* Shimmering Gold Accent */
+@keyframes goldShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.gold-shimmer-text {
+  background: linear-gradient(90deg, #8A5F08 0%, #D9A21B 25%, #F28C28 50%, #D9A21B 75%, #8A5F08 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: goldShimmer 6s linear infinite;
+}
+
+.dark .gold-shimmer-text {
+  background: linear-gradient(90deg, #F59E0B 0%, #FCD34D 25%, #FFFBEB 50%, #FCD34D 75%, #F59E0B 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: goldShimmer 6s linear infinite;
+}
+
+/* Golden Hour sunset glow highlight */
+.golden-sun-orb {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.08) 50%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Golden Silk Blueprint - Architectural grid & drafting markers */
+.blueprint-grid-subtle {
+  background-image: 
+    linear-gradient(to right, rgba(217, 162, 27, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(217, 162, 27, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.dark .blueprint-grid-subtle {
+  background-image: 
+    linear-gradient(to right, rgba(94, 123, 196, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(94, 123, 196, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.blueprint-border {
+  border: 1px solid rgba(217, 162, 27, 0.28);
+}
+.dark .blueprint-border {
+  border: 1px solid rgba(94, 123, 196, 0.28);
+}
+
+.blueprint-crop-box {
+  position: relative;
+}
+.blueprint-crop-box::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #D9A21B;
+  border-left: 2px solid #D9A21B;
+  pointer-events: none;
+  z-index: 10;
+}
+.blueprint-crop-box::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid #D9A21B;
+  border-right: 2px solid #D9A21B;
+  pointer-events: none;
+  z-index: 10;
+}
+.dark .blueprint-crop-box::before,
+.dark .blueprint-crop-box::after {
+  border-color: #F2C14E;
+}
+
+.golden-silk-surface {
+  background: linear-gradient(180deg, rgba(253, 249, 240, 0.96) 0%, rgba(246, 235, 211, 0.92) 100%);
+}
+.dark .golden-silk-surface {
+  background: linear-gradient(180deg, rgba(15, 27, 61, 0.9) 0%, rgba(11, 16, 29, 0.95) 100%);
+}
+
+/* Custom Native Select and Option Styling */
+select {
+  background-color: transparent;
+  color: inherit;
+}
+
+/* Universal Styled Native Select with Custom Angkor Amber Chevron */
+select.input-carved,
+select.filter-select,
+.filter-select select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23B45309' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem 1rem;
+  padding-right: 2.25rem !important;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.dark select.input-carved,
+.dark select.filter-select,
+.dark .filter-select select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fd9353' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+}
+
+select option {
+  background-color: #FFFFFF;
+  color: #0A0A0A;
+  font-family: var(--font-km);
+  font-size: 15px;
+  padding: 10px 14px;
+}
+
+.dark select option,
+html.dark select option,
+[data-theme="sandstone"].dark select option {
+  background-color: #2a2a2a;
+  color: #f7f1ff;
+}
+
+select option:checked {
+  background-color: var(--laterite-600) !important;
+  color: #FFFFFF !important;
+  font-weight: 700;
+}
+
+.dark select option:checked,
+html.dark select option:checked,
+[data-theme="sandstone"].dark select option:checked {
+  background-color: #fd9353 !important;
+  color: #1e1e1e !important;
+  font-weight: 700;
+}
+
+/* Universal Form Elements in Dark Mode */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
+.dark textarea,
+.dark select {
+  color-scheme: dark;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #69676c;
+}
+
+/* ================================================================= */
+/* ANGKOR SANDSTONE & BAS-RELIEF COMPONENT UTILITIES                 */
+/* ================================================================= */
+
+/* 1. Clean Surface Wrapper (Allows default Khmer cultural background to display) */
+.stone-grain {
+  position: relative;
+  background-color: transparent !important;
+  color: var(--stone-900);
+}
+.dark .stone-grain,
+html.dark .stone-grain,
+[data-theme="sandstone"].dark .stone-grain,
+[data-theme="sandstone"] .dark .stone-grain {
+  background-color: transparent !important;
+  color: #f7f1ff;
+}
+.stone-grain::before {
+  display: none;
+}
+
+/* Ensure page root containers inside <main> are transparent so default background applies to all pages */
+main .stone-grain,
+main [class*="stone-grain"],
+main > div > div.stone-grain,
+main > div > div[class*="min-h-"],
+main div.min-h-screen,
+main div.min-h-\[100dvh\],
+main div[class*="min-h-"] {
+  background-color: transparent !important;
+}
+
+/* 2. Clean Modern Panels */
+.panel-raised {
+  background-color: var(--stone-100);
+  border: 1px solid var(--stone-200);
+  border-radius: var(--radius-card);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+.dark .panel-raised,
+html.dark .panel-raised,
+[data-theme="sandstone"].dark .panel-raised,
+[data-theme="sandstone"] .dark .panel-raised {
+  background-color: #2a2a2a;
+  border-color: #363537;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.45), 0 1px 2px -1px rgba(0, 0, 0, 0.35);
+}
+.panel-raised-hover:hover {
+  transform: translateY(-2px);
+  border-color: var(--stone-300);
+  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+}
+.dark .panel-raised-hover:hover {
+  border-color: #49474b;
+  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.5), 0 2px 6px -2px rgba(0, 0, 0, 0.4);
+}
+
+/* 3. Clean Modern Form Inputs */
+.input-carved {
+  background-color: var(--stone-50);
+  color: var(--stone-900);
+  border: 1px solid var(--stone-200);
+  border-radius: var(--radius-control);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+  min-height: 48px;
+  font-size: 1rem;
+  padding: 0.625rem 1rem;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+.input-carved:focus,
+.input-carved:focus-within {
+  outline: none;
+  border-color: var(--laterite-600);
+  box-shadow: 0 0 0 3px rgba(168, 68, 42, 0.15);
+}
+
+/* Dark mode for .input-carved across all searchbars, dropdowns, inputs, forms */
+.dark .input-carved,
+html.dark .input-carved,
+[data-theme="sandstone"].dark .input-carved,
+[data-theme="sandstone"] .dark .input-carved {
+  background-color: #1e1e1e !important;
+  color: #f7f1ff !important;
+  border-color: #363537 !important;
+  box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.5) !important;
+}
+.dark .input-carved::placeholder,
+html.dark .input-carved::placeholder,
+[data-theme="sandstone"].dark .input-carved::placeholder,
+[data-theme="sandstone"] .dark .input-carved::placeholder {
+  color: #69676c !important;
+}
+.dark .input-carved:focus,
+.dark .input-carved:focus-within,
+html.dark .input-carved:focus,
+html.dark .input-carved:focus-within,
+[data-theme="sandstone"].dark .input-carved:focus,
+[data-theme="sandstone"] .dark .input-carved:focus {
+  border-color: #fd9353 !important;
+  box-shadow: 0 0 0 3px rgba(253, 147, 83, 0.25) !important;
+}
+
+/* 4. Angkor Sandstone Action Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  background-color: var(--laterite-600);
+  color: #FFFFFF !important;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius-control);
+  box-shadow: var(--relief-raise);
+  transition: all 120ms ease;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-decoration: none;
+}
+.dark .btn-primary,
+html.dark .btn-primary {
+  color: #181411 !important;
+  font-weight: 700;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.btn-primary:hover {
+  background-color: var(--laterite-700);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  box-shadow: var(--relief-sink) !important;
+  transform: translateY(1px) scale(0.99) !important;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  background-color: var(--stone-100);
+  color: var(--stone-900);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--stone-300);
+  box-shadow: var(--relief-raise);
+  transition: all 120ms ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.dark .btn-secondary,
+html.dark .btn-secondary,
+[data-theme="sandstone"].dark .btn-secondary {
+  background-color: #2a2a2a;
+  color: #f7f1ff;
+  border-color: #363537;
+}
+.btn-secondary:hover {
+  background-color: var(--stone-200);
+}
+.dark .btn-secondary:hover,
+html.dark .btn-secondary:hover,
+[data-theme="sandstone"].dark .btn-secondary:hover {
+  background-color: #323232;
+  border-color: #49474b;
+  color: #f7f1ff;
+}
+.btn-secondary:active {
+  box-shadow: var(--relief-sink) !important;
+  transform: translateY(1px) scale(0.99) !important;
+}
+
+/* 5. Chips / Filter Tablets */
+.chip-tablet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 40px;
+  padding: 0.4rem 0.875rem;
+  border-radius: 9999px;
+  background-color: var(--stone-100);
+  border: 1px solid var(--stone-200);
+  color: var(--stone-700);
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: var(--relief-raise);
+  transition: all 120ms ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dark .chip-tablet,
+html.dark .chip-tablet,
+[data-theme="sandstone"].dark .chip-tablet {
+  background-color: #2a2a2a;
+  border-color: #363537;
+  color: #bab6c0;
+}
+.chip-tablet:hover {
+  border-color: var(--stone-300);
+  color: var(--stone-900);
+}
+.dark .chip-tablet:hover,
+html.dark .chip-tablet:hover,
+[data-theme="sandstone"].dark .chip-tablet:hover {
+  border-color: #49474b;
+  color: #f7f1ff;
+}
+.chip-tablet-active {
+  border-color: var(--laterite-600) !important;
+  background-color: rgba(168, 68, 42, 0.08) !important;
+  color: var(--laterite-600) !important;
+  font-weight: 600;
+}
+.dark .chip-tablet-active {
+  border-color: #fd9353 !important;
+  background-color: rgba(253, 147, 83, 0.16) !important;
+  color: #fd9353 !important;
+}
+
+/* 6. Stepped Temple Lintel Frame Moulding */
+.lintel-frame {
+  position: relative;
+  border: 1px solid var(--stone-300);
+  padding: 4px;
+  background-color: var(--stone-100);
+  border-radius: var(--radius-card);
+  box-shadow: var(--relief-raise);
+}
+.dark .lintel-frame,
+html.dark .lintel-frame,
+[data-theme="sandstone"].dark .lintel-frame {
+  background-color: #2a2a2a;
+  border-color: #363537;
+}
+.lintel-frame-inner {
+  border: 1px solid var(--stone-300);
+  border-radius: calc(var(--radius-card) - 4px);
+  overflow: hidden;
+  position: relative;
+}
+.dark .lintel-frame-inner,
+html.dark .lintel-frame-inner,
+[data-theme="sandstone"].dark .lintel-frame-inner {
+  border-color: #363537;
+}
+
+/* 7. Subtle Focus Ring for Accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--river-600) !important;
+  outline-offset: 2px !important;
+}
+
+/* Exclude integrated dropdown inputs from harsh outer outline */
+.no-focus-outline:focus,
+.no-focus-outline:focus-visible,
+[role="listbox"] input:focus-visible,
+[role="listbox"] input:focus {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+
+/* 8. Mobile Safe Area & Responsiveness Helpers */
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-left {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+.safe-right {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+.overscroll-contain {
+  overscroll-behavior: contain;
+}
+.overscroll-y-contain {
+  overscroll-behavior-y: contain;
+}
+.overscroll-x-contain {
+  overscroll-behavior-x: contain;
+}
+
+/* Prevent long text from causing horizontal overflow */
+.break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* 9. Off-canvas Left Slide-in Drawer Animation */
+@keyframes slideFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-left {
+  animation: slideFromLeft 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 10. Universal Scrollbar Suppression */
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important; /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* ================================================================= */
+/* 11. MONOKAI PRO (FILTER SPECTRUM) EXPLICIT FIDELITY TOKENS        */
+/* ================================================================= */
+.dark .dark\:text-stone-100,
+html.dark .dark\:text-stone-100,
+[data-theme="sandstone"].dark .dark\:text-stone-100 {
+  color: #f7f1ff !important;
+}
+.dark .dark\:text-stone-200,
+html.dark .dark\:text-stone-200,
+[data-theme="sandstone"].dark .dark\:text-stone-200 {
+  color: #ebe5f2 !important;
+}
+.dark .dark\:text-stone-300,
+html.dark .dark\:text-stone-300,
+[data-theme="sandstone"].dark .dark\:text-stone-300 {
+  color: #d8d2df !important;
+}
+.dark .dark\:text-stone-400,
+html.dark .dark\:text-stone-400,
+[data-theme="sandstone"].dark .dark\:text-stone-400 {
+  color: #bab6c0 !important;
+}
+.dark .dark\:text-stone-500,
+html.dark .dark\:text-stone-500,
+[data-theme="sandstone"].dark .dark\:text-stone-500 {
+  color: #8a8690 !important;
+}
+.dark .dark\:text-stone-600,
+html.dark .dark\:text-stone-600,
+[data-theme="sandstone"].dark .dark\:text-stone-600 {
+  color: #69676c !important;
+}
+
+.dark .dark\:border-stone-800,
+html.dark .dark\:border-stone-800,
+[data-theme="sandstone"].dark .dark\:border-stone-800 {
+  border-color: #363537 !important;
+}
+.dark .dark\:border-stone-700,
+html.dark .dark\:border-stone-700,
+[data-theme="sandstone"].dark .dark\:border-stone-700 {
+  border-color: #403e41 !important;
+}
+
+.dark .dark\:bg-stone-900,
+html.dark .dark\:bg-stone-900,
+[data-theme="sandstone"].dark .dark\:bg-stone-900 {
+  background-color: #2a2a2a !important;
+}
+
+.dark .dark\:bg-stone-900\/90,
+html.dark .dark\:bg-stone-900\/90,
+[data-theme="sandstone"].dark .dark\:bg-stone-900\/90 {
+  background-color: rgba(42, 42, 42, 0.9) !important;
+}
+
+.dark .dark\:bg-stone-900\/95,
+html.dark .dark\:bg-stone-900\/95,
+[data-theme="sandstone"].dark .dark\:bg-stone-900\/95 {
+  background-color: rgba(42, 42, 42, 0.95) !important;
+}
+
+.dark .dark\:bg-stone-950,
+html.dark .dark\:bg-stone-950,
+[data-theme="sandstone"].dark .dark\:bg-stone-950 {
+  background-color: #1e1e1e !important;
+}
+
+.dark .dark\:bg-stone-950\/90,
+html.dark .dark\:bg-stone-950\/90,
+[data-theme="sandstone"].dark .dark\:bg-stone-950\/90 {
+  background-color: rgba(30, 30, 30, 0.9) !important;
+}
+
+.dark .dark\:bg-stone-800,
+html.dark .dark\:bg-stone-800,
+[data-theme="sandstone"].dark .dark\:bg-stone-800 {
+  background-color: #323232 !important;
+}
+
+/* Below-the-fold content optimization for smooth 60fps scrolling */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 600px;
+}
+
+/* Respect user accessibility preferences without freezing essential marquees */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+}
+
+
+
