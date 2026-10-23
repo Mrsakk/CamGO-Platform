@@ -59,22 +59,7 @@ In accordance with Phase 2 (Step 2A) specifications, the following architectural
 8. **Phase 3 Portal Separation Complete**: Staff use `/admin/*` in `admin-business` (port 5176) with the staff-only `AdminRoute` guard. Owners use `/owner/*` in `frontend-business` (port 5175) with the `OwnerRoute` guard and owner-only navigation. Backend owner endpoints require the `owner` middleware (`auth:sanctum` + linked active business). Cross-portal access is rejected on both the frontend and API.
 9. **Phase 4 Partner Success Complete**: Owners now have lead tracking, review replies, in-app/Telegram notification preferences, business team roles, category-specific profile fields, profile scoring, a 14-day Featured trial, and renewal guidance. Access is capability-based (`business.can`) for `owner`, `manager`, `editor`, and `viewer` memberships. Trials require an 80% profile score, KYC verification, and no prior trial. Payments remain manual KHQR/cash/bank settlement; there is still no automated gateway, commission, payout, or booking engine.
 
----
 
-## 🔑 Default Credentials
-
-All accounts share the default development password: `password123`. Demo login emails retain the legacy domain for backward compatibility; visible product branding is CamGO.
-
-| Role | Email | Password | Permissions |
-| :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin@khemaramorodok.com` | `password123` | Full access across Travel & Business modules |
-| **Business Manager** | `bizmanager@khemaramorodok.com` | `password123` | Manage businesses, contacts, hours, photos, moderation |
-| **Content Manager** | `manager@khemaramorodok.com` | `password123` | Manage Travel destinations, articles, and banners |
-| **Moderator** | `moderator@khemaramorodok.com` | `password123` | Moderate visitor reviews and comments |
-| **Business Owner** | `owner@khemaramorodok.com` | `password123` | Owner portal only, scoped to the linked demo business |
-| **Tourist User** | `sokha@example.com` | `password123` | Public user account |
-
----
 
 ## 📂 Monorepo Architecture
 
