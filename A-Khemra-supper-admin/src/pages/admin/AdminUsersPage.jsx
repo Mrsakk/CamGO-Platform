@@ -9,6 +9,7 @@ import { adminApi } from "@/lib/api/admin";
 import { queryKeys } from "@/lib/queryKeys";
 import { useDebounce } from "@/lib/useDebounce";
 import { toast } from "@/store/toastStore";
+import { getImageUrl } from "@/lib/utils";
 
 const AdminUsersPage = () => {
   const queryClient = useQueryClient();
@@ -146,8 +147,12 @@ const AdminUsersPage = () => {
                         <div className="flex items-center gap-3">
                           {u.avatar ? (
                             <img
-                              src={u.avatar}
+                              src={getImageUrl(u.avatar)}
                               alt={u.name}
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || "User")}&background=c2410c&color=fff&bold=true`;
+                              }}
                               className="w-9 h-9 rounded-full object-cover border border-amber-500"
                             />
                           ) : (

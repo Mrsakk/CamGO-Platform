@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
 import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+import { getImageUrl } from "@/lib/utils";
 
 const AdminBannersPage = () => {
   const queryClient = useQueryClient();
@@ -124,10 +125,14 @@ const AdminBannersPage = () => {
   >
               <div className="aspect-[16/9] overflow-hidden bg-stone-100 dark:bg-stone-800 relative">
                 <img
-    src={b.image_url || "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=600&q=80"}
-    alt="banner"
-    className="w-full h-full object-cover"
-  />
+                  src={getImageUrl(b.image_url, "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=600&q=80")}
+                  alt="banner"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=600&q=80";
+                  }}
+                  className="w-full h-full object-cover"
+                />
                 <span
     className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-small font-bold ${b.is_active ? "bg-emerald-600 text-white" : "bg-stone-800/80 text-stone-300"}`}
   >

@@ -27,6 +27,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
 import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+import { getImageUrl } from "@/lib/utils";
 
 const AdminDashboardPage = () => {
   const { t } = useTranslation();
@@ -339,11 +340,17 @@ const AdminDashboardPage = () => {
             {topDestinations.map((dest, idx) => <div key={dest.id} className="py-3 flex items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="w-5 font-bold text-stone-400">{idx + 1}</span>
-                  {dest.cover_image && <img
-    src={dest.cover_image}
-    alt={dest.name_en}
-    className="w-10 h-10 rounded-xl object-cover"
-  />}
+                  {dest.cover_image && (
+                    <img
+                      src={getImageUrl(dest.cover_image, "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=80&q=80")}
+                      alt={dest.name_en}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=80&q=80";
+                      }}
+                      className="w-10 h-10 rounded-xl object-cover bg-stone-200"
+                    />
+                  )}
                   <div className="min-w-0">
                     <span className="font-bold text-stone-900 dark:text-stone-900 block truncate">
                       {dest.name_en}

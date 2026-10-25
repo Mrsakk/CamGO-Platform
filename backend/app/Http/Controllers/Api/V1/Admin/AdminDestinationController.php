@@ -104,8 +104,7 @@ class AdminDestinationController extends ApiController
         ]);
 
         if ($hasCover) {
-            $path = $request->file($coverFileKey)->store('destinations', 'public');
-            $validated['cover_image'] = Storage::url($path);
+            $validated['cover_image'] = \App\Services\StorageService::upload($request->file($coverFileKey), 'destinations', 'cover');
         }
         unset($validated['image']);
 
@@ -199,8 +198,7 @@ class AdminDestinationController extends ApiController
         ]);
 
         if ($hasCover) {
-            $path = $request->file($coverFileKey)->store('destinations', 'public');
-            $validated['cover_image'] = Storage::url($path);
+            $validated['cover_image'] = \App\Services\StorageService::upload($request->file($coverFileKey), 'destinations', 'cover');
 
             DestinationImage::updateOrCreate(
                 ['destination_id' => $destination->id, 'is_cover' => true],
@@ -308,8 +306,7 @@ class AdminDestinationController extends ApiController
         $created = [];
 
         foreach ($files as $index => $file) {
-            $path = $file->store('destinations/' . $destination->id, 'public');
-            $imageUrl = Storage::url($path);
+            $imageUrl = \App\Services\StorageService::upload($file, 'destinations', 'dest_' . $destination->id);
             $isCover = $index === 0 && $request->boolean('is_cover');
 
             $created[] = DestinationImage::create([

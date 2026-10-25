@@ -18,6 +18,7 @@ import { categoriesApi } from "@/lib/api/categories";
 import { queryKeys } from "@/lib/queryKeys";
 import { useDebounce } from "@/lib/useDebounce";
 import { toast } from "@/store/toastStore";
+import { getImageUrl } from "@/lib/utils";
 
 const AdminDestinationsPage = () => {
   const navigate = useNavigate();
@@ -232,10 +233,14 @@ const AdminDestinationsPage = () => {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <img
-    src={dest.cover_image || "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=120&q=80"}
-    alt={dest.name_en}
-    className="w-12 h-10 rounded-lg object-cover bg-stone-200"
-  />
+                          src={getImageUrl(dest.cover_image, "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=120&q=80")}
+                          alt={dest.name_en}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=120&q=80";
+                          }}
+                          className="w-12 h-10 rounded-lg object-cover bg-stone-200"
+                        />
                         <div>
                           <span className="font-bold text-stone-900 dark:text-stone-900 block truncate max-w-xs">
                             {dest.name_en}

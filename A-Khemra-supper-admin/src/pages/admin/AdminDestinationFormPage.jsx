@@ -17,6 +17,7 @@ import { provincesApi } from "@/lib/api/provinces";
 import { categoriesApi } from "@/lib/api/categories";
 import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+import { getImageUrl } from "@/lib/utils";
 
 const AdminDestinationFormPage = () => {
   const { id } = useParams();
@@ -97,7 +98,7 @@ const AdminDestinationFormPage = () => {
           setIsFeatured(Boolean(d.is_featured));
           setIsActive(Boolean(d.is_active));
           setHighlights(d.highlights && d.highlights.length > 0 ? d.highlights : [""]);
-          if (d.cover_image) setCoverPreview(d.cover_image);
+          if (d.cover_image) setCoverPreview(getImageUrl(d.cover_image));
           if (d.images) setExistingImages(d.images);
         }
       }).catch(() => toast.error("Failed to load attraction")).finally(() => setIsLoading(false));
@@ -544,11 +545,17 @@ const AdminDestinationFormPage = () => {
                 Cover Photo (Primary)
               </label>
               <div className="flex items-center gap-4">
-                {coverPreview && <img
-    src={coverPreview}
-    alt="cover preview"
-    className="w-28 h-20 rounded-xl object-cover border border-amber-500 shadow-sm"
-  />}
+                {coverPreview && (
+                  <img
+                    src={coverPreview}
+                    alt="cover preview"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=200&q=80";
+                    }}
+                    className="w-28 h-20 rounded-xl object-cover border border-amber-500 shadow-sm"
+                  />
+                )}
                 <input
     type="file"
     accept="image/*"
@@ -585,7 +592,15 @@ const AdminDestinationFormPage = () => {
                 </span>
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
                   {existingImages.map((img) => <div key={img.id} className="relative group rounded-xl overflow-hidden aspect-[4/3]">
-                      <img src={img.image_url} alt="gallery" className="w-full h-full object-cover" />
+                      <img
+                        src={getImageUrl(img.image_url)}
+                        alt="gallery"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=200&q=80";
+                        }}
+                        className="w-full h-full object-cover"
+                      />
                       <button
     type="button"
     onClick={() => handleDeleteExistingImage(img.id)}

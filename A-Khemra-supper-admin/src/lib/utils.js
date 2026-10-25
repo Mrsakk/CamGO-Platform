@@ -16,8 +16,11 @@ function formatPrice(usdVal, lang = "km") {
 }
 function getImageUrl(path, fallback = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80") {
   if (!path) return fallback;
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  const storageBase = import.meta.env.VITE_STORAGE_URL || "http://localhost:8000";
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) return path;
+  const storageBase =
+    import.meta.env.VITE_STORAGE_URL ||
+    (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api\/v1\/?$/, "") : "") ||
+    "https://backend-api-two-theta.vercel.app";
   return `${storageBase}${path.startsWith("/") ? path : "/" + path}`;
 }
 function truncate(text, length = 100) {

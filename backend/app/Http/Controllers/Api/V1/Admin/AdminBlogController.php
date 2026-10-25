@@ -63,8 +63,7 @@ class AdminBlogController extends ApiController
         ]);
 
         if ($hasCover) {
-            $path = $request->file($coverFileKey)->store('blog', 'public');
-            $validated['cover_image'] = Storage::url($path);
+            $validated['cover_image'] = \App\Services\StorageService::upload($request->file($coverFileKey), 'blog', 'blog');
         }
         unset($validated['image']);
 
@@ -122,8 +121,7 @@ class AdminBlogController extends ApiController
         ]);
 
         if ($hasCover) {
-            $path = $request->file($coverFileKey)->store('blog', 'public');
-            $validated['cover_image'] = Storage::url($path);
+            $validated['cover_image'] = \App\Services\StorageService::upload($request->file($coverFileKey), 'blog', 'blog');
         }
         unset($validated['image']);
 

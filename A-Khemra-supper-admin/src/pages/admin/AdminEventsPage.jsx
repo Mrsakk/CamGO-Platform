@@ -6,6 +6,7 @@ import { provincesApi } from "@/lib/api/provinces";
 import { queryKeys } from "@/lib/queryKeys";
 import { useDebounce } from "@/lib/useDebounce";
 import { toast } from "@/store/toastStore";
+import { getImageUrl } from "@/lib/utils";
 
 const AdminEventsPage = () => {
   const queryClient = useQueryClient();
@@ -206,7 +207,8 @@ const AdminEventsPage = () => {
                 </tr>
               ) : (
                 events.map((evt) => {
-                  const cover = evt.cover_image || evt.image_url;
+                  const rawCover = evt.cover_image || evt.image_url;
+                  const cover = rawCover ? getImageUrl(rawCover) : null;
                   const provinceName = evt.province ? (evt.province.name_en || evt.province.name_km) : null;
                   const venue = evt.location_name_en || evt.location_name_km || evt.location;
                   const startDateStr = evt.start_date_date || (evt.start_date ? evt.start_date.substring(0, 10) : "—");
@@ -221,6 +223,10 @@ const AdminEventsPage = () => {
                             <img
                               src={cover}
                               alt={evt.title_en}
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=120&q=80";
+                              }}
                               className="w-14 h-10 rounded-lg object-cover bg-stone-200 dark:bg-stone-700 shrink-0 border border-stone-200/60 dark:border-stone-700"
                             />
                           ) : (

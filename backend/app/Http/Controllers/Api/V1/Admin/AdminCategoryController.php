@@ -42,8 +42,7 @@ class AdminCategoryController extends ApiController
         ]);
 
         if ($hasImage) {
-            $path = $request->file('image')->store('categories', 'public');
-            $validated['image'] = Storage::url($path);
+            $validated['image'] = \App\Services\StorageService::upload($request->file('image'), 'categories', 'cat');
         }
 
         $category = Category::create(array_merge($validated, [
@@ -94,8 +93,7 @@ class AdminCategoryController extends ApiController
         ]);
 
         if ($hasImage) {
-            $path = $request->file('image')->store('categories', 'public');
-            $validated['image'] = Storage::url($path);
+            $validated['image'] = \App\Services\StorageService::upload($request->file('image'), 'categories', 'cat');
         }
 
         $category->update($validated);

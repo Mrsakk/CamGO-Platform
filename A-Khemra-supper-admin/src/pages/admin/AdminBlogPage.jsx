@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
 import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+import { getImageUrl } from "@/lib/utils";
 
 const AdminBlogPage = () => {
   const queryClient = useQueryClient();
@@ -140,13 +141,21 @@ const AdminBlogPage = () => {
                 </tr> : posts.map((post) => <tr key={post.id} className="hover:bg-stone-50/50 dark:hover:bg-stone-800/30">
                     <td className="p-4 font-bold text-stone-900 dark:text-stone-900">
                       <div className="flex items-center gap-3">
-                        {post.cover_image || post.image_url ? <img
-    src={post.cover_image || post.image_url}
-    alt={post.title_en}
-    className="w-12 h-9 rounded-lg object-cover bg-stone-200"
-  /> : <div className="w-12 h-9 rounded-lg bg-teal-800/40 text-teal-400 flex items-center justify-center">
+                        {post.cover_image || post.image_url ? (
+                          <img
+                            src={getImageUrl(post.cover_image || post.image_url, "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=120&q=80")}
+                            alt={post.title_en}
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=120&q=80";
+                            }}
+                            className="w-12 h-9 rounded-lg object-cover bg-stone-200"
+                          />
+                        ) : (
+                          <div className="w-12 h-9 rounded-lg bg-teal-800/40 text-teal-400 flex items-center justify-center">
                             <FileText className="w-4 h-4" />
-                          </div>}
+                          </div>
+                        )}
                         <div>
                           <span className="block truncate max-w-sm">{post.title_en}</span>
                           <span className="text-small text-amber-600 font-normal">

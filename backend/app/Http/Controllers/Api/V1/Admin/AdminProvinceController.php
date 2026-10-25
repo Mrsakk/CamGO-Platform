@@ -53,8 +53,7 @@ class AdminProvinceController extends ApiController
         ]);
 
         if ($hasImage) {
-            $path = $request->file('image')->store('provinces', 'public');
-            $validated['image'] = Storage::url($path);
+            $validated['image'] = \App\Services\StorageService::upload($request->file('image'), 'provinces', 'prov');
         }
 
         $province = Province::create(array_merge($validated, [
@@ -109,8 +108,7 @@ class AdminProvinceController extends ApiController
         ]);
 
         if ($hasImage) {
-            $path = $request->file('image')->store('provinces', 'public');
-            $validated['image'] = Storage::url($path);
+            $validated['image'] = \App\Services\StorageService::upload($request->file('image'), 'provinces', 'prov');
         }
 
         $province->update($validated);

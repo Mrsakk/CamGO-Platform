@@ -98,8 +98,7 @@ class AdminEventController extends ApiController
         }
 
         if ($hasCover) {
-            $path = $request->file($coverFileKey)->store('events', 'public');
-            $validated['cover_image'] = Storage::url($path);
+            $validated['cover_image'] = \App\Services\StorageService::upload($request->file($coverFileKey), 'events', 'event');
         }
         unset($validated['image']);
 
@@ -187,8 +186,7 @@ class AdminEventController extends ApiController
         }
 
         if ($hasCover) {
-            $path = $request->file($coverFileKey)->store('events', 'public');
-            $validated['cover_image'] = Storage::url($path);
+            $validated['cover_image'] = \App\Services\StorageService::upload($request->file($coverFileKey), 'events', 'event');
         }
         unset($validated['image']);
 

@@ -5,6 +5,7 @@ import { adminApi } from "@/lib/api/admin";
 import { provincesApi } from "@/lib/api/provinces";
 import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+import { getImageUrl } from "@/lib/utils";
 
 const AdminProvincesPage = () => {
   const queryClient = useQueryClient();
@@ -130,13 +131,21 @@ const AdminProvincesPage = () => {
                 </tr> : provinces.map((prov) => <tr key={prov.id} className="hover:bg-stone-50/50 dark:hover:bg-stone-800/30">
                     <td className="p-4 font-bold text-stone-900 dark:text-stone-900">
                       <div className="flex items-center gap-3">
-                        {prov.image_url ? <img
-    src={prov.image_url}
-    alt={prov.name_en}
-    className="w-10 h-8 rounded-lg object-cover"
-  /> : <div className="w-10 h-8 rounded-lg bg-teal-800/40 text-teal-400 flex items-center justify-center">
+                        {prov.image_url ? (
+                          <img
+                            src={getImageUrl(prov.image_url, "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=80&q=80")}
+                            alt={prov.name_en}
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=80&q=80";
+                            }}
+                            className="w-10 h-8 rounded-lg object-cover bg-stone-200"
+                          />
+                        ) : (
+                          <div className="w-10 h-8 rounded-lg bg-teal-800/40 text-teal-400 flex items-center justify-center">
                             <MapPin className="w-4 h-4" />
-                          </div>}
+                          </div>
+                        )}
                         <div>
                           <span>{prov.name_en}</span>
                           <span className="block text-small text-amber-600 font-normal">
