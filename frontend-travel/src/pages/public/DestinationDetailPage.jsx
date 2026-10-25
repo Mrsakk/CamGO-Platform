@@ -210,10 +210,16 @@ const DestinationDetailPage = () => {
     ? rawHighlights
     : (Array.isArray(destination.features) ? destination.features : []);
 
-  const myReview = destination.reviews?.find((r) => r.user_id === user?.id);
+  const reviewsList = Array.isArray(destination.reviews)
+    ? destination.reviews
+    : Array.isArray(destination.reviews?.data)
+    ? destination.reviews.data
+    : [];
+
+  const myReview = reviewsList.find((r) => r.user_id === user?.id);
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destination.latitude || 13.4125},${destination.longitude || 103.867}`;
   const ratingScore = Number(destination.avg_rating > 0 ? destination.avg_rating : 5.0).toFixed(1);
-  const reviewsCount = destination.reviews_count || (destination.reviews ? destination.reviews.length : 4);
+  const reviewsCount = destination.reviews_count || reviewsList.length || 0;
   const viewCount = destination.view_count || 1280;
 
   return (
@@ -677,9 +683,9 @@ const DestinationDetailPage = () => {
               </div>
 
               {/* Review Cards List */}
-              {destination.reviews && destination.reviews.length > 0 ? (
+              {reviewsList.length > 0 ? (
                 <div className="space-y-3.5">
-                  {destination.reviews.map((rev) => {
+                  {reviewsList.map((rev) => {
                     const reviewerName = rev.user?.name || (km ? "អ្នកធ្វើដំណើរ" : "Traveler");
                     const initial = reviewerName.charAt(0).toUpperCase();
                     const dateFormatted = rev.created_at

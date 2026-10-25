@@ -65,7 +65,9 @@ class DestinationDetailResource extends JsonResource
                     'order' => $img->order,
                 ];
             }),
-            'reviews' => ReviewResource::collection($this->whenLoaded('approvedReviews')),
+            'reviews' => $this->relationLoaded('approvedReviews')
+                ? ReviewResource::collection($this->approvedReviews)->resolve()
+                : [],
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

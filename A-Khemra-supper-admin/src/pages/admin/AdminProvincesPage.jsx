@@ -22,12 +22,26 @@ const AdminProvincesPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProvince, setEditingProvince] = useState(null);
+  const [formData, setFormData] = useState({
+    name_en: "",
+    name_km: "",
+    code: "",
+    area_km2: "",
+    population: "",
+    latitude: "12.5657",
+    longitude: "104.9910",
+    description_en: "",
+    description_km: ""
+  });
+  const [imageFile, setImageFile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const openCreateModal = () => {
     setEditingProvince(null);
     setFormData({
       name_en: "",
       name_km: "",
-      capital: "",
+      code: "",
       area_km2: "",
       population: "",
       latitude: "12.5657",
@@ -41,9 +55,9 @@ const AdminProvincesPage = () => {
   const openEditModal = (p) => {
     setEditingProvince(p);
     setFormData({
-      name_en: p.name_en,
+      name_en: p.name_en || "",
       name_km: p.name_km || "",
-      capital: p.capital || "",
+      code: p.code || "",
       area_km2: String(p.area_km2 || ""),
       population: String(p.population || ""),
       latitude: String(p.latitude || ""),
@@ -70,7 +84,9 @@ const AdminProvincesPage = () => {
       setIsSubmitting(true);
       const data = new FormData();
       Object.entries(formData).forEach(([key, val]) => {
-        data.append(key, val);
+        if (val !== undefined && val !== null && val !== "") {
+          data.append(key, val);
+        }
       });
       if (imageFile) {
         data.append("image", imageFile);
@@ -231,14 +247,17 @@ const AdminProvincesPage = () => {
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-stone-700 dark:text-stone-700 uppercase mb-1">
-                    Capital
+                    Code (e.g. SRP) *
                   </label>
                   <input
-    type="text"
-    value={formData.capital}
-    onChange={(e) => setFormData({ ...formData, capital: e.target.value })}
-    className="w-full px-3 py-2 rounded-xl border border-stone-300 dark:border-stone-300 bg-white dark:bg-stone-800 text-xs sm:text-sm focus:outline-none focus:border-amber-500"
-  />
+                    type="text"
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                    placeholder="SRP"
+                    maxLength={10}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 dark:border-stone-300 bg-white dark:bg-stone-800 text-xs sm:text-sm focus:outline-none focus:border-amber-500 uppercase font-mono font-bold"
+                    required
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-stone-700 dark:text-stone-700 uppercase mb-1">

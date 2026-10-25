@@ -47,6 +47,24 @@ class StorageService
                     return "{$supabaseUrl}/storage/v1/object/public/{$bucket}/{$filename}";
                 }
 
+                // If specific bucket does not exist, retry on the primary 'destinations' public bucket
+                if ($bucket !== 'destinations') {
+                    $retryFilename = "{$bucket}_" . $filename;
+                    $retryResponse = Http::withoutVerifying()->withHeaders([
+                        'apikey' => $supabaseKey,
+                        'Authorization' => 'Bearer ' . $supabaseKey,
+                        'Content-Type' => $mimeType,
+                        'x-upsert' => 'true',
+                    ])->withBody(
+                        $binaryContent,
+                        $mimeType
+                    )->post("{$supabaseUrl}/storage/v1/object/destinations/{$retryFilename}");
+
+                    if ($retryResponse->successful()) {
+                        return "{$supabaseUrl}/storage/v1/object/public/destinations/{$retryFilename}";
+                    }
+                }
+
                 Log::warning('Supabase storage upload failed: HTTP ' . $response->status() . ' - ' . $response->body());
             } catch (\Throwable $e) {
                 Log::warning('Supabase storage upload exception: ' . $e->getMessage());

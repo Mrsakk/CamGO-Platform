@@ -14,6 +14,22 @@ const AdminEventsPage = () => {
   const debouncedSearch = useDebounce(searchQuery, 300);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
+  const [formData, setFormData] = useState({
+    title_en: "",
+    title_km: "",
+    province_id: "",
+    location_name_en: "",
+    location_name_km: "",
+    start_date: new Date().toISOString().substring(0, 10),
+    end_date: "",
+    description_en: "",
+    description_km: "",
+    is_published: true,
+    is_featured: false,
+  });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 1. Cached Provinces (24 hours)
   const { data: provinces = [] } = useQuery({

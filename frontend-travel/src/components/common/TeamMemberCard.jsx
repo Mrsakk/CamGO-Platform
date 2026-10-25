@@ -26,7 +26,7 @@ export const TeamMemberCard = ({ member, index = 0, km = true }) => {
       transition={{ type: "spring", stiffness: 340, damping: 22 }}
     >
       {/* Top Media Canvas */}
-      <div className="relative aspect-[4/5] w-full rounded-xl overflow-hidden bg-stone-200 dark:bg-stone-800 border border-stone-300 dark:border-stone-700">
+      <div className="relative aspect-[4/5] w-full rounded-xl overflow-hidden bg-white dark:bg-stone-850 border border-stone-200 dark:border-stone-700/80 shadow-2xs">
         <img
           src={avatar}
           alt={memberName}
@@ -39,18 +39,15 @@ export const TeamMemberCard = ({ member, index = 0, km = true }) => {
               setImageError(true);
             }
           }}
-          className={`w-full h-full object-cover object-top transition-all duration-500 ease-out group-hover:scale-105 ${imageLoaded ? "opacity-100" : "opacity-90"}`}
+          className={`w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-103 ${imageLoaded ? "opacity-100" : "opacity-90"}`}
         />
 
         {/* Top Index Badge */}
-        <div className="absolute top-2 left-2 z-10">
-          <span className="px-2 py-0.5 rounded-sm bg-stone-950/80 text-white font-mono text-[10px] font-bold tracking-wider">
+        <div className="absolute top-2.5 left-2.5 z-10">
+          <span className="px-2 py-0.5 rounded-md bg-stone-900/85 backdrop-blur-xs text-white font-mono text-[10px] font-bold tracking-wider shadow-2xs">
             #{memberIndexStr}
           </span>
         </div>
-
-        {/* Ambient Bottom Cinematic Vignette */}
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950/75 via-stone-950/15 to-transparent pointer-events-none" />
       </div>
 
       {/* Member Details Content Block */}

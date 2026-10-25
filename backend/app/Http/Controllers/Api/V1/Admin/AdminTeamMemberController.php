@@ -52,7 +52,7 @@ class AdminTeamMemberController extends ApiController
         ]);
 
         if ($hasImage) {
-            $validated['image'] = \App\Services\StorageService::upload($request->file('image'), 'team', 'team');
+            $validated['image'] = \App\Services\StorageService::upload($request->file('image'), 'destinations', 'team');
         }
 
         if ($request->has('is_published')) {
@@ -107,7 +107,7 @@ class AdminTeamMemberController extends ApiController
         ]);
 
         if ($hasImage) {
-            $validated['image'] = \App\Services\StorageService::upload($request->file('image'), 'team', 'team');
+            $validated['image'] = \App\Services\StorageService::upload($request->file('image'), 'destinations', 'team');
         }
 
         if ($request->has('is_published')) {

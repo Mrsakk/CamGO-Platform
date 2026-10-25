@@ -2,15 +2,62 @@ import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Search, X, Sparkles, Compass, ArrowRight } from "lucide-react";
+import {
+  Search,
+  X,
+  Sparkles,
+  Compass,
+  ArrowRight,
+  Landmark,
+  TreePine,
+  Mountain,
+  Waves,
+  UtensilsCrossed,
+  Footprints,
+  Users,
+  Camera,
+  Palmtree,
+} from "lucide-react";
 import { categoriesApi } from "@/lib/api/categories";
 import { CategoryCardSkeleton } from "@/components/common/ShimmerSkeleton";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { RumduolFlower } from "@/components/common/RumduolMotifs";
-import { getImageUrl } from "@/lib/utils";
 
 const toKm = (n) => String(n ?? 0);
+const pad = (n) => String(n).padStart(2, "0");
+
+const getCategoryIcon = (category) => {
+  const key = `${category?.slug || ""} ${category?.icon || ""} ${category?.name_en || ""}`.toLowerCase();
+  if (key.includes("temple") || key.includes("heritage") || key.includes("monument") || key.includes("ancient") || key.includes("culture")) {
+    return Landmark;
+  }
+  if (key.includes("nature") || key.includes("eco") || key.includes("forest") || key.includes("wildlife")) {
+    return TreePine;
+  }
+  if (key.includes("mountain") || key.includes("hill") || key.includes("waterfall")) {
+    return Mountain;
+  }
+  if (key.includes("beach") || key.includes("coast") || key.includes("island") || key.includes("sea") || key.includes("water")) {
+    return Waves;
+  }
+  if (key.includes("food") || key.includes("culinary") || key.includes("dining") || key.includes("taste")) {
+    return UtensilsCrossed;
+  }
+  if (key.includes("adventure") || key.includes("trek") || key.includes("hike") || key.includes("sport")) {
+    return Footprints;
+  }
+  if (key.includes("community") || key.includes("local") || key.includes("village") || key.includes("people")) {
+    return Users;
+  }
+  if (key.includes("photo") || key.includes("sight") || key.includes("view")) {
+    return Camera;
+  }
+  if (key.includes("relax") || key.includes("resort") || key.includes("leisure")) {
+    return Palmtree;
+  }
+  return Compass;
+};
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 16 },
@@ -196,78 +243,83 @@ const CategoriesPage = () => {
             animate="visible"
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6"
           >
-            {filteredCategories.map((c) => {
+            {filteredCategories.map((c, idx) => {
               const name = km && c.name_km ? c.name_km : c.name_en;
               const subName = km ? c.name_en : c.name_km;
               const desc = km && c.description_km ? c.description_km : (c.description_en || c.description_km);
-              const catImage = getImageUrl(
-                c.image || c.image_url,
-                "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
-              );
               const count = c.destinations_count || 0;
+              const CategoryIcon = getCategoryIcon(c);
+              const categoryIndexStr = pad(idx + 1);
 
               return (
                 <motion.div
                   key={c.id}
                   variants={fadeInUp}
-                  whileHover={{ y: -2, scale: 1.018 }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  whileHover={{ y: -6, scale: 1.018 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 320, damping: 22 }}
                 >
                   <Link
                     to={`/categories/${c.slug}`}
-                    className="group rounded-3xl sm:rounded-[32px] overflow-hidden aspect-[4/5] relative flex flex-col justify-between p-5 sm:p-6 select-none border border-stone-200/90 dark:border-stone-800 shadow-sm hover:shadow-2xl transition-all duration-500 bg-stone-950"
+                    className="group rounded-3xl p-6 sm:p-7 relative flex flex-col justify-between select-none border border-stone-200/90 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm hover:shadow-2xl hover:border-laterite-500/50 dark:hover:border-laterite-500/40 transition-all duration-300 min-h-[310px] sm:min-h-[320px] overflow-hidden"
                   >
-                    {/* Photographic Background */}
-                    <img
-                      src={catImage}
-                      alt={name}
-                      loading="lazy"
-                      decoding="async"
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
-                      onError={(e) => {
-                        e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80";
-                      }}
-                    />
+                    {/* Layered Ambient Glow Orbs */}
+                    <div className="absolute -top-16 -right-16 w-44 h-44 bg-gradient-to-br from-laterite-500/12 via-amber-500/8 to-transparent rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
+                    <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-stone-200/30 dark:bg-stone-800/20 rounded-full blur-2xl pointer-events-none" />
 
-                    {/* Multi-layer Ambient Gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-950/95 via-stone-950/45 to-stone-950/20 group-hover:from-stone-950/90 transition-colors pointer-events-none" />
-
-                    {/* Top Bar: Destination Count Plaque */}
-                    <div className="relative z-10 flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-900/80 backdrop-blur-md border border-white/20 text-white text-xs font-bold shadow-xs font-sans">
-                        <Compass className="w-3.5 h-3.5 text-amber-400" />
-                        <span>{km ? `${toKm(count)} ទីតាំងទេសចរណ៍` : `${count} sanctuaries`}</span>
-                      </span>
+                    {/* Rotating Rumduol Flower Watermark */}
+                    <div className="absolute -right-8 -bottom-8 opacity-[0.035] dark:opacity-[0.045] group-hover:opacity-[0.08] group-hover:rotate-45 transition-all duration-700 pointer-events-none select-none">
+                      <RumduolFlower size={200} className="text-laterite-600 dark:text-amber-400" />
                     </div>
 
-                    {/* Bottom Content: Name, Description, Action Link */}
-                    <div className="relative z-10 space-y-2 text-white">
-                      <div className="space-y-0.5">
-                        <h3 className="font-heading font-black text-2xl sm:text-3xl text-white group-hover:text-amber-300 transition-colors leading-none tracking-wide drop-shadow-sm">
-                          {name}
-                        </h3>
-                        {subName && (
-                          <span className="text-xs text-stone-300/90 block font-sans tracking-wide">
-                            {subName}
-                          </span>
-                        )}
+                    {/* Top Row: Icon Vessel & Plaque Counter */}
+                    <div className="relative z-10 flex items-start justify-between gap-4">
+                      {/* Architectural Icon Vessel */}
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-stone-50 to-stone-100 dark:from-stone-850 dark:to-stone-800 border border-stone-200/90 dark:border-stone-700/80 text-laterite-600 dark:text-amber-400 flex items-center justify-center shadow-xs group-hover:bg-laterite-600 group-hover:text-white group-hover:border-laterite-600 group-hover:shadow-lg group-hover:shadow-laterite-600/25 transition-all duration-300">
+                        <CategoryIcon className="w-6 h-6 stroke-[1.9] group-hover:scale-110 transition-transform duration-300" />
                       </div>
 
+                      {/* Top Counter Plaque */}
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 dark:bg-stone-800/90 border border-stone-200/80 dark:border-stone-700 text-stone-700 dark:text-stone-300 text-xs font-bold font-sans shadow-2xs">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 group-hover:scale-125 transition-transform" />
+                          <span>{km ? `${toKm(count)} ទីតាំង` : `${count} spots`}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Middle Block: Index Tag, Title, Subtitle, Description */}
+                    <div className="relative z-10 space-y-2 py-4 my-auto">
+                      <div className="flex items-center gap-2 text-[10px] font-mono font-bold tracking-widest text-stone-400 dark:text-stone-500 uppercase">
+                        <span>{`#${categoryIndexStr}`}</span>
+                        <span className="w-1 h-1 rounded-full bg-stone-300 dark:bg-stone-700" />
+                        <span>{subName || "CAMGO ATLAS"}</span>
+                      </div>
+
+                      <h3 className="font-heading font-black text-2xl sm:text-[26px] text-stone-900 dark:text-stone-100 group-hover:text-laterite-600 dark:group-hover:text-amber-400 transition-colors leading-tight tracking-wide">
+                        {name}
+                      </h3>
+
                       {desc && (
-                        <p className="text-xs text-stone-300/80 line-clamp-2 font-sans leading-relaxed">
+                        <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 font-sans leading-relaxed line-clamp-3 pt-0.5">
                           {desc}
                         </p>
                       )}
-
-                      <div className="pt-2 flex items-center justify-between text-xs font-bold text-amber-400 group-hover:text-amber-300 transition-colors border-t border-white/10">
-                        <span className="font-sans">{km ? "រុករកគោលដៅទាំងអស់" : "Explore Destinations"}</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                      </div>
-
-                      {/* Animated Light Beam */}
-                      <div className="h-0.5 w-0 group-hover:w-full bg-gradient-to-r from-laterite-600 via-amber-400 to-laterite-600 transition-all duration-500 rounded-full" />
                     </div>
+
+                    {/* Bottom Action Footer */}
+                    <div className="relative z-10 pt-3.5 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between">
+                      <span className="text-xs font-bold text-laterite-600 dark:text-amber-400 font-sans group-hover:translate-x-1 transition-transform duration-200">
+                        {km ? "រុករកគោលដៅទាំងអស់" : "Explore All Sanctuaries"}
+                      </span>
+
+                      <div className="w-8 h-8 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 flex items-center justify-center group-hover:bg-laterite-600 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 shadow-2xs">
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+
+                    {/* Bottom Animated Beam */}
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-laterite-600 via-amber-400 to-laterite-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                   </Link>
                 </motion.div>
               );

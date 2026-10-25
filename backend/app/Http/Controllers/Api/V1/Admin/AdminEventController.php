@@ -59,8 +59,8 @@ class AdminEventController extends ApiController
         $validated = $request->validate([
             'title_km' => 'required|string|max:255',
             'title_en' => 'required|string|max:255',
-            'description_km' => 'required|string',
-            'description_en' => 'required|string',
+            'description_km' => 'nullable|string',
+            'description_en' => 'nullable|string',
             'province_id' => 'nullable|exists:provinces,id',
             'location_name_km' => 'nullable|string|max:255',
             'location_name_en' => 'nullable|string|max:255',
@@ -149,8 +149,8 @@ class AdminEventController extends ApiController
         $validated = $request->validate([
             'title_km' => 'sometimes|required|string|max:255',
             'title_en' => 'sometimes|required|string|max:255',
-            'description_km' => 'sometimes|required|string',
-            'description_en' => 'sometimes|required|string',
+            'description_km' => 'nullable|string',
+            'description_en' => 'nullable|string',
             'province_id' => 'nullable|exists:provinces,id',
             'location_name_km' => 'nullable|string|max:255',
             'location_name_en' => 'nullable|string|max:255',
