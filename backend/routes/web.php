@@ -17,6 +17,26 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/logo.png', function () {
+    $candidates = [
+        public_path('logo.png'),
+        base_path('storage/app/public/settings/v90ORpDANwMmycKmo3ytkVA1bg2fvKYxac02YzWK.png'),
+        storage_path('app/public/settings/v90ORpDANwMmycKmo3ytkVA1bg2fvKYxac02YzWK.png'),
+    ];
+
+    foreach ($candidates as $file) {
+        if (file_exists($file) && is_file($file)) {
+            return response()->file($file, [
+                'Content-Type' => 'image/png',
+                'Cache-Control' => 'public, max-age=31536000, immutable',
+                'Access-Control-Allow-Origin' => '*',
+            ]);
+        }
+    }
+
+    abort(404);
+});
+
 Route::get('/media/{path}', function (string $path) {
     $candidates = [
         base_path('storage/app/public/'.$path),
