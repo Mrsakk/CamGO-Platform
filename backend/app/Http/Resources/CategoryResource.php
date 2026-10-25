@@ -18,6 +18,7 @@ class CategoryResource extends JsonResource
             'description_km' => $this->description_km,
             'description_en' => $this->description_en,
             'image' => $this->image,
+            'image_url' => $this->image,
             'is_active' => (bool) $this->is_active,
             'destinations_count' => $this->whenCounted('destinations', $this->destinations_count),
         ];

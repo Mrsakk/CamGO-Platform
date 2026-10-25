@@ -19,6 +19,7 @@ class BlogPostResource extends JsonResource
             'content_km' => $this->content_km,
             'content_en' => $this->content_en,
             'cover_image' => $this->cover_image,
+            'image_url' => $this->cover_image,
             'tags' => $this->tags ?? [],
             'view_count' => (int) $this->view_count,
             'is_published' => (bool) $this->is_published,

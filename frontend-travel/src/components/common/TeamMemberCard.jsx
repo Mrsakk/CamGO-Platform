@@ -13,7 +13,8 @@ export const TeamMemberCard = ({ member, index = 0, km = true }) => {
   const memberName = km && member?.name_km ? member.name_km : (member?.name_en || member?.name_km || "");
   const memberRole = km && member?.role_km ? member.role_km : (member?.role_en || member?.role_km || "");
   const rawImage = member?.image || member?.image_url;
-  const avatar = getImageUrl(rawImage, "");
+  const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80";
+  const avatar = getImageUrl(rawImage, DEFAULT_AVATAR);
 
   const memberIndexStr = String(index + 1).padStart(2, "0");
 
@@ -26,24 +27,20 @@ export const TeamMemberCard = ({ member, index = 0, km = true }) => {
     >
       {/* Top Media Canvas */}
       <div className="relative aspect-[4/5] w-full rounded-xl overflow-hidden bg-stone-200 dark:bg-stone-800 border border-stone-300 dark:border-stone-700">
-        {(!avatar || imageError) ? (
-          <div className="w-full h-full flex flex-col items-center justify-center text-stone-500 bg-stone-200 dark:bg-stone-800">
-            <span className="text-2xl font-heading font-bold text-stone-400">CamGO</span>
-            <span className="text-xs font-mono font-bold tracking-wider uppercase text-stone-400 mt-1">
-              [ MEMBER #{memberIndexStr} ]
-            </span>
-          </div>
-        ) : (
-          <img
-            src={avatar}
-            alt={memberName}
-            loading="lazy"
-            onLoad={() => setImageLoaded(true)}
-            onError={() => setImageError(true)}
-            className={`w-full h-full object-cover object-top transition-all duration-500 ease-out group-hover:scale-105 ${imageLoaded ? "opacity-100" : "opacity-0"
-              }`}
-          />
-        )}
+        <img
+          src={avatar}
+          alt={memberName}
+          loading="lazy"
+          onLoad={() => setImageLoaded(true)}
+          onError={(e) => {
+            if (e.currentTarget.src !== DEFAULT_AVATAR) {
+              e.currentTarget.src = DEFAULT_AVATAR;
+            } else {
+              setImageError(true);
+            }
+          }}
+          className={`w-full h-full object-cover object-top transition-all duration-500 ease-out group-hover:scale-105 ${imageLoaded ? "opacity-100" : "opacity-90"}`}
+        />
 
         {/* Top Index Badge */}
         <div className="absolute top-2 left-2 z-10">

@@ -617,6 +617,9 @@ const HomePage = () => {
                           width="800"
                           height="500"
                           className="absolute inset-0 w-full h-full object-cover group-hover:scale-106 transition-transform duration-700 ease-out"
+                          onError={(e) => {
+                            e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80";
+                          }}
                         />
 
                         {/* Cinematic Gradient Scrim */}
@@ -918,6 +921,9 @@ const HomePage = () => {
                               loading="lazy"
                               decoding="async"
                               className="absolute inset-0 w-full h-full object-cover group-hover:scale-112 transition-transform duration-700 ease-out"
+                              onError={(e) => {
+                                e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80";
+                              }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-stone-950/95 via-stone-950/40 to-stone-950/20 group-hover:from-stone-950/90 transition-colors pointer-events-none" />
 
@@ -990,6 +996,9 @@ const HomePage = () => {
                               loading="lazy"
                               decoding="async"
                               className="absolute inset-0 w-full h-full object-cover group-hover:scale-112 transition-transform duration-700 ease-out"
+                              onError={(e) => {
+                                e.currentTarget.src = "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80";
+                              }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-stone-950/95 via-stone-950/40 to-stone-950/20 group-hover:from-stone-950/90 transition-colors pointer-events-none" />
 
@@ -1147,6 +1156,9 @@ const HomePage = () => {
                               loading="lazy"
                               decoding="async"
                               className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                              onError={(e) => {
+                                e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80";
+                              }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-stone-950/95 via-stone-950/40 to-stone-950/20 pointer-events-none" />
 
@@ -1218,6 +1230,9 @@ const HomePage = () => {
                               loading="lazy"
                               decoding="async"
                               className="absolute inset-0 w-full h-full object-cover group-hover:scale-112 transition-transform duration-700 ease-out"
+                              onError={(e) => {
+                                e.currentTarget.src = "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=800&q=80";
+                              }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-stone-950/95 via-stone-950/40 to-stone-950/20 group-hover:from-stone-950/90 transition-colors pointer-events-none" />
 
@@ -1287,6 +1302,9 @@ const HomePage = () => {
                               loading="lazy"
                               decoding="async"
                               className="absolute inset-0 w-full h-full object-cover group-hover:scale-112 transition-transform duration-700 ease-out"
+                              onError={(e) => {
+                                e.currentTarget.src = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80";
+                              }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-stone-950/95 via-stone-950/40 to-stone-950/20 group-hover:from-stone-950/90 transition-colors pointer-events-none" />
 

@@ -18,6 +18,7 @@ import { useFavoriteStore } from "@/store/favoriteStore";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "@/store/toastStore";
 import LintelFrame from "@/components/sandstone/LintelFrame";
+import { getImageUrl } from "@/lib/utils";
 
 export const DestinationQuickViewModal = ({ destination, isOpen, onClose }) => {
   const { i18n, t } = useTranslation();
@@ -68,10 +69,10 @@ export const DestinationQuickViewModal = ({ destination, isOpen, onClose }) => {
       ? destination.category.name_km
       : destination.category.name_en
     : null;
-  const coverImage =
-    destination.cover_image ||
-    destination.primary_image?.image_url ||
-    "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80";
+  const coverImage = getImageUrl(
+    destination.cover_image || destination.primary_image?.image_url,
+    "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80"
+  );
 
   const ratingScore = Number(destination.rating_avg ?? destination.avg_rating ?? 5.0);
   const reviewsCount = destination.rating_count ?? destination.reviews_count ?? 4;
@@ -116,6 +117,9 @@ export const DestinationQuickViewModal = ({ destination, isOpen, onClose }) => {
                   <img
                     src={coverImage}
                     alt={name}
+                    onError={(e) => {
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80";
+                    }}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent" />

@@ -7,6 +7,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
 import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+import { getImageUrl } from "@/lib/utils";
 
 const AdminPagesPage = () => {
   const queryClient = useQueryClient();
@@ -109,7 +110,7 @@ const AdminPagesPage = () => {
       is_published: m.is_published ?? true,
     });
     setImageFile(null);
-    setImagePreview(m.image || m.image_url || null);
+    setImagePreview(getImageUrl(m.image || m.image_url) || null);
     setIsTeamModalOpen(true);
   };
 
@@ -300,8 +301,11 @@ const AdminPagesPage = () => {
                             <div className="flex items-center gap-3">
                               {avatar ? (
                                 <img
-                                  src={avatar}
+                                  src={getImageUrl(avatar)}
                                   alt={m.name_en}
+                                  onError={(e) => {
+                                    e.currentTarget.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80";
+                                  }}
                                   className="w-11 h-11 rounded-full object-cover bg-stone-200 dark:bg-stone-700 border border-stone-200 dark:border-stone-700 shrink-0"
                                 />
                               ) : (
@@ -555,8 +559,11 @@ const AdminPagesPage = () => {
                 {imagePreview && (
                   <div className="mb-2 flex items-center gap-3">
                     <img
-                      src={imagePreview}
+                      src={getImageUrl(imagePreview)}
                       alt="Preview"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80";
+                      }}
                       className="w-14 h-14 rounded-full object-cover border border-stone-300 dark:border-stone-700"
                     />
                     <span className="text-[11px] text-stone-500">Current photo preview</span>

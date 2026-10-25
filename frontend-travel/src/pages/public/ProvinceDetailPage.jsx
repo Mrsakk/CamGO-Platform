@@ -13,6 +13,7 @@ import { RumduolFlower } from "@/components/common/RumduolMotifs";
 import { provincesApi } from "@/lib/api/provinces";
 import { toast } from "@/store/toastStore";
 import { SEOHead } from "@/components/common/SEOHead";
+import { getImageUrl } from "@/lib/utils";
 
 const toKm = (n) => String(n ?? 0);
 
@@ -200,17 +201,19 @@ const ProvinceDetailPage = () => {
             {/* Right Column: Visual Showcase Card */}
             <div className="lg:col-span-5">
               <div className="aspect-[4/3] rounded-3xl overflow-hidden bg-stone-200 dark:bg-stone-800 border border-stone-200/90 dark:border-stone-800 relative shadow-md group">
-                {province.image || province.image_url ? (
-                  <img
-                    src={province.image || province.image_url}
-                    alt={name}
-                    loading="eager"
-                    fetchPriority="high"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-stone-300 dark:bg-stone-800" />
-                )}
+                <img
+                  src={getImageUrl(
+                    province.image || province.image_url,
+                    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"
+                  )}
+                  alt={name}
+                  loading="eager"
+                  fetchPriority="high"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80";
+                  }}
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent pointer-events-none" />
                 <div className="absolute bottom-4 left-4 right-4 text-white pointer-events-none">
                   <span className="text-xs font-bold px-3 py-1 rounded-full bg-stone-900/80 backdrop-blur-md text-stone-200 inline-flex items-center gap-1.5 border border-white/20 font-sans">

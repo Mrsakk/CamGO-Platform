@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { customMapIcon } from "@/lib/leaflet-icons";
 import { Star, MapPin } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 
 // Auto invalidate map size on container resize / mobile orientation change
 const MapResizer = () => {
@@ -81,8 +82,11 @@ const LeafletMap = ({
               <Popup className="custom-popup">
                 <div className="w-56 p-1 text-stone-900 dark:text-stone-100">
                   {dest.cover_image && <img
-      src={dest.cover_image}
+      src={getImageUrl(dest.cover_image, "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=300&q=80")}
       alt={name}
+      onError={(e) => {
+        e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=300&q=80";
+      }}
       className="w-full h-28 object-cover rounded-lg mb-2"
     />}
                   <h4 className="font-bold text-stone-900 dark:text-stone-100 text-small font-km leading-snug line-clamp-1 mb-1">

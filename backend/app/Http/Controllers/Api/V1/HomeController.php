@@ -102,7 +102,8 @@ class HomeController extends Controller
                 'name_km'            => $p->name_km,
                 'name_en'            => $p->name_en,
                 'code'               => $p->code,
-                'image_url'          => $p->image_url,  // appended accessor
+                'image'              => $p->image,
+                'image_url'          => $p->image_url ?? $p->image,
                 'is_featured'        => $p->is_featured,
                 'latitude'           => $p->latitude,
                 'longitude'          => $p->longitude,
@@ -136,6 +137,7 @@ class HomeController extends Controller
                 'excerpt_km'   => $p->excerpt_km,
                 'excerpt_en'   => $p->excerpt_en,
                 'cover_image'  => $p->cover_image,
+                'image_url'    => $p->cover_image,
                 'published_at' => $p->published_at?->toIso8601String(),
                 'view_count'   => $p->view_count,
             ])
@@ -144,12 +146,13 @@ class HomeController extends Controller
 
         // ── CATEGORIES (formatted for frontend use) ──────────────────────────
         $categoriesFormatted = $categories->map(fn($c) => [
-            'id'      => $c->id,
-            'slug'    => $c->slug,
-            'name_km' => $c->name_km,
-            'name_en' => $c->name_en,
-            'icon'    => $c->icon,
-            'image'   => $c->image,
+            'id'        => $c->id,
+            'slug'      => $c->slug,
+            'name_km'   => $c->name_km,
+            'name_en'   => $c->name_en,
+            'icon'      => $c->icon,
+            'image'     => $c->image,
+            'image_url' => $c->image,
         ])
         ->values()
         ->all();
@@ -174,6 +177,8 @@ class HomeController extends Controller
             'excerpt_km'     => $d->excerpt_km,
             'excerpt_en'     => $d->excerpt_en,
             'cover_image'    => $d->cover_image,
+            'image_url'      => $d->cover_image,
+            'image'          => $d->cover_image,
             'avg_rating'     => $d->avg_rating,
             'reviews_count'  => $d->reviews_count,
             'is_free'        => $d->is_free,

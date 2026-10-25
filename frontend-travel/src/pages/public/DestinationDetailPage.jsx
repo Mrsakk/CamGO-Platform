@@ -48,6 +48,7 @@ import { useAuthStore } from "@/store/authStore";
 import { toast } from "@/store/toastStore";
 import { SEOHead } from "@/components/common/SEOHead";
 import { AddToPlanModal } from "@/components/planner/AddToPlanModal";
+import { getImageUrl } from "@/lib/utils";
 import { ShareModal } from "@/components/common/ShareModal";
 
 const toKm = (n) => String(n ?? 0);
@@ -164,11 +165,14 @@ const DestinationDetailPage = () => {
 
   // Compile rich images gallery
   const allImages = [];
-  if (destination.cover_image) allImages.push(destination.cover_image);
+  if (destination.cover_image) allImages.push(getImageUrl(destination.cover_image));
   if (Array.isArray(destination.images) && destination.images.length > 0) {
     destination.images.forEach((img) => {
       const url = typeof img === "string" ? img : (img.image_url || img.image_path);
-      if (url && !allImages.includes(url)) allImages.push(url);
+      if (url) {
+        const resolved = getImageUrl(url);
+        if (!allImages.includes(resolved)) allImages.push(resolved);
+      }
     });
   }
   if (allImages.length === 0) {
@@ -341,6 +345,9 @@ const DestinationDetailPage = () => {
                   setLightboxIndex(0);
                   setLightboxOpen(true);
                 }}
+                onError={(e) => {
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80";
+                }}
                 className="w-full h-full object-cover cursor-pointer group-hover:scale-103 transition-transform duration-700 ease-out"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent pointer-events-none" />
@@ -372,6 +379,9 @@ const DestinationDetailPage = () => {
                   alt={name}
                   loading="eager"
                   fetchPriority="high"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80";
+                  }}
                   className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-700 ease-out"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-stone-950/60 via-transparent to-transparent pointer-events-none" />
@@ -393,6 +403,9 @@ const DestinationDetailPage = () => {
                     src={allImages[1]}
                     alt={`${name} secondary view`}
                     loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1000&q=80";
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-stone-950/20 group-hover:bg-transparent transition-colors" />
@@ -409,6 +422,9 @@ const DestinationDetailPage = () => {
                     src={allImages.length > 2 ? allImages[2] : allImages[0]}
                     alt={`${name} gallery view`}
                     loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=1000&q=80";
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-stone-950/30 group-hover:bg-transparent transition-colors" />

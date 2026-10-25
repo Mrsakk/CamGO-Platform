@@ -41,6 +41,8 @@ class DestinationListResource extends JsonResource
             'excerpt_km' => $this->excerpt_km,
             'excerpt_en' => $this->excerpt_en,
             'cover_image' => $this->cover_image,
+            'image_url' => $this->cover_image,
+            'image' => $this->cover_image,
             'is_free' => (bool) $this->is_free,
             'entrance_fee_usd' => (float) $this->entrance_fee_usd,
             'entrance_fee_en' => $this->entrance_fee_en,

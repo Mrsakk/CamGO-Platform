@@ -45,8 +45,13 @@ class AdminCategoryController extends ApiController
             $validated['image'] = \App\Services\StorageService::upload($request->file('image'), 'categories', 'cat');
         }
 
+        $slug = Str::slug($validated['name_en']);
+        if (empty($slug)) {
+            $slug = 'cat-' . Str::lower(Str::random(8));
+        }
+
         $category = Category::create(array_merge($validated, [
-            'slug' => Str::slug($validated['name_en']),
+            'slug' => $slug,
         ]));
 
         Cache::flush();

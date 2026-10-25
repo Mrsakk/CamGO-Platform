@@ -14,6 +14,7 @@ import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { RumduolFlower } from "@/components/common/RumduolMotifs";
 import { toast } from "@/store/toastStore";
 import { SelectDestinationModal } from "@/components/planner/SelectDestinationModal";
+import { getImageUrl } from "@/lib/utils";
 
 const toKm = (n) => (n === null || n === undefined ? "0" : String(n));
 
@@ -478,8 +479,11 @@ export const TripPlannerPage = () => {
                             {/* Destination Image */}
                             <div className="w-full sm:w-44 h-32 rounded-2xl overflow-hidden shrink-0 bg-stone-200 dark:bg-stone-800 relative border border-stone-200 dark:border-stone-700/80">
                               <img
-                                src={it.image}
+                                src={getImageUrl(it.image, "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=400&q=80")}
                                 alt={it.name_km}
+                                onError={(e) => {
+                                  e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=400&q=80";
+                                }}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 loading="lazy"
                               />

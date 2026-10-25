@@ -109,7 +109,8 @@ class AdminDestinationController extends ApiController
         unset($validated['image']);
 
         $ulid = (string) Str::ulid();
-        $slug = Str::slug($validated['name_en']) . '-' . substr($ulid, -6);
+        $baseSlug = Str::slug($validated['name_en']) ?: 'destination';
+        $slug = $baseSlug . '-' . substr($ulid, -6);
 
         $destination = Destination::create(array_merge($validated, [
             'ulid' => $ulid,

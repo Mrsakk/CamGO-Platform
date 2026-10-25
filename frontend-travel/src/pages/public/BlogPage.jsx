@@ -9,6 +9,7 @@ import { PageContainer } from "@/components/layout/PageContainer";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { SEOHead } from "@/components/common/SEOHead";
 import { RumduolFlower } from "@/components/common/RumduolMotifs";
+import { getImageUrl } from "@/lib/utils";
 
 const toKm = (n) => (n === null || n === undefined ? "0" : String(n));
 
@@ -256,38 +257,39 @@ export const BlogPage = () => {
                     className="group rounded-2xl sm:rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800/90 shadow-2xs hover:shadow-xl hover:shadow-stone-950/10 dark:hover:shadow-black/50 hover:border-laterite-500/40 dark:hover:border-laterite-500/40 transition-all duration-300 flex flex-col justify-between select-none h-full block"
                   >
                     {/* Visual Media Pane */}
-                    {post.image_url && (
-                      <div className="w-full aspect-[16/10] border-b border-stone-200/90 dark:border-stone-800 overflow-hidden bg-stone-950 relative">
-                        <img
-                          src={post.image_url}
-                          alt={title}
-                          loading="lazy"
-                          decoding="async"
-                          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
-                        />
-                        {/* Cinematic Scrims */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/70 via-stone-950/20 to-transparent pointer-events-none" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent pointer-events-none" />
+                    <div className="w-full aspect-[16/10] border-b border-stone-200/90 dark:border-stone-800 overflow-hidden bg-stone-950 relative">
+                      <img
+                        src={getImageUrl(post.cover_image || post.image_url, "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80")}
+                        alt={title}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80";
+                        }}
+                      />
+                      {/* Cinematic Scrims */}
+                      <div className="absolute inset-0 bg-gradient-to-b from-stone-950/70 via-stone-950/20 to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent pointer-events-none" />
 
-                        {/* Top-Left Date Pill */}
-                        {dateStr && (
-                          <div className="absolute top-3 left-3 z-10">
-                            <span className="px-2.5 py-1 rounded-full bg-stone-950/70 dark:bg-stone-900/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold shadow-xs flex items-center gap-1.5 font-mono">
-                              <Calendar className="w-3 h-3 text-amber-400" />
-                              <span>{dateStr}</span>
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Bottom-Left Reading Badge */}
-                        <div className="absolute bottom-3 left-3 z-10">
-                          <span className="px-2.5 py-0.5 rounded-full bg-stone-950/75 backdrop-blur-md border border-white/20 text-stone-200 text-[10px] font-semibold flex items-center gap-1 font-khmer shadow-xs">
-                            <Clock className="w-3 h-3 text-amber-400" />
-                            <span>{km ? "អាន 4 នាទី" : "4 min read"}</span>
+                      {/* Top-Left Date Pill */}
+                      {dateStr && (
+                        <div className="absolute top-3 left-3 z-10">
+                          <span className="px-2.5 py-1 rounded-full bg-stone-950/70 dark:bg-stone-900/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold shadow-xs flex items-center gap-1.5 font-mono">
+                            <Calendar className="w-3 h-3 text-amber-400" />
+                            <span>{dateStr}</span>
                           </span>
                         </div>
+                      )}
+
+                      {/* Bottom-Left Reading Badge */}
+                      <div className="absolute bottom-3 left-3 z-10">
+                        <span className="px-2.5 py-0.5 rounded-full bg-stone-950/75 backdrop-blur-md border border-white/20 text-stone-200 text-[10px] font-semibold flex items-center gap-1 font-khmer shadow-xs">
+                          <Clock className="w-3 h-3 text-amber-400" />
+                          <span>{km ? "អាន 4 នាទី" : "4 min read"}</span>
+                        </span>
                       </div>
-                    )}
+                    </div>
 
                     {/* Editorial Content */}
                     <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">

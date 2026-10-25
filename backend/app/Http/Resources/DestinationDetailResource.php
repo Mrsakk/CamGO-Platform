@@ -30,6 +30,8 @@ class DestinationDetailResource extends JsonResource
             'highlights_km' => $this->highlights_km ?? [],
             'highlights_en' => $this->highlights_en ?? [],
             'cover_image' => $this->cover_image,
+            'image_url' => $this->cover_image,
+            'image' => $this->cover_image,
             'opening_hours_en' => $this->opening_hours_en,
             'opening_hours_km' => $this->opening_hours_km,
             'entrance_fee_usd' => (float) $this->entrance_fee_usd,

@@ -23,6 +23,7 @@ import { AddToPlanModal } from "@/components/planner/AddToPlanModal";
 import { RumduolFlower } from "@/components/common/RumduolMotifs";
 import { useTripPlannerStore } from "@/store/tripPlannerStore";
 import { toast } from "@/store/toastStore";
+import { getImageUrl } from "@/lib/utils";
 
 const toKm = (n) => (n === null || n === undefined ? "0" : String(n));
 
@@ -624,10 +625,10 @@ export const MapExplorerPage = () => {
                     ? "ទេសចរណ៍"
                     : "Attraction";
 
-                const coverImg =
-                  dest.cover_image ||
-                  dest.primary_image?.image_url ||
-                  "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=300&q=80";
+                const coverImg = getImageUrl(
+                  dest.cover_image || dest.primary_image?.image_url,
+                  "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=300&q=80"
+                );
 
                 const rating = Number(dest.avg_rating ?? dest.rating_avg ?? 0);
                 const priceLabel = dest.is_free
@@ -669,6 +670,9 @@ export const MapExplorerPage = () => {
                         alt={name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=300&q=80";
+                        }}
                       />
                       {isSelected && (
                         <span className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-lg bg-laterite-600/95 backdrop-blur-xs text-white text-[10px] font-sans font-bold shadow-xs flex items-center gap-1">
@@ -830,10 +834,10 @@ export const MapExplorerPage = () => {
                   ? dest.province.name_km
                   : dest.province.name_en
                 : "";
-              const coverImg =
-                dest.cover_image ||
-                dest.primary_image?.image_url ||
-                "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=400&q=80";
+              const coverImg = getImageUrl(
+                dest.cover_image || dest.primary_image?.image_url,
+                "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=400&q=80"
+              );
 
               return (
                 <Marker
@@ -852,6 +856,9 @@ export const MapExplorerPage = () => {
                             src={coverImg}
                             alt={name}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=400&q=80";
+                            }}
                           />
                         </div>
                       )}
@@ -945,12 +952,14 @@ export const MapExplorerPage = () => {
             <div className="lg:hidden absolute bottom-3 left-3 right-3 z-[1001] bg-white/95 dark:bg-stone-900/95 rounded-3xl p-3.5 border border-stone-200/90 dark:border-stone-700/80 shadow-2xl backdrop-blur-md animate-fade-in flex gap-3.5">
               <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0 bg-stone-100 dark:bg-stone-800 relative border border-stone-200 dark:border-stone-700">
                 <img
-                  src={
-                    activeDestination.cover_image ||
-                    activeDestination.primary_image?.image_url ||
+                  src={getImageUrl(
+                    activeDestination.cover_image || activeDestination.primary_image?.image_url,
                     "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=300&q=80"
-                  }
+                  )}
                   alt={km && activeDestination.name_km ? activeDestination.name_km : activeDestination.name_en}
+                  onError={(e) => {
+                    e.currentTarget.src = "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=300&q=80";
+                  }}
                   className="w-full h-full object-cover"
                 />
               </div>

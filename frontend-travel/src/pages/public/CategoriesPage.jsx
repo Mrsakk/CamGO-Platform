@@ -225,6 +225,9 @@ const CategoriesPage = () => {
                       loading="lazy"
                       decoding="async"
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80";
+                      }}
                     />
 
                     {/* Multi-layer Ambient Gradient */}
