@@ -1,29 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
-import { toast } from "@/store/toastStore";
+import { queryKeys } from "@/lib/queryKeys";
+
 const AdminAuditLogsPage = () => {
-  const [logs, setLogs] = useState([]);
-  const [meta, setMeta] = useState(null);
   const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
-  const fetchLogs = async () => {
-    try {
-      setIsLoading(true);
-      const res = await adminApi.getAuditLogs({ page, per_page: 20 });
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setLogs(list);
-      if (res?.meta) setMeta(res.meta);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load audit logs");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchLogs();
-  }, [page]);
+
+  const { data: res, isLoading } = useQuery({
+    queryKey: queryKeys.auditLogs.list({ page, per_page: 20 }),
+    queryFn: () => adminApi.getAuditLogs({ page, per_page: 20 }),
+    placeholderData: keepPreviousData,
+  });
+
+  const logs = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
+  const meta = res?.meta || null;
+
   return <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-black text-stone-900 dark:text-white">

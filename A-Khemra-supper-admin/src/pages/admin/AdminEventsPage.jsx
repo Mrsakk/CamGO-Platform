@@ -1,68 +1,45 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Plus, Edit, Trash2, Calendar, X, Save, Loader2, MapPin, Sparkles, Search } from "lucide-react";
+import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
+import { provincesApi } from "@/lib/api/provinces";
+import { queryKeys } from "@/lib/queryKeys";
+import { useDebounce } from "@/lib/useDebounce";
 import { toast } from "@/store/toastStore";
 
 const AdminEventsPage = () => {
-  const [events, setEvents] = useState([]);
-  const [provinces, setProvinces] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
 
-  const [formData, setFormData] = useState({
-    title_en: "",
-    title_km: "",
-    province_id: "",
-    location_name_en: "",
-    location_name_km: "",
-    start_date: "",
-    end_date: "",
-    description_en: "",
-    description_km: "",
-    is_published: true,
-    is_featured: false,
+  // 1. Cached Provinces (24 hours)
+  const { data: provinces = [] } = useQuery({
+    queryKey: queryKeys.provinces.all(),
+    queryFn: async () => {
+      const res = await provincesApi.getAll();
+      return res?.data || [];
+    },
+    staleTime: 1000 * 60 * 60 * 24,
   });
 
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // 1. Fetch Events from Database
-  const fetchEvents = async (search = searchQuery) => {
-    try {
-      setIsLoading(true);
-      const res = await adminApi.getEvents({ per_page: 50, search: search || undefined });
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setEvents(list);
-    } catch (err) {
-      console.error("Failed to load events", err);
-      toast.error("Failed to load events from database");
-    } finally {
-      setIsLoading(false);
-    }
+  // 2. Events Query with keepPreviousData
+  const eventFilters = {
+    per_page: 50,
+    search: debouncedSearch.trim() || undefined,
   };
 
-  // 2. Fetch Provinces from Database
-  const fetchProvinces = async () => {
-    try {
-      const res = await adminApi.getProvinces();
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setProvinces(list);
-    } catch (err) {
-      console.error("Failed to load provinces", err);
-    }
-  };
+  const { data: eventsRes, isLoading } = useQuery({
+    queryKey: queryKeys.events.list(eventFilters),
+    queryFn: () => adminApi.getEvents(eventFilters),
+    placeholderData: keepPreviousData,
+  });
 
-  useEffect(() => {
-    fetchEvents();
-    fetchProvinces();
-  }, []);
+  const events = eventsRes?.data?.items || (Array.isArray(eventsRes?.data) ? eventsRes.data : []);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    fetchEvents(searchQuery);
   };
 
   // Open Create Modal
@@ -115,7 +92,7 @@ const AdminEventsPage = () => {
     if (!window.confirm(`Delete event "${title}"?`)) return;
     try {
       await adminApi.deleteEvent(id);
-      setEvents((prev) => prev.filter((e) => e.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.all() });
       toast.success("Event deleted from database");
     } catch (err) {
       console.error(err);
@@ -154,7 +131,7 @@ const AdminEventsPage = () => {
         toast.success("Event created successfully");
       }
       setIsModalOpen(false);
-      fetchEvents();
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.all() });
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save event");
     } finally {

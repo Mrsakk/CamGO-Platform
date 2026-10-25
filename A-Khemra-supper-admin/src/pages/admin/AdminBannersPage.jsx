@@ -1,10 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Plus, Edit, Trash2, X, Save, Loader2 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
+import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+
 const AdminBannersPage = () => {
-  const [banners, setBanners] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  const { data: bannersRes, isLoading } = useQuery({
+    queryKey: queryKeys.banners.all(),
+    queryFn: () => adminApi.getBanners(),
+  });
+
+  const banners = bannersRes?.data?.items || (Array.isArray(bannersRes?.data) ? bannersRes.data : []);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState(null);
   const [formData, setFormData] = useState({
@@ -18,22 +28,7 @@ const AdminBannersPage = () => {
   });
   const [imageFile, setImageFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fetchBanners = async () => {
-    try {
-      setIsLoading(true);
-      const res = await adminApi.getBanners();
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setBanners(list);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load banners");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchBanners();
-  }, []);
+
   const openCreateModal = () => {
     setEditingBanner(null);
     setFormData({
@@ -66,7 +61,7 @@ const AdminBannersPage = () => {
     if (!window.confirm("Delete this banner?")) return;
     try {
       await adminApi.deleteBanner(id);
-      setBanners((prev) => prev.filter((b) => b.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.banners.all() });
       toast.success("Banner deleted");
     } catch (err) {
       toast.error("Failed to delete banner");
@@ -95,7 +90,7 @@ const AdminBannersPage = () => {
         toast.success("Banner created");
       }
       setIsModalOpen(false);
-      fetchBanners();
+      queryClient.invalidateQueries({ queryKey: queryKeys.banners.all() });
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save banner");
     } finally {

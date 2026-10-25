@@ -1,8 +1,32 @@
 import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { HelmetProvider, Helmet } from "react-helmet-async";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, MAX_CACHE_AGE } from "@/lib/queryClient";
+import { createIdbPersister } from "@/lib/persister";
+
+const idbPersister = createIdbPersister("CAMGO_BUSINESS_CACHE");
+
+const persistOptions = {
+  persister: idbPersister,
+  maxAge: MAX_CACHE_AGE,
+  buster: "kmb-perf-v2",
+  dehydrateOptions: {
+    // Only persist public directory, categories, and home data
+    // NEVER persist owner private data, KYC, leads, tokens, or team records
+    shouldDehydrateQuery: (query) => {
+      if (query.state.status !== "success" || !Array.isArray(query.queryKey)) {
+        return false;
+      }
+      const rootKey = query.queryKey[0];
+      const sensitiveKeys = ["owner", "auth", "token", "kyc", "leads", "team", "subscription"];
+      if (sensitiveKeys.includes(rootKey)) {
+        return false;
+      }
+      return ["business", "categories", "home", "directory"].includes(rootKey);
+    },
+  },
+};
 import { PublicLayout } from "@/layouts/PublicLayout";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { OwnerLayout } from "@/layouts/OwnerLayout";
@@ -41,11 +65,6 @@ const PrivacyPage = lazy(() =>
 );
 const TermsPage = lazy(() =>
   import("@/pages/TermsPage").then((m) => ({ default: m.TermsPage }))
-);
-const DesignSystemPage = lazy(() =>
-  import("@/pages/DesignSystemPage").then((m) => ({
-    default: m.DesignSystemPage,
-  }))
 );
 
 // Auth pages
@@ -133,7 +152,7 @@ function App() {
         />
       </Helmet>
 
-      <QueryClientProvider client={queryClient}>
+      <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
         <BrowserRouter>
           <Routes>
             <Route element={<PublicLayout />}>
@@ -210,15 +229,6 @@ function App() {
                 }
               />
             </Route>
-
-            <Route
-              path="/__design"
-              element={
-                <Suspense fallback={<LoadingFallback />}>
-                  <DesignSystemPage />
-                </Suspense>
-              }
-            />
 
             <Route element={<AuthLayout />}>
               <Route
@@ -334,7 +344,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
-      </QueryClientProvider>
+      </PersistQueryClientProvider>
     </HelmetProvider>
   );
 }

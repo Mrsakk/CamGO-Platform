@@ -72,6 +72,7 @@ export const OwnerTeamPage = () => {
       const res = await api.get("/business/owner/team");
       return res.data?.data || res.data;
     },
+    staleTime: 1000 * 60 * 5,
   });
 
   const members = Array.isArray(data) ? data : [];
@@ -277,7 +278,7 @@ export const OwnerTeamPage = () => {
 
       {isError ? (
         <QueryError onRetry={refetch} isRetrying={isFetching} />
-      ) : isLoading ? (
+      ) : isLoading && members.length === 0 ? (
         <div className="flex items-center justify-center gap-2 py-16 text-sm text-stone-500">
           <Loader2 className="w-5 h-5 animate-spin" />
           {isKm ? "កំពុងផ្ទុកក្រុមការងារ..." : "Loading team..."}

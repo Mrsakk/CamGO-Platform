@@ -17,6 +17,7 @@ use App\Modules\Business\Services\ProfileScoreService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -34,22 +35,27 @@ class OwnerBusinessController extends ApiController
             return $this->errorResponse('No business is linked to this account.', 404);
         }
 
-        $business = Business::with([
-            'category',
-            'province',
-            'coverMedia',
-            'media',
-            'contacts',
-            'services',
-            'hours',
-            'closures',
-            'documents',
-            'owners',
-        ])->findOrFail($user->business_id);
-
+        $business = Business::findOrFail($user->business_id);
         $this->authorize('view', $business);
 
-        return $this->successResponse(new BusinessOwnerDetailResource($business));
+        $payload = Cache::remember("owner:mybiz:{$user->business_id}", 30, function () use ($user) {
+            $b = Business::with([
+                'category',
+                'province',
+                'coverMedia',
+                'media',
+                'contacts',
+                'services',
+                'hours',
+                'closures',
+                'documents',
+                'owners',
+            ])->findOrFail($user->business_id);
+
+            return (new BusinessOwnerDetailResource($b))->response()->getData(true)['data'];
+        });
+
+        return $this->successResponse($payload);
     }
 
     /**
@@ -128,6 +134,11 @@ class OwnerBusinessController extends ApiController
             'documents',
         ]);
 
+        Cache::forget("owner:mybiz:{$user->business_id}");
+        Cache::forget("owner:stats:{$business->id}:7");
+        Cache::forget("owner:stats:{$business->id}:30");
+        Cache::forget("owner:stats:{$business->id}:90");
+
         return $this->successResponse(
             new BusinessOwnerDetailResource($business),
             $coreChanged ? 'Profile updated. Core details submitted for staff verification.' : 'Profile updated successfully.'
@@ -162,91 +173,96 @@ class OwnerBusinessController extends ApiController
             ? min($requestedDays, (int) $maxAnalyticsDays)
             : $requestedDays;
 
-        $startDate = now()->subDays($days);
+        $cacheKey = "owner:stats:{$business->id}:{$days}";
+        $data = Cache::remember($cacheKey, 30, function () use ($business, $days, $leadService, $profileScore) {
+            $startDate = now()->subDays($days);
 
-        // Events by channel
-        $channelCounts = BusinessContactEvent::where('business_id', $business->id)
-            ->where('occurred_at', '>=', $startDate)
-            ->select('channel', DB::raw('COUNT(*) as count'))
-            ->groupBy('channel')
-            ->pluck('count', 'channel')
-            ->toArray();
+            // Events by channel
+            $channelCounts = BusinessContactEvent::where('business_id', $business->id)
+                ->where('occurred_at', '>=', $startDate)
+                ->select('channel', DB::raw('COUNT(*) as count'))
+                ->groupBy('channel')
+                ->pluck('count', 'channel')
+                ->toArray();
 
-        // Daily trend
-        $dailyTrend = BusinessContactEvent::where('business_id', $business->id)
-            ->where('occurred_at', '>=', $startDate)
-            ->select(
-                DB::raw('DATE(occurred_at) as date'),
-                DB::raw("SUM(CASE WHEN channel = 'profile_view' THEN 1 ELSE 0 END) as views"),
-                DB::raw("SUM(CASE WHEN channel != 'profile_view' THEN 1 ELSE 0 END) as contacts")
-            )
-            ->groupBy(DB::raw('DATE(occurred_at)'))
-            ->orderBy('date')
-            ->get();
+            // Daily trend
+            $dailyTrend = BusinessContactEvent::where('business_id', $business->id)
+                ->where('occurred_at', '>=', $startDate)
+                ->select(
+                    DB::raw('DATE(occurred_at) as date'),
+                    DB::raw("SUM(CASE WHEN channel = 'profile_view' THEN 1 ELSE 0 END) as views"),
+                    DB::raw("SUM(CASE WHEN channel != 'profile_view' THEN 1 ELSE 0 END) as contacts")
+                )
+                ->groupBy(DB::raw('DATE(occurred_at)'))
+                ->orderBy('date')
+                ->get();
 
-        $totalViews = $channelCounts['profile_view'] ?? 0;
-        $totalContacts = array_sum(array_filter(
-            $channelCounts,
-            fn ($k) => $k !== 'profile_view',
-            ARRAY_FILTER_USE_KEY
-        ));
+            $totalViews = $channelCounts['profile_view'] ?? 0;
+            $totalContacts = array_sum(array_filter(
+                $channelCounts,
+                fn ($k) => $k !== 'profile_view',
+                ARRAY_FILTER_USE_KEY
+            ));
 
-        $followUpDays = 3;
-        $followUpQuery = Lead::where('business_id', $business->id)
-            ->whereIn('status', ['new', 'contacted', 'qualified'])
-            ->where('last_contact_at', '<=', now()->subDays($followUpDays))
-            ->orderBy('last_contact_at');
-        $followUpCount = (clone $followUpQuery)->count();
-        $followUpLeads = (clone $followUpQuery)
-            ->take(5)
-            ->get(['id', 'status', 'primary_channel', 'contact_count', 'last_contact_at', 'note'])
-            ->map(fn (Lead $lead) => [
-                'id' => $lead->id,
-                'status' => $lead->status,
-                'primary_channel' => $lead->primary_channel,
-                'contact_count' => (int) $lead->contact_count,
-                'last_contact_at' => $lead->last_contact_at?->toIso8601String(),
-                'waiting_days' => $lead->last_contact_at
-                    ? (int) $lead->last_contact_at->diffInDays(now())
-                    : null,
-                'note' => $lead->note,
-            ]);
+            $followUpDays = 3;
+            $followUpQuery = Lead::where('business_id', $business->id)
+                ->whereIn('status', ['new', 'contacted', 'qualified'])
+                ->where('last_contact_at', '<=', now()->subDays($followUpDays))
+                ->orderBy('last_contact_at');
+            $followUpCount = (clone $followUpQuery)->count();
+            $followUpLeads = (clone $followUpQuery)
+                ->take(5)
+                ->get(['id', 'status', 'primary_channel', 'contact_count', 'last_contact_at', 'note'])
+                ->map(fn (Lead $lead) => [
+                    'id' => $lead->id,
+                    'status' => $lead->status,
+                    'primary_channel' => $lead->primary_channel,
+                    'contact_count' => (int) $lead->contact_count,
+                    'last_contact_at' => $lead->last_contact_at?->toIso8601String(),
+                    'waiting_days' => $lead->last_contact_at
+                        ? (int) $lead->last_contact_at->diffInDays(now())
+                        : null,
+                    'note' => $lead->note,
+                ]);
 
-        return $this->successResponse([
-            'business_id' => $business->id,
-            'range' => "{$days}d",
-            'totals' => [
-                'views' => $totalViews,
-                'contacts' => $totalContacts,
-                'rating_avg' => (float) $business->rating_avg,
-                'rating_count' => (int) $business->rating_count,
-            ],
-            'channels' => $channelCounts,
-            'daily_trend' => $dailyTrend,
-            'leads' => $leadService->stats($business, $days),
-            'lead_change' => $leadService->recentStats($business, $days),
-            'profile' => $profileScore->forBusiness($business),
-            'plan_limits' => $business->planLimits(),
-            'usage' => [
-                'photos' => $business->media()->count(),
-                'services' => $business->services()->count(),
-                'team_members' => $business->members()->where('role', '!=', 'owner')->count(),
-            ],
-            'follow_ups' => [
-                'days' => $followUpDays,
-                'count' => $followUpCount,
-                'items' => $followUpLeads,
-            ],
-            'tier' => [
-                'current' => $business->tier ?: 'free',
-                'is_featured' => $business->isFeatured(),
-                'is_on_trial' => $business->isOnTrial(),
-                'has_used_trial' => $business->hasUsedTrial(),
-                'trial_ends_at' => $business->trial_ends_at?->toIso8601String(),
-                'expires_at' => $business->subscription_expires_at?->toIso8601String(),
-                'is_active' => $business->isSubscriptionActive(),
-            ],
-        ]);
+            return [
+                'business_id' => $business->id,
+                'range' => "{$days}d",
+                'totals' => [
+                    'views' => $totalViews,
+                    'contacts' => $totalContacts,
+                    'rating_avg' => (float) $business->rating_avg,
+                    'rating_count' => (int) $business->rating_count,
+                ],
+                'channels' => $channelCounts,
+                'daily_trend' => $dailyTrend,
+                'leads' => $leadService->stats($business, $days),
+                'lead_change' => $leadService->recentStats($business, $days),
+                'profile' => $profileScore->forBusiness($business),
+                'plan_limits' => $business->planLimits(),
+                'usage' => [
+                    'photos' => $business->media()->count(),
+                    'services' => $business->services()->count(),
+                    'team_members' => $business->members()->where('role', '!=', 'owner')->count(),
+                ],
+                'follow_ups' => [
+                    'days' => $followUpDays,
+                    'count' => $followUpCount,
+                    'items' => $followUpLeads,
+                ],
+                'tier' => [
+                    'current' => $business->tier ?: 'free',
+                    'is_featured' => $business->isFeatured(),
+                    'is_on_trial' => $business->isOnTrial(),
+                    'has_used_trial' => $business->hasUsedTrial(),
+                    'trial_ends_at' => $business->trial_ends_at?->toIso8601String(),
+                    'expires_at' => $business->subscription_expires_at?->toIso8601String(),
+                    'is_active' => $business->isSubscriptionActive(),
+                ],
+            ];
+        });
+
+        return $this->successResponse($data);
     }
 
     /**

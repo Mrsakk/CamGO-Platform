@@ -1,5 +1,4 @@
-@import "@fontsource-variable/kantumruy-pro";
-@import "@fontsource-variable/inter";
+@import './styles/fonts.css';
 @import './styles/typography.css';
 @tailwind base;
 @tailwind components;

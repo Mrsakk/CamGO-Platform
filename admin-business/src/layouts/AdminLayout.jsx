@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import {
   LayoutDashboard,
@@ -17,21 +16,19 @@ import api from "@/lib/axios";
 
 export const AdminLayout = () => {
   const { t, i18n } = useTranslation();
-  const location = useLocation();
   const isKm = i18n.language === "km";
   const { user, hasPermission } = useAuthStore();
-  const [pendingReviewsCount, setPendingReviewsCount] = useState(0);
+  const canModerateReviews = hasPermission("business.reviews.moderate");
 
-  useEffect(() => {
-    api.get("/admin/business/reviews?status=pending&per_page=1")
-      .then((res) => {
-        const count = res.data?.data?.pending_count ?? res.data?.pending_count;
-        if (count !== undefined) {
-          setPendingReviewsCount(count);
-        }
-      })
-      .catch(() => {});
-  }, [location.pathname]);
+  const { data: pendingReviewsCount = 0 } = useQuery({
+    queryKey: ["admin", "business", "reviews", "pendingCount"],
+    queryFn: async () => {
+      const res = await api.get("/admin/business/reviews?status=pending&per_page=1");
+      return res.data?.data?.pending_count ?? res.data?.pending_count ?? 0;
+    },
+    enabled: canModerateReviews,
+    staleTime: 60 * 1000,
+  });
 
   const navItems = [
     {

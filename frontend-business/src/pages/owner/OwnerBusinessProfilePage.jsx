@@ -552,8 +552,8 @@ export const OwnerBusinessProfilePage = () => {
     uploadMediaMutation.mutate(files);
   };
 
-  const contacts = business?.contacts || [];
-  const mediaList = business?.media || [];
+  const contacts = Array.isArray(business?.contacts) ? business.contacts : [];
+  const mediaList = Array.isArray(business?.media) ? business.media : [];
 
   const requestContactDelete = (contact) => {
     setConfirmDelete({

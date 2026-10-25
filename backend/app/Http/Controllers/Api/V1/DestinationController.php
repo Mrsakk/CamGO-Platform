@@ -154,25 +154,40 @@ class DestinationController extends ApiController
      */
     public function show(string $slugOrUlid): JsonResponse
     {
-        $destination = Destination::query()
-            ->where(function ($q) use ($slugOrUlid) {
-                $q->where('slug', $slugOrUlid)
-                  ->orWhere('ulid', $slugOrUlid)
-                  ->orWhere('id', $slugOrUlid);
-            })
-            ->published()
-            ->with(['province', 'category', 'images', 'approvedReviews.user', 'approvedReviews.images'])
-            ->first();
+        $cacheKey = "dest:detail:{$slugOrUlid}";
+        $data = Cache::remember($cacheKey, 300, function () use ($slugOrUlid) {
+            $dest = Destination::query()
+                ->where(function ($q) use ($slugOrUlid) {
+                    $q->where('slug', $slugOrUlid)
+                      ->orWhere('ulid', $slugOrUlid);
+                    if (is_numeric($slugOrUlid)) {
+                        $q->orWhere('id', (int) $slugOrUlid);
+                    }
+                })
+                ->published()
+                ->with(['province', 'category', 'images', 'approvedReviews.user', 'approvedReviews.images'])
+                ->first();
 
-        if (!$destination) {
+            if (!$dest) {
+                return null;
+            }
+
+            return [
+                'id' => $dest->id,
+                'payload' => (new DestinationDetailResource($dest))->resolve(),
+            ];
+        });
+
+        if (!$data) {
             return $this->errorResponse('Destination not found', 404);
         }
 
-        // Increment view count asynchronously
-        $destination->incrementQuietly('view_count');
+        // Defer view count increment to run after the response is sent to user
+        $destId = $data['id'];
+        dispatch(fn () => Destination::where('id', $destId)->increment('view_count'))->afterResponse();
 
         return $this->successResponse([
-            'destination' => new DestinationDetailResource($destination),
+            'destination' => $data['payload'],
         ]);
     }
 

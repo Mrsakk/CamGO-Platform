@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import {
   ArrowRight,
@@ -67,6 +67,7 @@ export const OwnerLeadsPage = () => {
       const res = await api.get("/business/owner/leads", { params });
       return res.data;
     },
+    placeholderData: keepPreviousData,
   });
 
   const { data: stats } = useQuery({
@@ -75,6 +76,7 @@ export const OwnerLeadsPage = () => {
       const res = await api.get("/business/owner/leads/stats?days=90");
       return res.data?.data || res.data;
     },
+    staleTime: 1000 * 60 * 5,
   });
 
   const updateMutation = useMutation({
@@ -243,7 +245,7 @@ export const OwnerLeadsPage = () => {
 
       {isError ? (
         <QueryError onRetry={refetch} isRetrying={isFetching} />
-      ) : isLoading ? (
+      ) : isLoading && leads.length === 0 ? (
         <div className="flex items-center justify-center gap-2 py-16 text-sm text-stone-500">
           <Loader2 className="w-5 h-5 animate-spin" />
           {isKm ? "កំពុងផ្ទុកអតិថិជន..." : "Loading leads..."}

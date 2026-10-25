@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import {
   CheckCircle2,
@@ -60,6 +60,7 @@ export const OwnerReviewsPage = () => {
       const res = await api.get("/business/owner/reviews", { params });
       return res.data;
     },
+    placeholderData: keepPreviousData,
   });
 
   const { data: stats } = useQuery({
@@ -68,6 +69,7 @@ export const OwnerReviewsPage = () => {
       const res = await api.get("/business/owner/reviews/stats");
       return res.data?.data || res.data;
     },
+    staleTime: 1000 * 60 * 5,
   });
 
   const replyMutation = useMutation({
@@ -172,7 +174,7 @@ export const OwnerReviewsPage = () => {
 
       {isError ? (
         <QueryError onRetry={refetch} isRetrying={isFetching} />
-      ) : isLoading ? (
+      ) : isLoading && reviews.length === 0 ? (
         <div className="flex items-center justify-center gap-2 py-16 text-sm text-stone-500">
           <Loader2 className="w-5 h-5 animate-spin" />
           {isKm ? "កំពុងផ្ទុកការវាយតម្លៃ..." : "Loading reviews..."}

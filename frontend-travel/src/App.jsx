@@ -28,8 +28,6 @@ const ContactPage = lazy(() => import("@/pages/public/ContactPage").then((m) => 
 const FaqPage = lazy(() => import("@/pages/public/FaqPage").then((m) => ({ default: m.FaqPage })));
 const TermsPage = lazy(() => import("@/pages/public/TermsPage").then((m) => ({ default: m.TermsPage })));
 const PrivacyPage = lazy(() => import("@/pages/public/PrivacyPage").then((m) => ({ default: m.PrivacyPage })));
-const TypographyTestPage = lazy(() => import("@/pages/public/TypographyTestPage").then((m) => ({ default: m.TypographyTestPage })));
-const ResponsiveCheckPage = lazy(() => import("@/pages/public/ResponsiveCheckPage").then((m) => ({ default: m.ResponsiveCheckPage })));
 const NotFoundPage = lazy(() => import("@/pages/public/NotFoundPage").then((m) => ({ default: m.NotFoundPage })));
 
 // 2. Auth Pages (Code-split)
@@ -114,9 +112,6 @@ function App() {
             <Route path="/terms-of-use" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/privacy-policy" element={<PrivacyPage />} />
-            <Route path="/typography" element={<TypographyTestPage />} />
-            <Route path="/typography-test" element={<TypographyTestPage />} />
-            <Route path="/responsive-check" element={<ResponsiveCheckPage />} />
 
             {/* Tourist Protected Routes */}
             <Route

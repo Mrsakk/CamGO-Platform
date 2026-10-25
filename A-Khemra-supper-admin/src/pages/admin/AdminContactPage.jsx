@@ -1,33 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Check, Trash2, Eye, X } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
+import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+
 const AdminContactPage = () => {
-  const [messages, setMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [selectedMessage, setSelectedMessage] = useState(null);
-  const fetchMessages = async () => {
-    try {
-      setIsLoading(true);
-      const res = await adminApi.getContacts();
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setMessages(list);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load contact messages");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchMessages();
-  }, []);
+
+  const { data: contactsRes, isLoading } = useQuery({
+    queryKey: queryKeys.contactMessages.all(),
+    queryFn: () => adminApi.getContacts(),
+  });
+
+  const messages = contactsRes?.data?.items || (Array.isArray(contactsRes?.data) ? contactsRes.data : []);
+
   const handleMarkRead = async (id) => {
     try {
       await adminApi.markContactRead(id);
-      setMessages(
-        (prev) => prev.map((m) => m.id === id ? { ...m, is_read: true } : m)
-      );
+      queryClient.invalidateQueries({ queryKey: queryKeys.contactMessages.all() });
       toast.success("Marked as read");
     } catch (err) {
       toast.error("Failed to mark read");
@@ -37,7 +29,7 @@ const AdminContactPage = () => {
     if (!window.confirm("Delete this message?")) return;
     try {
       await adminApi.deleteContact(id);
-      setMessages((prev) => prev.filter((m) => m.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.contactMessages.all() });
       toast.success("Message deleted");
     } catch (err) {
       toast.error("Failed to delete message");

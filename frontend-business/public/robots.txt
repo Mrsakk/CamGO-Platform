@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /owner
+Disallow: /login
+Disallow: /set-password
+Disallow: /accept-invite/
+
+Sitemap: /sitemap.xml

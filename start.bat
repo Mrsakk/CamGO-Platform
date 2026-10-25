@@ -6,14 +6,19 @@ echo   Phase 1 (Travel) + Phase 2 (Business Directory)
 echo ========================================================
 echo.
 
-REM 1. Ensure MySQL Database is running
-tasklist /fi "imagename eq mysqld.exe" | find /i "mysqld.exe" >nul
-if errorlevel 1 (
-    echo [1/6] Starting MySQL Database Server on port 3306...
-    start /b "" "C:\Setup_Software\Unit_Project\laragon\bin\mysql\mysql-8.0.30-winx64\bin\mysqld.exe" --defaults-file="C:\Setup_Software\Unit_Project\laragon\bin\mysql\mysql-8.0.30-winx64\my.ini"
-    timeout /t 2 /nobreak >nul
+REM 1. Database Connection Check
+findstr /i "^DB_CONNECTION=pgsql" "%~dp0backend\.env" >nul 2>&1
+if not errorlevel 1 (
+    echo [1/6] Database: Connected to Supabase PostgreSQL (Cloud Database)
 ) else (
-    echo [1/6] MySQL Database is already active on port 3306.
+    tasklist /fi "imagename eq mysqld.exe" | find /i "mysqld.exe" >nul
+    if errorlevel 1 (
+        echo [1/6] Starting MySQL Database Server on port 3306...
+        start /b "" "C:\Setup_Software\Unit_Project\laragon\bin\mysql\mysql-8.0.30-winx64\bin\mysqld.exe" --defaults-file="C:\Setup_Software\Unit_Project\laragon\bin\mysql\mysql-8.0.30-winx64\my.ini"
+        timeout /t 2 /nobreak >nul
+    ) else (
+        echo [1/6] MySQL Database is already active on port 3306.
+    )
 )
 
 REM 2. Start Laravel Backend API (Shared backend on 8000)
@@ -49,7 +54,7 @@ if exist "%~dp0admin-business" (
 echo.
 echo ========================================================
 echo   All Services are up and running!
-echo   - 1. Backend API:        http://localhost:8000 (API & Docs)
+echo   - 1. Backend API:        http://localhost:8000 (API and Docs)
 echo   - 2. Frontend Travel:    http://localhost:5173
 echo   - 3. Admin Travel:       http://localhost:5174
 echo   - 4. Frontend Business:  http://localhost:5175 (Public Directory)

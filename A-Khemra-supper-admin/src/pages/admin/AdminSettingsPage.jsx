@@ -23,12 +23,12 @@ import { useThemeStore } from "@/store/themeStore";
 import { toast } from "@/store/toastStore";
 
 const AdminSettingsPage = () => {
-  const { updateSettingState } = useAdminSettingsStore();
+  const { settings: globalSettings, isLoaded, updateSettingState } = useAdminSettingsStore();
   const { theme } = useThemeStore();
   const fileInputRef = useRef(null);
   const faviconInputRef = useRef(null);
 
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState(() => ({
     site_name_en: "CamGO",
     site_name_highlight: "GO",
     site_name_km: "CamGO",
@@ -47,10 +47,11 @@ const AdminSettingsPage = () => {
     social_youtube: "",
     seo_title_default: "",
     seo_description_default: "",
-    seo_keywords_default: ""
-  });
+    seo_keywords_default: "",
+    ...(globalSettings || {})
+  }));
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!isLoaded);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isUploadingFavicon, setIsUploadingFavicon] = useState(false);

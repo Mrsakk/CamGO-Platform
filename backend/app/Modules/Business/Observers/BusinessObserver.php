@@ -10,7 +10,7 @@ class BusinessObserver
     /**
      * Clear all business-related cache tags or keys.
      */
-    public function clearCache(): void
+    public function clearCache(?Business $business = null): void
     {
         // Flush all biz: cache keys or tag
         try {
@@ -22,6 +22,10 @@ class BusinessObserver
                 Cache::forget('biz:public:categories');
                 Cache::forget('biz:public:provinces');
             }
+
+            if ($business && $business->slug) {
+                Cache::forget("biz:public:detail:{$business->slug}");
+            }
         } catch (\Throwable $e) {
             // Ignore cache flush failures
         }
@@ -31,7 +35,7 @@ class BusinessObserver
     {
         // If status changed to suspended, ensure it immediately drops from cache
         if ($business->isDirty('status') && $business->status === 'suspended') {
-            $this->clearCache();
+            $this->clearCache($business);
         }
     }
 
@@ -41,16 +45,16 @@ class BusinessObserver
             $business->recalculateDestinationLinks();
         }
 
-        $this->clearCache();
+        $this->clearCache($business);
     }
 
     public function deleted(Business $business): void
     {
-        $this->clearCache();
+        $this->clearCache($business);
     }
 
     public function restored(Business $business): void
     {
-        $this->clearCache();
+        $this->clearCache($business);
     }
 }

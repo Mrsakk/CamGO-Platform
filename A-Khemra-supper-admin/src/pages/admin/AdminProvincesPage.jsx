@@ -1,40 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Plus, Edit, Trash2, MapPin, X, Save, Loader2 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
 import { provincesApi } from "@/lib/api/provinces";
+import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+
 const AdminProvincesPage = () => {
-  const [provinces, setProvinces] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  // 1. Cached Provinces (24 hours staleTime, instant display)
+  const { data: provinces = [], isLoading } = useQuery({
+    queryKey: queryKeys.provinces.all(),
+    queryFn: async () => {
+      const res = await provincesApi.getAll();
+      return res?.data || [];
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProvince, setEditingProvince] = useState(null);
-  const [formData, setFormData] = useState({
-    name_en: "",
-    name_km: "",
-    capital: "",
-    area_km2: "",
-    population: "",
-    latitude: "",
-    longitude: "",
-    description_en: "",
-    description_km: ""
-  });
-  const [imageFile, setImageFile] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const fetchProvinces = async () => {
-    try {
-      setIsLoading(true);
-      const res = await provincesApi.getAll();
-      if (res.data) setProvinces(res.data);
-    } catch (err) {
-      toast.error("Failed to load provinces");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchProvinces();
-  }, []);
   const openCreateModal = () => {
     setEditingProvince(null);
     setFormData({
@@ -71,7 +57,7 @@ const AdminProvincesPage = () => {
     if (!window.confirm(`Delete province "${name}"?`)) return;
     try {
       await adminApi.deleteProvince(id);
-      setProvinces((prev) => prev.filter((p) => p.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.provinces.all() });
       toast.success("Province deleted");
     } catch (err) {
       toast.error("Failed to delete province");
@@ -96,7 +82,7 @@ const AdminProvincesPage = () => {
         toast.success("Province created");
       }
       setIsModalOpen(false);
-      fetchProvinces();
+      queryClient.invalidateQueries({ queryKey: queryKeys.provinces.all() });
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save province");
     } finally {

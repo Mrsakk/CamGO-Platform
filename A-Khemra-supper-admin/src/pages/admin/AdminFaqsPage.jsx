@@ -1,10 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Plus, Edit, Trash2, X, Save, Loader2 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
+import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+
 const AdminFaqsPage = () => {
-  const [faqs, setFaqs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  const { data: faqsRes, isLoading } = useQuery({
+    queryKey: queryKeys.faqs.all(),
+    queryFn: () => adminApi.getFaqs(),
+  });
+
+  const faqs = faqsRes?.data?.items || (Array.isArray(faqsRes?.data) ? faqsRes.data : []);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingFaq, setEditingFaq] = useState(null);
   const [formData, setFormData] = useState({
@@ -16,22 +26,7 @@ const AdminFaqsPage = () => {
     order: "0"
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fetchFaqs = async () => {
-    try {
-      setIsLoading(true);
-      const res = await adminApi.getFaqs();
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setFaqs(list);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load FAQs");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchFaqs();
-  }, []);
+
   const openCreateModal = () => {
     setEditingFaq(null);
     setFormData({
@@ -60,7 +55,7 @@ const AdminFaqsPage = () => {
     if (!window.confirm("Delete this FAQ entry?")) return;
     try {
       await adminApi.deleteFaq(id);
-      setFaqs((prev) => prev.filter((f) => f.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.faqs.all() });
       toast.success("FAQ deleted");
     } catch (err) {
       toast.error("Failed to delete FAQ");
@@ -82,7 +77,7 @@ const AdminFaqsPage = () => {
         toast.success("FAQ created");
       }
       setIsModalOpen(false);
-      fetchFaqs();
+      queryClient.invalidateQueries({ queryKey: queryKeys.faqs.all() });
     } catch (err) {
       toast.error("Failed to save FAQ");
     } finally {

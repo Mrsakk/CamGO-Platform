@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet, NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Menu,
   X,
@@ -17,6 +18,7 @@ import { useThemeStore } from "@/store/themeStore";
 import { useSettingsStore, resolveAssetUrl } from "@/store/settingsStore";
 import { ToastContainer } from "@/components/common/ToastContainer";
 import { toast } from "@/store/toastStore";
+import { prefetchRoute } from "@/lib/prefetchRoutes";
 
 const shared = {
   header:
@@ -120,6 +122,7 @@ export const PortalLayout = ({
   const { user, logout } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
   const { settings, fetchSettings } = useSettingsStore();
+  const queryClient = useQueryClient();
   const [logoImgError, setLogoImgError] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -309,6 +312,7 @@ export const PortalLayout = ({
                   key={item.to}
                   to={item.to}
                   end={item.end}
+                  onPointerEnter={() => prefetchRoute(item.to, queryClient)}
                   className={({ isActive }) =>
                     `group flex items-center justify-between gap-3 rounded-2xl px-4 py-2.5 text-sm font-medium transition-all ${
                       isActive

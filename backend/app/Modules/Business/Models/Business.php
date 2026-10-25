@@ -453,7 +453,7 @@ class Business extends Model
                         tier = 'free'
                         OR (subscription_expires_at IS NOT NULL AND subscription_expires_at > ?)
                     ) THEN 2
-                WHEN is_verified = 1 THEN 1
+                WHEN is_verified THEN 1
                 ELSE 0
             END DESC",
             [

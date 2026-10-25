@@ -185,30 +185,42 @@ class PublicBusinessController extends ApiController
      */
     public function show(string $slug): JsonResponse
     {
-        $business = Business::where('slug', $slug)
-            ->published()
-            ->with([
-                'category',
-                'province',
-                'contacts',
-                'activeServices',
-                'hours',
-                'closures',
-                'media',
-                'approvedReviews',
-                'nearbyDestinations',
-                'branches' => fn ($query) => $query->where('is_active', true)->orderByDesc('is_primary'),
-            ])
-            ->first();
+        $normalizedSlug = \Illuminate\Support\Str::slug($slug);
+        $cacheKey = "biz:public:detail:{$normalizedSlug}";
 
-        if (! $business) {
+        $payload = Cache::remember($cacheKey, 300, function () use ($slug, $normalizedSlug) {
+            $business = Business::where(function ($q) use ($slug, $normalizedSlug) {
+                    $q->where('slug', $slug);
+                    if ($normalizedSlug && $normalizedSlug !== $slug) {
+                        $q->orWhere('slug', $normalizedSlug);
+                    }
+                })
+                ->published()
+                ->with([
+                    'category',
+                    'province',
+                    'contacts',
+                    'activeServices',
+                    'hours',
+                    'closures',
+                    'media',
+                    'approvedReviews',
+                    'nearbyDestinations',
+                    'branches' => fn ($query) => $query->where('is_active', true)->orderByDesc('is_primary'),
+                ])
+                ->first();
+
+            return $business ? (new BusinessPublicDetailResource($business))->response()->getData(true)['data'] : null;
+        });
+
+        if (! $payload) {
             return $this->errorResponse('Business not found or is currently not publicly active', 404);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Business profile retrieved',
-            'data' => new BusinessPublicDetailResource($business),
+            'data' => $payload,
         ])->header('Cache-Control', 'public, max-age=60, stale-while-revalidate=600');
     }
 
@@ -218,51 +230,45 @@ class PublicBusinessController extends ApiController
     public function home(): JsonResponse
     {
         $payload = Cache::remember('biz:public:home', 600, function () {
-            // Verified businesses pool
-            $verified = Business::query()->published()
-                ->where('is_verified', true)
+            $businesses = Business::query()->published()
                 ->with(['category', 'province', 'coverMedia', 'media', 'contacts', 'hours', 'closures'])
-                ->orderByDesc('rating_avg')
+                ->orderByPublicPriority()
+                ->get();
+
+            $verified = $businesses
+                ->filter(fn ($business) => (bool) $business->is_verified)
+                ->sortByDesc('rating_avg')
                 ->take(16)
-                ->get();
+                ->values();
 
-            // Newest businesses pool
-            $newest = Business::query()->published()
-                ->with(['category', 'province', 'coverMedia', 'media', 'contacts', 'hours', 'closures'])
-                ->orderByDesc('id')
+            $newest = $businesses
+                ->sortByDesc('id')
                 ->take(16)
-                ->get();
+                ->values();
 
-            // Categories with top sample businesses
-            $categories = Category::withCount(['businesses' => fn ($q) => $q->published()])
-                ->orderBy('sort_order')
-                ->get();
+            $categories = Category::orderBy('sort_order')->get();
 
-            $categoriesWithItems = [];
-            foreach ($categories as $cat) {
-                $items = Business::query()->published()
-                    ->where('category_id', $cat->id)
-                    ->with(['category', 'province', 'coverMedia', 'media', 'contacts', 'hours', 'closures'])
-                    ->orderByPublicPriority($cat->id)
-                    ->take(8)
-                    ->get();
+            $categoriesWithItems = $categories
+                ->map(function ($cat) use ($businesses) {
+                    $items = $businesses->where('category_id', $cat->id)->take(8)->values();
 
-                $categoriesWithItems[] = [
-                    'id' => $cat->id,
-                    'slug' => $cat->slug,
-                    'name_km' => $cat->name_km,
-                    'name_en' => $cat->name_en,
-                    'icon' => $cat->icon,
-                    'businesses_count' => $cat->businesses_count,
-                    'businesses' => BusinessPublicListResource::collection($items),
-                ];
-            }
+                    return [
+                        'id' => $cat->id,
+                        'slug' => $cat->slug,
+                        'name_km' => $cat->name_km,
+                        'name_en' => $cat->name_en,
+                        'icon' => $cat->icon,
+                        'businesses_count' => $businesses->where('category_id', $cat->id)->count(),
+                        'businesses' => BusinessPublicListResource::collection($items)->resolve(),
+                    ];
+                })
+                ->filter(fn ($cat) => $cat['businesses_count'] > 0)
+                ->values();
 
-            // Key provinces
             $provinces = Province::whereNull('deleted_at')
                 ->get()
-                ->map(function ($p) {
-                    $cnt = Business::where('province_id', $p->id)->published()->count();
+                ->map(function ($p) use ($businesses) {
+                    $cnt = $businesses->where('province_id', $p->id)->count();
 
                     return [
                         'id' => $p->id,
@@ -277,10 +283,10 @@ class PublicBusinessController extends ApiController
                 ->values();
 
             return [
-                'verified_pool' => BusinessPublicListResource::collection($verified),
-                'newest_pool' => BusinessPublicListResource::collection($newest),
-                'categories' => $categoriesWithItems,
-                'provinces' => $provinces,
+                'verified_pool' => BusinessPublicListResource::collection($verified)->resolve(),
+                'newest_pool' => BusinessPublicListResource::collection($newest)->resolve(),
+                'categories' => $categoriesWithItems->all(),
+                'provinces' => $provinces->all(),
             ];
         });
 

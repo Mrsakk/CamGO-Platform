@@ -80,7 +80,8 @@ class OwnerSubscriptionController extends ApiController
             'trial' => [
                 'can_start' => $profile['is_trial_eligible']
                     && !$business->hasActivePaidSubscription()
-                    && !$business->isOnTrial(),
+                    && !$business->isOnTrial()
+                    && !$business->hasUsedTrial(),
                 'profile_completion' => $profile,
             ],
             'active_subscription' => $business->activeSubscription
@@ -113,6 +114,10 @@ class OwnerSubscriptionController extends ApiController
 
         if ($business->isOnTrial()) {
             return $this->errorResponse('A free Pro trial is already active.', 422);
+        }
+
+        if ($business->hasUsedTrial()) {
+            return $this->errorResponse('This business has already used its free trial.', 422);
         }
 
         $profile = $profileScore->forBusiness($business);

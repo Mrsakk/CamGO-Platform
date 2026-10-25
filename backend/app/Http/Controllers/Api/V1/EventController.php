@@ -45,8 +45,12 @@ class EventController extends ApiController
     public function show(string $slug): JsonResponse
     {
         $event = Event::query()
-            ->where('slug', $slug)
-            ->orWhere('id', $slug)
+            ->where(function ($q) use ($slug) {
+                $q->where('slug', $slug);
+                if (is_numeric($slug)) {
+                    $q->orWhere('id', (int) $slug);
+                }
+            })
             ->published()
             ->with('province')
             ->first();

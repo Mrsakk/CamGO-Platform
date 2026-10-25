@@ -17,4 +17,8 @@ require __DIR__.'/../vendor/autoload.php';
 /** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
+if ($storagePath = getenv('LARAVEL_STORAGE_PATH')) {
+    $app->useStoragePath($storagePath);
+}
+
 $app->handleRequest(Request::capture());

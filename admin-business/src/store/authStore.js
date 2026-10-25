@@ -36,7 +36,7 @@ const checkIsBusinessOwner = (user) => {
     roles.some((r) =>
       ["business_owner", "Business Owner"].includes(typeof r === "string" ? r : r.name)
     );
-  return isOwnerRole && Boolean(u.business_id);
+  return isOwnerRole || Boolean(u.business_id);
 };
 
 export const useAuthStore = create((set, get) => ({

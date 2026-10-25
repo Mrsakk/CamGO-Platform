@@ -13,12 +13,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+
+        $middleware->appendToGroup('api', \App\Http\Middleware\EnsureActiveUser::class);
+        $middleware->appendToGroup('api', \App\Http\Middleware\PerformanceHeaders::class);
+
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'owner' => \App\Http\Middleware\EnsureBusinessOwner::class,
+            'active' => \App\Http\Middleware\EnsureActiveUser::class,
             'business.context' => \App\Http\Middleware\ResolveBusinessContext::class,
             'business.can' => \App\Http\Middleware\EnsureBusinessCapability::class,
         ]);

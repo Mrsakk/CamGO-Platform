@@ -1,5 +1,7 @@
-import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { PrefetchLink } from "@/components/common/PrefetchLink";
+import { queryClient } from "@/lib/queryClient";
+import api from "@/lib/axios";
 import {
   Star,
   MapPin,
@@ -17,6 +19,19 @@ import { getBusinessCover } from "@/lib/businessMedia";
 export const BusinessCard = ({ business, source = "list" }) => {
   if (!business) return null;
 
+  const prefetchData = () => {
+    queryClient.prefetchQuery({
+      queryKey: ["public", "business", business.slug],
+      queryFn: async () => {
+        const res = await api.get(`/business/public/businesses/${business.slug}`);
+        return res.data?.data || res.data;
+      },
+      staleTime: 5 * 60 * 1000,
+    });
+  };
+
+  const prefetchChunk = () => import("@/pages/BusinessProfilePage");
+
   const { i18n } = useTranslation();
   const isKm = i18n.language === "km";
 
@@ -33,8 +48,9 @@ export const BusinessCard = ({ business, source = "list" }) => {
     ? business.province?.name_km || business.province?.name_en
     : business.province?.name_en || business.province?.name_km;
 
+  const contactsList = Array.isArray(business.contacts) ? business.contacts : [];
   const primaryContact =
-    business.primary_contact || (business.contacts && business.contacts[0]);
+    business.primary_contact || contactsList.find((c) => c.is_primary) || contactsList[0] || null;
 
   const handleContactClick = () => {
     if (!primaryContact) return;
@@ -77,20 +93,23 @@ export const BusinessCard = ({ business, source = "list" }) => {
       ? "ឧបត្ថម្ភ"
       : "Sponsored"
     : isFeatured
-    ? isKm
-      ? "ពិសេស"
-      : "Featured"
-    : business.is_verified
-    ? isKm
-      ? "ផ្ទៀងផ្ទាត់"
-      : "Verified"
-    : null;
+      ? isKm
+        ? "ពិសេស"
+        : "Featured"
+      : business.is_verified
+        ? isKm
+          ? "ផ្ទៀងផ្ទាត់"
+          : "Verified"
+        : null;
 
   return (
     <article className="group flex flex-col h-full overflow-hidden rounded-card border border-line bg-cream shadow-premium transition duration-200 hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-premium-lg dark:border-white/10 dark:bg-stone-850">
       {/* 1. Cover Image Section */}
-      <Link
+      <PrefetchLink
         to={`/b/${business.slug}`}
+        prefetchData={prefetchData}
+        prefetchChunk={prefetchChunk}
+        prefetchOnView={true}
         className="relative block aspect-[16/10] sm:aspect-[4/3] w-full overflow-hidden bg-stone-100 dark:bg-stone-800 shrink-0"
       >
         <img
@@ -122,11 +141,10 @@ export const BusinessCard = ({ business, source = "list" }) => {
 
           {business.open_now !== undefined && (
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-1 sm:px-2.5 sm:py-1.5 text-[11px] sm:text-xs font-semibold backdrop-blur ${
-                business.open_now
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-1 sm:px-2.5 sm:py-1.5 text-[11px] sm:text-xs font-semibold backdrop-blur ${business.open_now
                   ? "bg-cream/95 text-forest dark:bg-stone-900/90 dark:text-cream"
                   : "bg-ink/80 text-white/90 dark:bg-black/80"
-              }`}
+                }`}
             >
               <Clock className="h-3 w-3" />
               <span>{business.open_now ? (isKm ? "បើក" : "Open") : isKm ? "បិទ" : "Closed"}</span>
@@ -141,7 +159,7 @@ export const BusinessCard = ({ business, source = "list" }) => {
             <span>{business.distance_km} km</span>
           </span>
         )}
-      </Link>
+      </PrefetchLink>
 
       {/* 2. Business Info & Actions */}
       <div className="flex flex-1 flex-col justify-between p-3.5 sm:p-5 gap-3">
@@ -159,11 +177,16 @@ export const BusinessCard = ({ business, source = "list" }) => {
           </div>
 
           {/* Business Name (Title) */}
-          <Link to={`/b/${business.slug}`} className="block">
+          <PrefetchLink
+            to={`/b/${business.slug}`}
+            prefetchData={prefetchData}
+            prefetchChunk={prefetchChunk}
+            className="block"
+          >
             <h3 className="line-clamp-2 text-base sm:text-lg font-bold text-forest transition group-hover:text-brand-700 dark:text-cream dark:group-hover:text-brand-300 leading-snug">
               {name}
             </h3>
-          </Link>
+          </PrefetchLink>
 
           {/* Tagline */}
           {tagline && (
@@ -183,8 +206,8 @@ export const BusinessCard = ({ business, source = "list" }) => {
                 {business.rating_avg
                   ? Number(business.rating_avg).toFixed(1)
                   : isKm
-                  ? "ថ្មី"
-                  : "New"}
+                    ? "ថ្មី"
+                    : "New"}
               </span>
               {business.rating_count > 0 && (
                 <span className="text-stone-400">({business.rating_count})</span>
@@ -217,28 +240,32 @@ export const BusinessCard = ({ business, source = "list" }) => {
                   {primaryContact.type === "telegram"
                     ? "Telegram"
                     : primaryContact.type === "phone"
-                    ? isKm
-                      ? "ទូរស័ព្ទ"
-                      : "Call"
-                    : primaryContact.label || (isKm ? "ទាក់ទង" : "Contact")}
+                      ? isKm
+                        ? "ទូរស័ព្ទ"
+                        : "Call"
+                      : primaryContact.label || (isKm ? "ទាក់ទង" : "Contact")}
                 </span>
               </a>
             ) : (
-              <Link
+              <PrefetchLink
                 to={`/b/${business.slug}`}
+                prefetchData={prefetchData}
+                prefetchChunk={prefetchChunk}
                 className="flex h-10 sm:h-11 flex-1 items-center justify-center rounded-control border border-line bg-cream px-3 py-2 text-xs sm:text-sm font-semibold text-forest transition hover:border-brand-500 hover:bg-brand-50 dark:border-white/15 dark:bg-transparent dark:text-cream dark:hover:bg-white/5 shadow-xs"
               >
                 {isKm ? "មើលលម្អិត" : "View profile"}
-              </Link>
+              </PrefetchLink>
             )}
 
-            <Link
+            <PrefetchLink
               to={`/b/${business.slug}`}
+              prefetchData={prefetchData}
+              prefetchChunk={prefetchChunk}
               className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-control border border-line text-forest transition hover:border-brand-500 hover:bg-brand-50 dark:border-white/15 dark:text-white/70 dark:hover:bg-white/5 active:scale-95"
               title={isKm ? "មើលលម្អិត" : "View details"}
             >
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </PrefetchLink>
           </div>
         </div>
       </div>

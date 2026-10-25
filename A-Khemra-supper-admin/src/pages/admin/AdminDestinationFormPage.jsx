@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Save,
@@ -14,13 +15,35 @@ import {
 import { adminApi } from "@/lib/api/admin";
 import { provincesApi } from "@/lib/api/provinces";
 import { categoriesApi } from "@/lib/api/categories";
+import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+
 const AdminDestinationFormPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isEdit = Boolean(id);
-  const [provinces, setProvinces] = useState([]);
-  const [categories, setCategories] = useState([]);
+
+  // 1. Cached Provinces (24 hours)
+  const { data: provinces = [] } = useQuery({
+    queryKey: queryKeys.provinces.all(),
+    queryFn: async () => {
+      const res = await provincesApi.getAll();
+      return res?.data || [];
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  // 2. Cached Categories (24 hours)
+  const { data: categories = [] } = useQuery({
+    queryKey: queryKeys.categories.all(),
+    queryFn: async () => {
+      const res = await categoriesApi.getAll();
+      return res?.data || [];
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [nameEn, setNameEn] = useState("");
@@ -47,13 +70,8 @@ const AdminDestinationFormPage = () => {
   const [coverPreview, setCoverPreview] = useState(null);
   const [galleryFiles, setGalleryFiles] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
+
   useEffect(() => {
-    provincesApi.getAll().then((res) => {
-      if (res.data) setProvinces(res.data);
-    });
-    categoriesApi.getAll().then((res) => {
-      if (res.data) setCategories(res.data);
-    });
     if (isEdit && id) {
       setIsLoading(true);
       adminApi.getDestination(Number(id)).then((res) => {
@@ -160,6 +178,7 @@ const AdminDestinationFormPage = () => {
       if (galleryFiles.length > 0 && destinationId) {
         await adminApi.uploadDestinationImages(destinationId, galleryFiles);
       }
+      queryClient.invalidateQueries({ queryKey: queryKeys.destinations.all() });
       navigate("/admin/destinations");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save destination");

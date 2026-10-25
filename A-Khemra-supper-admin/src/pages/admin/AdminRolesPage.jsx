@@ -1,40 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Shield, Check, Users, Key, Edit, X, Save, Search, Sparkles } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
+import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
 
 const AdminRolesPage = () => {
-  const [roles, setRoles] = useState([]);
-  const [allPermissions, setAllPermissions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  const { data: rolesRes, isLoading } = useQuery({
+    queryKey: queryKeys.roles(),
+    queryFn: () => adminApi.getRoles(),
+  });
+
+  const roles = rolesRes?.data?.roles || (Array.isArray(rolesRes?.data) ? rolesRes.data : []);
+  const allPermissions = rolesRes?.data?.all_permissions || [];
 
   // Edit Permissions Modal State
   const [editingRole, setEditingRole] = useState(null);
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [permissionSearch, setPermissionSearch] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-
-  const fetchRoles = async () => {
-    try {
-      setIsLoading(true);
-      const res = await adminApi.getRoles();
-      // Backend returns { roles: [...], all_permissions: [...] }
-      const rolesList = res?.data?.roles || (Array.isArray(res?.data) ? res.data : []);
-      setRoles(rolesList);
-      if (res?.data?.all_permissions) {
-        setAllPermissions(res.data.all_permissions);
-      }
-    } catch (err) {
-      console.error("Failed to load roles", err);
-      toast.error("Failed to load access roles");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRoles();
-  }, []);
 
   const openEditModal = (role) => {
     setEditingRole(role);
@@ -61,7 +47,7 @@ const AdminRolesPage = () => {
       await adminApi.syncRolePermissions(editingRole.name, selectedPermissions);
       toast.success(`Permissions updated for role "${editingRole.name}"`);
       setEditingRole(null);
-      fetchRoles();
+      queryClient.invalidateQueries({ queryKey: queryKeys.roles() });
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Failed to update permissions");

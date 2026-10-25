@@ -10,6 +10,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 
+use Illuminate\Support\Facades\Cache;
+
 class AdminUserController extends ApiController
 {
     /**
@@ -17,7 +19,9 @@ class AdminUserController extends ApiController
      */
     public function index(Request $request): JsonResponse
     {
-        $query = User::query()->with('roles');
+        $query = User::query()
+            ->with(['roles.permissions', 'business', 'businessMemberships', 'activeBusinessUser'])
+            ->withCount(['favorites', 'reviews']);
 
         if ($request->filled('role')) {
             $roleInput = $request->input('role');
@@ -54,7 +58,7 @@ class AdminUserController extends ApiController
                 'per_page' => $paginated->perPage(),
                 'total' => $paginated->total(),
             ],
-            'roles' => Role::pluck('name'),
+            'roles' => Cache::remember('admin:roles:names', 60, fn () => Role::pluck('name')),
         ]);
     }
 

@@ -13,6 +13,7 @@ use App\Modules\Business\Services\SubscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class AdminSubscriptionRequestController extends ApiController
@@ -116,6 +117,9 @@ class AdminSubscriptionRequestController extends ApiController
             return $activation;
         });
 
+        Cache::forget('admin:business:stats:overview');
+        Cache::forget('admin:billing:stats');
+
         return $this->successResponse([
             'request' => new SubscriptionRequestResource(
                 $subscriptionRequest->fresh(['business', 'requestedPlan', 'requester', 'approver'])
@@ -156,6 +160,9 @@ class AdminSubscriptionRequestController extends ApiController
             'approved_by' => $request->user()->id,
             'admin_note' => $validated['admin_note'],
         ]);
+
+        Cache::forget('admin:business:stats:overview');
+        Cache::forget('admin:billing:stats');
 
         return $this->successResponse(
             new SubscriptionRequestResource($subscriptionRequest->fresh(['business', 'requestedPlan', 'requester', 'approver'])),

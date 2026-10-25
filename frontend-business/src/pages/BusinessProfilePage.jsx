@@ -165,18 +165,20 @@ export const BusinessProfilePage = () => {
   const categoryName = isKm ? business.category?.name_km : business.category?.name_en;
   const provinceName = isKm ? business.province?.name_km : business.province?.name_en;
 
-  const mediaList = business.media || [];
-  const contacts = business.contacts || [];
-  const services = business.services || [];
+  const mediaList = Array.isArray(business.media) ? business.media : [];
+  const contacts = Array.isArray(business.contacts) ? business.contacts : [];
+  const services = Array.isArray(business.services) ? business.services : [];
   const servicePresetLabel = isKm
     ? business.category?.service_presets?.label_km
     : business.category?.service_presets?.label_en;
-  const hours = business.hours || [];
-  const reviews = business.reviews || [];
-  const nearbyDestinations = business.nearby_destinations || [];
+  const hours = Array.isArray(business.hours) ? business.hours : [];
+  const reviews = Array.isArray(business.reviews)
+    ? business.reviews
+    : (Array.isArray(business.approved_reviews) ? business.approved_reviews : []);
+  const nearbyDestinations = Array.isArray(business.nearby_destinations) ? business.nearby_destinations : [];
 
   // Primary contact
-  const primaryContact = contacts.find((c) => c.is_primary) || contacts[0];
+  const primaryContact = contacts.find((c) => c.is_primary) || contacts[0] || null;
   const secondaryContacts = contacts.filter((c) => c !== primaryContact);
 
   const leadMessage = isKm

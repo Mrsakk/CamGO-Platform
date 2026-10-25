@@ -158,6 +158,7 @@ export const AdminBusinessFormPage = () => {
       const res = await api.get("/admin/business/categories");
       return res.data?.data || [];
     },
+    staleTime: 1000 * 60 * 60 * 24, // 24 hours
   });
 
   const { data: provinces } = useQuery({
@@ -166,6 +167,7 @@ export const AdminBusinessFormPage = () => {
       const res = await api.get("/business/public/provinces");
       return res.data?.data || [];
     },
+    staleTime: 1000 * 60 * 60 * 24, // 24 hours
   });
 
   // Fetch business details if editing

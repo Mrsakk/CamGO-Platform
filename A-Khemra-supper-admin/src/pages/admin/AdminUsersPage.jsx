@@ -1,72 +1,64 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Search,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
+import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
+import { queryKeys } from "@/lib/queryKeys";
+import { useDebounce } from "@/lib/useDebounce";
 import { toast } from "@/store/toastStore";
+
 const AdminUsersPage = () => {
-  const [users, setUsers] = useState([]);
-  const [meta, setMeta] = useState(null);
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
   const [roleFilter, setRoleFilter] = useState("");
   const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
-  const [availableRoles, setAvailableRoles] = useState([
-    "Super Admin",
-    "Content Manager",
-    "Moderator",
-    "Tourist",
-    "Business Owner"
-  ]);
 
-  const fetchUsers = async () => {
-    try {
-      setIsLoading(true);
-      const res = await adminApi.getUsers({
-        search: search.trim() || void 0,
-        role: roleFilter || void 0,
-        page,
-        per_page: 15
-      });
-      if (res?.data) {
-        setUsers(Array.isArray(res.data) ? res.data : res.data.items || []);
-      }
-      if (res?.roles && Array.isArray(res.roles) && res.roles.length > 0) {
-        setAvailableRoles(res.roles);
-      }
-      if (res?.meta) setMeta(res.meta);
-    } catch (err) {
-      console.error("Failed to load user accounts", err);
-      toast.error("Failed to load user accounts");
-    } finally {
-      setIsLoading(false);
-    }
+  const userFilters = {
+    search: debouncedSearch.trim() || void 0,
+    role: roleFilter || void 0,
+    page,
+    per_page: 15,
   };
-  useEffect(() => {
-    fetchUsers();
-  }, [search, roleFilter, page]);
+
+  const { data: res, isLoading } = useQuery({
+    queryKey: queryKeys.users.list(userFilters),
+    queryFn: () => adminApi.getUsers(userFilters),
+    placeholderData: keepPreviousData,
+  });
+
+  const users = res?.data ? (Array.isArray(res.data) ? res.data : res.data.items || []) : [];
+  const meta = res?.meta || null;
+  const availableRoles = res?.roles && Array.isArray(res.roles) && res.roles.length > 0
+    ? res.roles
+    : [
+        "Super Admin",
+        "Content Manager",
+        "Moderator",
+        "Tourist",
+        "Business Owner"
+      ];
+
   const handleRoleChange = async (userId, newRole) => {
     try {
-      const res = await adminApi.updateUserRole(userId, newRole);
-      if (res.data) {
-        setUsers(
-          (prev) => prev.map((u) => u.id === userId ? { ...u, roles: [newRole] } : u)
-        );
+      const resp = await adminApi.updateUserRole(userId, newRole);
+      if (resp.data) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.users.all() });
         toast.success(`User role updated to ${newRole}`);
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update user role");
     }
   };
+
   const handleToggleStatus = async (userId) => {
     try {
-      const res = await adminApi.toggleUserStatus(userId);
-      if (res.data) {
-        setUsers(
-          (prev) => prev.map((u) => u.id === userId ? { ...u, is_active: res.data.is_active } : u)
-        );
+      const resp = await adminApi.toggleUserStatus(userId);
+      if (resp.data) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.users.all() });
         toast.success("User status updated");
       }
     } catch (err) {

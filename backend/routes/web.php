@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Province;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 Route::get('/', function () {
     return response()->json([
@@ -16,8 +17,16 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/media/{path}', function (string $path) {
+    $disk = Storage::disk('public');
+
+    abort_unless($disk->exists($path), 404);
+
+    return $disk->response($path);
+})->where('path', '.*');
+
 Route::get('/sitemap.xml', function () {
-    $baseUrl = config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:5173'));
+    $baseUrl = config('app.frontend_url', 'http://localhost:5173');
 
     $xml = '<?xml version="1.0" encoding="UTF-8"?>';
     $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';

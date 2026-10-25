@@ -46,6 +46,27 @@ class AdminFeaturedSlotController extends ApiController
             'ends_at' => 'required|date|after:starts_at',
         ]);
 
+        $startsAt = $validated['starts_at'];
+        $endsAt = $validated['ends_at'];
+        $slotType = $validated['slot'];
+
+        $overlapQuery = FeaturedSlot::where('status', 'active')
+            ->where('slot', $slotType)
+            ->where(function ($q) use ($startsAt, $endsAt) {
+                $q->where('starts_at', '<', $endsAt)
+                  ->where('ends_at', '>', $startsAt);
+            });
+
+        if ($slotType === 'category') {
+            $overlapQuery->where('category_id', $validated['category_id'] ?? null);
+        } elseif ($slotType === 'province') {
+            $overlapQuery->where('province_id', $validated['province_id'] ?? null);
+        }
+
+        if ($overlapQuery->exists()) {
+            return $this->errorResponse('An active featured slot already exists for this placement and date range', 422);
+        }
+
         $slot = FeaturedSlot::create(array_merge($validated, [
             'status' => 'active',
             'created_by' => $request->user()->id,
@@ -71,6 +92,30 @@ class AdminFeaturedSlotController extends ApiController
             'ends_at' => 'sometimes|required|date|after:starts_at',
             'amount_cents' => 'nullable|integer|min:0',
         ]);
+
+        $newStatus = $validated['status'] ?? $slot->status;
+        $startsAt = $validated['starts_at'] ?? $slot->starts_at;
+        $endsAt = $validated['ends_at'] ?? $slot->ends_at;
+
+        if ($newStatus === 'active') {
+            $overlapQuery = FeaturedSlot::where('id', '!=', $slot->id)
+                ->where('status', 'active')
+                ->where('slot', $slot->slot)
+                ->where(function ($q) use ($startsAt, $endsAt) {
+                    $q->where('starts_at', '<', $endsAt)
+                      ->where('ends_at', '>', $startsAt);
+                });
+
+            if ($slot->slot === 'category') {
+                $overlapQuery->where('category_id', $slot->category_id);
+            } elseif ($slot->slot === 'province') {
+                $overlapQuery->where('province_id', $slot->province_id);
+            }
+
+            if ($overlapQuery->exists()) {
+                return $this->errorResponse('An active featured slot already exists for this placement and date range', 422);
+            }
+        }
 
         $old = $slot->only(['status', 'starts_at', 'ends_at', 'amount_cents']);
         $slot->update($validated);

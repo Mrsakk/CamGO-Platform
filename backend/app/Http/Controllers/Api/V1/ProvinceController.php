@@ -44,9 +44,13 @@ class ProvinceController extends ApiController
     public function show(string $slugOrCode): JsonResponse
     {
         $province = Province::query()
-            ->where('slug', $slugOrCode)
-            ->orWhere('code', strtoupper($slugOrCode))
-            ->orWhere('id', $slugOrCode)
+            ->where(function ($q) use ($slugOrCode) {
+                $q->where('slug', $slugOrCode)
+                  ->orWhere('code', strtoupper($slugOrCode));
+                if (is_numeric($slugOrCode)) {
+                    $q->orWhere('id', (int) $slugOrCode);
+                }
+            })
             ->withCount(['destinations' => function ($q) {
                 $q->published();
             }])

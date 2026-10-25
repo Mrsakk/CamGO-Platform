@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -11,16 +11,17 @@ import {
   AlertCircle,
   Edit3,
   Trash2,
-
   ShieldCheck,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
 import api from "@/lib/axios";
 import { getPublicBusinessUrl } from "@/lib/publicUrls";
 import { LoadingFallback } from "@/components/common/LoadingFallback";
 import { toast } from "@/store/toastStore";
+import { useDebounce } from "@/lib/useDebounce";
 
 export const AdminBusinessesPage = () => {
   const { t } = useTranslation();
@@ -28,19 +29,21 @@ export const AdminBusinessesPage = () => {
   const [searchParams] = useSearchParams();
 
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
   const [status, setStatus] = useState(searchParams.get("status") || "");
   const [missingInfo, setMissingInfo] = useState(false);
   const [categoryId, setCategoryId] = useState("");
   const [provinceId, setProvinceId] = useState("");
   const [page, setPage] = useState(1);
 
-  // Fetch categories & provinces for filter dropdowns
+  // Fetch categories & provinces for filter dropdowns (cached 24h)
   const { data: categories } = useQuery({
     queryKey: ["admin", "categories"],
     queryFn: async () => {
       const res = await api.get("/admin/business/categories");
       return res.data?.data || [];
     },
+    staleTime: 1000 * 60 * 60 * 24,
   });
 
   const { data: provinces } = useQuery({
@@ -49,14 +52,15 @@ export const AdminBusinessesPage = () => {
       const res = await api.get("/business/public/provinces");
       return res.data?.data || [];
     },
+    staleTime: 1000 * 60 * 60 * 24,
   });
 
-  // Fetch businesses
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin", "businesses", { page, search, status, missingInfo, categoryId, provinceId }],
+  // Fetch businesses with debounced search & seamless pagination
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["admin", "businesses", { page, search: debouncedSearch, status, missingInfo, categoryId, provinceId }],
     queryFn: async () => {
       const params = new URLSearchParams({ page });
-      if (search) params.append("search", search);
+      if (debouncedSearch) params.append("search", debouncedSearch);
       if (status) params.append("status", status);
       if (missingInfo) params.append("missing_info", "1");
       if (categoryId) params.append("category_id", categoryId);
@@ -65,6 +69,7 @@ export const AdminBusinessesPage = () => {
       const res = await api.get(`/admin/business/businesses?${params.toString()}`);
       return res.data;
     },
+    placeholderData: keepPreviousData,
   });
 
   const deleteMutation = useMutation({
@@ -183,8 +188,11 @@ export const AdminBusinessesPage = () => {
               setPage(1);
             }}
             placeholder="Search by Khmer / English name, slug, or owner..."
-            className="w-full rounded-control border border-line bg-paper py-2.5 pl-11 pr-4 text-sm text-forest outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-stone-700 dark:bg-stone-900 dark:text-white"
+            className="w-full rounded-control border border-line bg-paper py-2.5 pl-11 pr-10 text-sm text-forest outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-stone-700 dark:bg-stone-900 dark:text-white"
           />
+          {isFetching && !isLoading && (
+            <Loader2 className="absolute right-3.5 top-3 h-4 w-4 animate-spin text-brand-600 opacity-70" />
+          )}
         </div>
 
         {/* Status Filter */}
@@ -241,7 +249,7 @@ export const AdminBusinessesPage = () => {
 
       {/* Table */}
       <div className="portal-surface overflow-hidden">
-        {isLoading ? (
+        {isLoading && businesses.length === 0 ? (
           <LoadingFallback />
         ) : businesses.length === 0 ? (
           <div className="p-12 text-center text-stone-400">

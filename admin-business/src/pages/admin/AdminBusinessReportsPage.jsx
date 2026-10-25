@@ -21,6 +21,8 @@ import {
 import api from "@/lib/axios";
 import { toast } from "@/store/toastStore";
 
+import { useDebounce } from "@/lib/useDebounce";
+
 export const AdminBusinessReportsPage = () => {
   const { t, i18n } = useTranslation();
   const isKm = i18n.language === "km";
@@ -29,14 +31,15 @@ export const AdminBusinessReportsPage = () => {
   const [selectedMonth, setSelectedMonth] = useState(currentYearMonth);
   const [selectedBusinessId, setSelectedBusinessId] = useState("");
   const [businessSearch, setBusinessSearch] = useState("");
+  const debouncedBusinessSearch = useDebounce(businessSearch, 300);
 
-  // Fetch overall stats
+  // Fetch overall stats (shares cache with AdminBusinessDashboardPage)
   const {
     data: statsData,
     isLoading: statsLoading,
     refetch: refetchStats,
   } = useQuery({
-    queryKey: ["admin", "stats", "overview"],
+    queryKey: ["admin", "business", "stats"],
     queryFn: async () => {
       const res = await api.get("/admin/business/stats");
       return res.data;
@@ -45,10 +48,10 @@ export const AdminBusinessReportsPage = () => {
 
   // Fetch business list for dropdown
   const { data: businessesData } = useQuery({
-    queryKey: ["admin", "businesses", "selector", businessSearch],
+    queryKey: ["admin", "businesses", "selector", debouncedBusinessSearch],
     queryFn: async () => {
       const res = await api.get("/admin/business/businesses", {
-        params: { per_page: 50, q: businessSearch },
+        params: { per_page: 50, search: debouncedBusinessSearch },
       });
       return res.data;
     },

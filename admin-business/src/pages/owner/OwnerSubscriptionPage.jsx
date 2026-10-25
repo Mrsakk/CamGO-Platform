@@ -58,6 +58,7 @@ export const OwnerSubscriptionPage = () => {
       const res = await api.get("/business/owner/subscription");
       return res.data?.data || res.data;
     },
+    staleTime: 1000 * 60 * 5,
   });
 
   const {
@@ -71,6 +72,7 @@ export const OwnerSubscriptionPage = () => {
       const res = await api.get("/business/owner/plans");
       return res.data?.data || res.data;
     },
+    staleTime: 1000 * 60 * 60 * 24, // 24 hours
   });
 
   const invalidate = () => {

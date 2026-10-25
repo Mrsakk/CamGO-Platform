@@ -1,11 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Plus, Edit, Trash2, Compass, X, Save, Loader2 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
 import { categoriesApi } from "@/lib/api/categories";
+import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+
 const AdminCategoriesPage = () => {
-  const [categories, setCategories] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  // 1. Cached Categories (24 hours staleTime, instant display)
+  const { data: categories = [], isLoading } = useQuery({
+    queryKey: queryKeys.categories.all(),
+    queryFn: async () => {
+      const res = await categoriesApi.getAll();
+      return res?.data || [];
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({
@@ -16,20 +29,7 @@ const AdminCategoriesPage = () => {
     description_km: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fetchCategories = async () => {
-    try {
-      setIsLoading(true);
-      const res = await categoriesApi.getAll();
-      if (res.data) setCategories(res.data);
-    } catch (err) {
-      toast.error("Failed to load categories");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+
   const openCreateModal = () => {
     setEditingCategory(null);
     setFormData({
@@ -56,7 +56,7 @@ const AdminCategoriesPage = () => {
     if (!window.confirm(`Delete category "${name}"?`)) return;
     try {
       await adminApi.deleteCategory(id);
-      setCategories((prev) => prev.filter((c) => c.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all() });
       toast.success("Category deleted");
     } catch (err) {
       toast.error("Failed to delete category");
@@ -74,7 +74,7 @@ const AdminCategoriesPage = () => {
         toast.success("Category created");
       }
       setIsModalOpen(false);
-      fetchCategories();
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all() });
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save category");
     } finally {

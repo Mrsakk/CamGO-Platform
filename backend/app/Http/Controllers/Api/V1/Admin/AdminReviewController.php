@@ -48,12 +48,19 @@ class AdminReviewController extends ApiController
                 'per_page' => $paginated->perPage(),
                 'total' => $paginated->total(),
             ],
-            'counts' => [
-                'all' => Review::count(),
-                'pending' => Review::where('status', 'pending')->count(),
-                'approved' => Review::where('status', 'approved')->count(),
-                'rejected' => Review::where('status', 'rejected')->count(),
-            ],
+            'counts' => \Illuminate\Support\Facades\Cache::remember('admin:reviews:counts', 15, function () {
+                $raw = Review::query()
+                    ->selectRaw("status, COUNT(*) as aggregate")
+                    ->groupBy('status')
+                    ->pluck('aggregate', 'status');
+
+                return [
+                    'all' => (int) $raw->sum(),
+                    'pending' => (int) ($raw['pending'] ?? 0),
+                    'approved' => (int) ($raw['approved'] ?? 0),
+                    'rejected' => (int) ($raw['rejected'] ?? 0),
+                ];
+            }),
         ]);
     }
 

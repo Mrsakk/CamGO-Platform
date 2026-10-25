@@ -23,84 +23,82 @@ import {
   Tooltip,
   CartesianGrid
 } from "recharts";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
+import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+
 const AdminDashboardPage = () => {
   const { t } = useTranslation();
-  const [stats, setStats] = useState(null);
+  const queryClient = useQueryClient();
   const [chartDays, setChartDays] = useState(30);
-  const [chartData, setChartData] = useState([]);
-  const [pendingReviews, setPendingReviews] = useState([]);
-  const [topDestinations, setTopDestinations] = useState([]);
-  const [auditLogs, setAuditLogs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const fetchDashboardData = async () => {
-    try {
-      setIsLoading(true);
-      const [statsRes, chartRes, reviewsRes, destRes, auditRes] = await Promise.allSettled([
-        adminApi.getStats(),
-        adminApi.getUserRegistrations(chartDays),
-        adminApi.getReviews({ status: "pending", per_page: 5 }),
-        adminApi.getDestinations({ sort_by: "top_rated", per_page: 5 }),
-        adminApi.getAuditLogs({ per_page: 6 })
-      ]);
+  const [removedReviewIds, setRemovedReviewIds] = useState(new Set());
 
-      if (statsRes.status === "fulfilled" && statsRes.value) {
-        const payload = statsRes.value.data || statsRes.value;
-        if (payload && typeof payload === "object") {
-          const counters = payload.counters || payload;
-          setStats((prev) => ({ ...prev, ...payload, ...counters }));
-        }
-      }
+  const { data: statsPayload, isLoading } = useQuery({
+    queryKey: queryKeys.stats(),
+    queryFn: async () => {
+      const res = await adminApi.getStats();
+      return res?.data || res;
+    },
+    staleTime: 60 * 1000,
+  });
 
-      if (chartRes.status === "fulfilled" && chartRes.value) {
-        const rawChart = chartRes.value.data || chartRes.value;
-        setChartData(Array.isArray(rawChart) ? rawChart : rawChart.items || []);
-      }
-      if (reviewsRes.status === "fulfilled" && reviewsRes.value) {
-        const rawRev = reviewsRes.value.data || reviewsRes.value;
-        setPendingReviews(Array.isArray(rawRev) ? rawRev : rawRev.items || []);
-      }
-      if (destRes.status === "fulfilled" && destRes.value) {
-        const rawDest = destRes.value.data || destRes.value;
-        setTopDestinations(Array.isArray(rawDest) ? rawDest : rawDest.items || []);
-      }
-      if (auditRes.status === "fulfilled" && auditRes.value) {
-        const rawAudit = auditRes.value.data || auditRes.value;
-        setAuditLogs(Array.isArray(rawAudit) ? rawAudit : rawAudit.items || []);
-      }
-    } catch (err) {
-      console.error("Dashboard data load error:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchDashboardData();
-  }, [chartDays]);
+  // Separate user registrations query when toggle to non-default timeframe if not in payload
+  const { data: customChartData } = useQuery({
+    queryKey: queryKeys.userRegistrations(chartDays),
+    queryFn: async () => {
+      const res = await adminApi.getUserRegistrations(chartDays);
+      const raw = res?.data || res;
+      return Array.isArray(raw) ? raw : raw?.items || [];
+    },
+    enabled: chartDays !== 30 && chartDays !== 7,
+    staleTime: 60 * 1000,
+  });
+
+  const stats = statsPayload ? { ...statsPayload, ...(statsPayload.counters || {}) } : null;
+
+  const chartData = chartDays === 30 && statsPayload?.charts?.registrations_30d
+    ? statsPayload.charts.registrations_30d
+    : chartDays === 7 && statsPayload?.charts?.registrations_7d
+    ? statsPayload.charts.registrations_7d
+    : customChartData || [];
+
+  const rawPendingReviews = statsPayload?.recent_reviews || [];
+  const pendingReviews = rawPendingReviews.filter((r) => !removedReviewIds.has(r.id));
+  const topDestinations = statsPayload?.top_destinations || [];
+  const auditLogs = statsPayload?.recent_activities || [];
+
   const handleApproveReview = async (id) => {
     try {
+      setRemovedReviewIds((prev) => new Set([...prev, id]));
       await adminApi.approveReview(id);
-      setPendingReviews((prev) => prev.filter((r) => r.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.stats() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.reviews.all() });
       toast.success("Review approved and published");
     } catch (err) {
       toast.error("Failed to approve review");
     }
   };
+
   const handleRejectReview = async (id) => {
     try {
+      setRemovedReviewIds((prev) => new Set([...prev, id]));
       await adminApi.rejectReview(id);
-      setPendingReviews((prev) => prev.filter((r) => r.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.stats() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.reviews.all() });
       toast.info("Review rejected");
     } catch (err) {
       toast.error("Failed to reject review");
     }
   };
+
   if (isLoading || !stats) {
-    return <div className="flex flex-col items-center justify-center min-h-[60vh]">
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <div className="w-12 h-12 rounded-full border-4 border-amber-500 border-t-transparent animate-spin mb-4" />
         <p className="text-sm font-semibold text-stone-500">Loading Admin Dashboard...</p>
-      </div>;
+      </div>
+    );
   }
   return <div className="space-y-8">
       {

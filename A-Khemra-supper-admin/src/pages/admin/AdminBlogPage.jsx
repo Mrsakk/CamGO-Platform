@@ -1,10 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Plus, Edit, Trash2, FileText, X, Save, Loader2 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
+import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+
 const AdminBlogPage = () => {
-  const [posts, setPosts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  const { data: postsRes, isLoading } = useQuery({
+    queryKey: queryKeys.blog.list(),
+    queryFn: () => adminApi.getBlogPosts(),
+  });
+
+  const posts = postsRes?.data?.items || (Array.isArray(postsRes?.data) ? postsRes.data : []);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
   const [formData, setFormData] = useState({
@@ -19,22 +29,7 @@ const AdminBlogPage = () => {
   });
   const [imageFile, setImageFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fetchPosts = async () => {
-    try {
-      setIsLoading(true);
-      const res = await adminApi.getBlogPosts();
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setPosts(list);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load blog posts");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+
   const openCreateModal = () => {
     setEditingPost(null);
     setFormData({
@@ -69,7 +64,7 @@ const AdminBlogPage = () => {
     if (!window.confirm(`Delete article "${title}"?`)) return;
     try {
       await adminApi.deleteBlogPost(id);
-      setPosts((prev) => prev.filter((p) => p.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.blog.all() });
       toast.success("Article deleted");
     } catch (err) {
       toast.error("Failed to delete post");
@@ -100,7 +95,7 @@ const AdminBlogPage = () => {
         toast.success("Article created");
       }
       setIsModalOpen(false);
-      fetchPosts();
+      queryClient.invalidateQueries({ queryKey: queryKeys.blog.all() });
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save post");
     } finally {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import {
   Star,
@@ -35,7 +35,7 @@ export const AdminBusinessReviewsPage = () => {
     return reason?.trim() || null;
   };
 
-  // Fetch reviews
+  // Fetch reviews with keepPreviousData for instant switching
   const {
     data: reviewsData,
     isLoading,
@@ -54,6 +54,7 @@ export const AdminBusinessReviewsPage = () => {
       const res = await api.get("/admin/business/reviews", { params });
       return res.data;
     },
+    placeholderData: keepPreviousData,
   });
 
   const payload = reviewsData?.data || reviewsData || {};
@@ -215,7 +216,7 @@ export const AdminBusinessReviewsPage = () => {
 
       {/* Review List */}
         <div className="portal-surface overflow-hidden">
-        {isLoading ? (
+        {isLoading && reviews.length === 0 ? (
           <div className="p-12 text-center">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-amber-500 mb-3" />
             <p className="text-sm text-stone-500 dark:text-stone-400">

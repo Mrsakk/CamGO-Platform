@@ -56,8 +56,12 @@ class BlogController extends ApiController
     public function show(string $slug): JsonResponse
     {
         $post = BlogPost::query()
-            ->where('slug', $slug)
-            ->orWhere('id', $slug)
+            ->where(function ($q) use ($slug) {
+                $q->where('slug', $slug);
+                if (is_numeric($slug)) {
+                    $q->orWhere('id', (int) $slug);
+                }
+            })
             ->published()
             ->with('author')
             ->first();

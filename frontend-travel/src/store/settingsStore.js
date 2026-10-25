@@ -28,6 +28,19 @@ export const resolveAssetUrl = (url) => {
   return url;
 };
 
+export const updateFavicon = (url) => {
+  if (!url || typeof document === "undefined") return;
+  const resolved = resolveAssetUrl(url);
+  let link = document.querySelector("link[rel~='icon']");
+  if (!link) {
+    link = document.createElement("link");
+    link.rel = "icon";
+    document.head.appendChild(link);
+  }
+  link.type = resolved.endsWith(".svg") ? "image/svg+xml" : "image/png";
+  link.href = resolved;
+};
+
 export const useSettingsStore = create((set, get) => ({
   settings: DEFAULT_SETTINGS,
   isLoaded: false,
@@ -40,6 +53,8 @@ export const useSettingsStore = create((set, get) => ({
       const res = await contentApi.getSettings();
       const data = res?.data || res || {};
       if (typeof data === "object" && data !== null) {
+        if (data.favicon_url) updateFavicon(data.favicon_url);
+        else if (data.logo_url) updateFavicon(data.logo_url);
         set((state) => ({
           settings: {
             ...state.settings,

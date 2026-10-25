@@ -16,16 +16,33 @@ class HomeCacheObserver
 
     public function saved($model): void
     {
-        Cache::forget(self::CACHE_KEY);
+        $this->invalidate($model);
     }
 
     public function deleted($model): void
     {
-        Cache::forget(self::CACHE_KEY);
+        $this->invalidate($model);
     }
 
     public function restored($model): void
     {
+        $this->invalidate($model);
+    }
+
+    private function invalidate($model): void
+    {
         Cache::forget(self::CACHE_KEY);
+
+        if ($model instanceof \App\Models\Destination) {
+            if ($model->slug) {
+                Cache::forget("dest:detail:{$model->slug}");
+            }
+            if ($model->id) {
+                Cache::forget("dest:detail:{$model->id}");
+            }
+            if (!empty($model->ulid)) {
+                Cache::forget("dest:detail:{$model->ulid}");
+            }
+        }
     }
 }

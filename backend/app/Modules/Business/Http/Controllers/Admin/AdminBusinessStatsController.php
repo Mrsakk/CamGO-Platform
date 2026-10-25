@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class AdminBusinessStatsController extends ApiController
@@ -25,11 +26,12 @@ class AdminBusinessStatsController extends ApiController
     {
         $this->authorize('viewStats', Business::class);
 
-        // Counts by status
-        $statusCounts = Business::select('status', DB::raw('COUNT(*) as total'))
-            ->groupBy('status')
-            ->pluck('total', 'status')
-            ->toArray();
+        $payload = Cache::remember('admin:business:stats:overview', 30, function () {
+            // Counts by status
+            $statusCounts = Business::select('status', DB::raw('COUNT(*) as total'))
+                ->groupBy('status')
+                ->pluck('total', 'status')
+                ->toArray();
 
         // Counts by category
         $byCategory = Category::withCount('businesses')
@@ -192,39 +194,42 @@ class AdminBusinessStatsController extends ApiController
             'pending_reviews' => BusinessReview::where('status', 'pending')->count(),
         ];
 
-        return $this->successResponse([
-            'overview' => $overview,
-            'channels' => $channels,
-            'totals' => [
-                'total_businesses' => Business::count(),
-                'approved' => $statusCounts['approved'] ?? 0,
-                'draft' => $statusCounts['draft'] ?? 0,
-                'pending_review' => $statusCounts['pending_review'] ?? 0,
-                'suspended' => $statusCounts['suspended'] ?? 0,
-                'verified' => Business::where('is_verified', true)->count(),
-            ],
-            'interactions' => [
-                'contacts_last_7_days' => $contacts7d,
-                'contacts_last_30_days' => $contacts30d,
-                'profile_views_last_30_days' => $views30d,
-            ],
-            'by_category' => $byCategory,
-            'by_province' => $byProvince,
-            'top_businesses' => $topBusinesses,
-            'queues' => [
-                'counts' => [
-                    'pending_approvals' => $pendingApprovalsCount,
-                    'pending_subscription_requests' => $pendingRequestsCount,
-                    'pending_payments' => $pendingPaymentsCount,
-                    'expiring_plans' => $expiringPlansCount,
-                    'expiring_trials' => $expiringTrialsCount,
+            return [
+                'overview' => $overview,
+                'channels' => $channels,
+                'totals' => [
+                    'total_businesses' => Business::count(),
+                    'approved' => $statusCounts['approved'] ?? 0,
+                    'draft' => $statusCounts['draft'] ?? 0,
+                    'pending_review' => $statusCounts['pending_review'] ?? 0,
+                    'suspended' => $statusCounts['suspended'] ?? 0,
+                    'verified' => Business::where('is_verified', true)->count(),
                 ],
-                'pending_approvals' => $pendingApprovals,
-                'subscription_requests' => $pendingRequests,
-                'pending_payments' => $pendingPayments,
-                'expiring_plans' => $expiringPlans,
-            ],
-        ]);
+                'interactions' => [
+                    'contacts_last_7_days' => $contacts7d,
+                    'contacts_last_30_days' => $contacts30d,
+                    'profile_views_last_30_days' => $views30d,
+                ],
+                'by_category' => $byCategory,
+                'by_province' => $byProvince,
+                'top_businesses' => $topBusinesses,
+                'queues' => [
+                    'counts' => [
+                        'pending_approvals' => $pendingApprovalsCount,
+                        'pending_subscription_requests' => $pendingRequestsCount,
+                        'pending_payments' => $pendingPaymentsCount,
+                        'expiring_plans' => $expiringPlansCount,
+                        'expiring_trials' => $expiringTrialsCount,
+                    ],
+                    'pending_approvals' => $pendingApprovals,
+                    'subscription_requests' => $pendingRequests,
+                    'pending_payments' => $pendingPayments,
+                    'expiring_plans' => $expiringPlans,
+                ],
+            ];
+        });
+
+        return $this->successResponse($payload);
     }
 
     /**
@@ -242,48 +247,54 @@ class AdminBusinessStatsController extends ApiController
             default => 30,
         };
 
-        $startDate = now()->subDays($days);
+        $cacheKey = "admin:biz:stats:{$id}:{$days}";
+        $data = Cache::remember($cacheKey, 30, function () use ($business, $days, $range) {
+            $startDate = now()->subDays($days);
 
-        // Events breakdown by channel
-        $events = BusinessContactEvent::where('business_id', $business->id)
-            ->where('occurred_at', '>=', $startDate)
-            ->select('channel', DB::raw('COUNT(*) as count'))
-            ->groupBy('channel')
-            ->pluck('count', 'channel')
-            ->toArray();
+            // Events breakdown by channel
+            $events = BusinessContactEvent::where('business_id', $business->id)
+                ->where('occurred_at', '>=', $startDate)
+                ->select('channel', DB::raw('COUNT(*) as count'))
+                ->groupBy('channel')
+                ->pluck('count', 'channel')
+                ->toArray();
 
-        // Daily trend
-        $daily = BusinessContactEvent::where('business_id', $business->id)
-            ->where('occurred_at', '>=', $startDate)
-            ->select(
-                DB::raw('DATE(occurred_at) as date'),
-                DB::raw("SUM(CASE WHEN channel = 'profile_view' THEN 1 ELSE 0 END) as views"),
-                DB::raw("SUM(CASE WHEN channel != 'profile_view' THEN 1 ELSE 0 END) as contacts")
-            )
-            ->groupBy(DB::raw('DATE(occurred_at)'))
-            ->orderBy('date')
-            ->get();
+            // Daily trend
+            $daily = BusinessContactEvent::where('business_id', $business->id)
+                ->where('occurred_at', '>=', $startDate)
+                ->select(
+                    DB::raw('DATE(occurred_at) as date'),
+                    DB::raw("SUM(CASE WHEN channel = 'profile_view' THEN 1 ELSE 0 END) as views"),
+                    DB::raw("SUM(CASE WHEN channel != 'profile_view' THEN 1 ELSE 0 END) as contacts")
+                )
+                ->groupBy(DB::raw('DATE(occurred_at)'))
+                ->orderBy('date')
+                ->get();
 
-        $totalViews = $events['profile_view'] ?? 0;
-        $totalContacts = array_sum(array_filter(
-            $events,
-            fn ($k) => $k !== 'profile_view',
-            ARRAY_FILTER_USE_KEY
-        ));
+            $totalViews = $events['profile_view'] ?? 0;
+            $totalContacts = array_sum(array_filter(
+                $events,
+                fn ($k) => $k !== 'profile_view',
+                ARRAY_FILTER_USE_KEY
+            ));
 
-        return $this->successResponse([
-            'business_id' => $business->id,
-            'business_name_en' => $business->name_en,
-            'business_name_km' => $business->name_km,
-            'range' => $range,
-            'summary' => [
-                'total_views' => $totalViews,
-                'total_contacts' => $totalContacts,
-                'channels' => $events,
-            ],
-            'daily_trend' => $daily,
-        ]);
+            return [
+                'business_id' => $business->id,
+                'business_name_en' => $business->name_en,
+                'business_name_km' => $business->name_km,
+                'range' => $range,
+                'summary' => [
+                    'total_views' => $totalViews,
+                    'total_contacts' => $totalContacts,
+                    'channels' => $events,
+                ],
+                'daily_trend' => $daily,
+            ];
+        });
+
+        return $this->successResponse($data);
     }
+
 
     /**
      * Download or view monthly report (CSV or Printable HTML) for business owner.

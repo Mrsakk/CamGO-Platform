@@ -67,14 +67,18 @@ class LeadService
         $total = (int) $inRange->count();
         $won = (int) ($statusCounts['won'] ?? 0);
 
+        $dailyCounts = (clone $inRange)
+            ->selectRaw('DATE(last_contact_at) as contact_date, count(*) as total')
+            ->groupBy(\Illuminate\Support\Facades\DB::raw('DATE(last_contact_at)'))
+            ->pluck('total', 'contact_date')
+            ->toArray();
+
         $series = [];
         for ($i = $days - 1; $i >= 0; $i--) {
             $date = now()->subDays($i)->toDateString();
             $series[] = [
                 'date' => $date,
-                'total' => (int) (clone $inRange)
-                    ->whereDate('last_contact_at', $date)
-                    ->count(),
+                'total' => (int) ($dailyCounts[$date] ?? 0),
             ];
         }
 

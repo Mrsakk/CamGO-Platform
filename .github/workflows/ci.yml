@@ -1,0 +1,135 @@
+name: Pre-Deploy CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  backend-tests:
+    name: Backend Tests & Quality Gate
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: khemara_testing
+          MYSQL_ROOT_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, bcmath, gd, zip
+          coverage: none
+
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        working-directory: backend
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Prepare Environment
+        working-directory: backend
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run Migrations
+        working-directory: backend
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: khemara_testing
+          DB_USERNAME: root
+          DB_PASSWORD: password
+        run: php artisan migrate --force
+
+      - name: Run PHPUnit Tests
+        working-directory: backend
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: khemara_testing
+          DB_USERNAME: root
+          DB_PASSWORD: password
+        run: php artisan test
+
+  frontend-builds:
+    name: Frontends Build & Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app:
+          - frontend-travel
+          - frontend-business
+          - admin-business
+          - A-Khemra-supper-admin
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+
+      - name: Clean Install Dependencies
+        working-directory: ${{ matrix.app }}
+        run: npm ci
+
+      - name: Run Tests (if defined)
+        working-directory: ${{ matrix.app }}
+        run: npm test --if-present
+
+      - name: Build Production Assets
+        working-directory: ${{ matrix.app }}
+        env:
+          VITE_API_URL: https://api.camgo-ci.internal/api/v1
+          VITE_API_BASE_URL: https://api.camgo-ci.internal/api/v1
+        run: npm run build
+
+      - name: Verify Bundle Size Budgets
+        working-directory: ${{ matrix.app }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+            const distPath = path.join(process.cwd(), 'dist/assets');
+            if (!fs.existsSync(distPath)) process.exit(0);
+            const files = fs.readdirSync(distPath);
+            let totalJs = 0, totalCss = 0, totalFont = 0;
+            for (const file of files) {
+              const stat = fs.statSync(path.join(distPath, file));
+              if (file.endsWith('.js')) totalJs += stat.size;
+              if (file.endsWith('.css')) totalCss += stat.size;
+              if (file.endsWith('.woff2') || file.endsWith('.woff')) totalFont += stat.size;
+            }
+            console.log('Built Assets Summary:');
+            console.log('- JS Total: ' + (totalJs/1024).toFixed(1) + ' KB');
+            console.log('- CSS Total: ' + (totalCss/1024).toFixed(1) + ' KB');
+            console.log('- Font Total: ' + (totalFont/1024).toFixed(1) + ' KB');
+            if (totalFont > 256 * 1024) {
+              console.error('FAIL: Font payload exceeds 250 KB budget!');
+              process.exit(1);
+            }
+          "

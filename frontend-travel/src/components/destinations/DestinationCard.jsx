@@ -1,4 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { PrefetchLink } from "@/components/common/PrefetchLink";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Heart, MapPin, ArrowRight, Star, Eye, Tag, Sparkles } from "lucide-react";
@@ -9,6 +10,8 @@ import { getImageUrl } from "@/lib/utils";
 
 import { queryClient } from "@/lib/queryClient";
 import { destinationsApi } from "@/lib/api/destinations";
+
+const prefetchDestinationChunk = () => import("@/pages/public/DestinationDetailPage");
 
 /**
  * DestinationCard - Premium Cultural & Architectural Travel Card
@@ -104,10 +107,11 @@ export const DestinationCard = ({
       whileTap={{ scale: 0.985 }}
       transition={{ type: "spring", stiffness: 340, damping: 22 }}
     >
-      <Link
+      <PrefetchLink
         to={`/destinations/${destination.slug}`}
-        onPointerEnter={handlePrefetch}
-        onTouchStart={handlePrefetch}
+        prefetchData={handlePrefetch}
+        prefetchChunk={prefetchDestinationChunk}
+        prefetchOnView={true}
         className={`group rounded-2xl sm:rounded-3xl overflow-hidden h-full bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800/90 shadow-2xs hover:shadow-xl hover:shadow-stone-950/10 dark:hover:shadow-black/50 hover:-translate-y-1.5 hover:border-laterite-500/40 dark:hover:border-laterite-500/40 transition-all duration-300 select-none flex flex-col justify-between ${containerClasses} ${className}`}
       >
         {/* =================================================================== */}
@@ -243,7 +247,7 @@ export const DestinationCard = ({
             </div>
           </div>
         </div>
-      </Link>
+      </PrefetchLink>
     </motion.div>
   );
 };

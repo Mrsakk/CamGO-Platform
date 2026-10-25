@@ -124,19 +124,34 @@ return new class extends Migration
             if (Schema::hasColumn('biz_reviews', 'owner_replied_by')) {
                 $table->dropConstrainedForeignId('owner_replied_by');
             }
-            $table->dropColumn(['owner_reply', 'owner_replied_at']);
+            if (Schema::hasColumn('biz_reviews', 'owner_reply')) {
+                $table->dropColumn('owner_reply');
+            }
+            if (Schema::hasColumn('biz_reviews', 'owner_replied_at')) {
+                $table->dropColumn('owner_replied_at');
+            }
         });
 
         Schema::table('biz_businesses', function (Blueprint $table) {
-            $table->dropColumn(['profile_data', 'trial_started_at', 'trial_ends_at']);
+            foreach (['profile_data', 'trial_started_at', 'trial_ends_at'] as $col) {
+                if (Schema::hasColumn('biz_businesses', $col)) {
+                    $table->dropColumn($col);
+                }
+            }
         });
 
         Schema::table('biz_categories', function (Blueprint $table) {
-            $table->dropColumn('profile_schema');
+            if (Schema::hasColumn('biz_categories', 'profile_schema')) {
+                $table->dropColumn('profile_schema');
+            }
         });
 
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['telegram_chat_id', 'notification_preferences']);
+            foreach (['telegram_chat_id', 'notification_preferences'] as $col) {
+                if (Schema::hasColumn('users', $col)) {
+                    $table->dropColumn($col);
+                }
+            }
         });
     }
 };

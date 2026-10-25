@@ -36,6 +36,7 @@ use App\Http\Controllers\Api\V1\SubscriberController;
 use App\Http\Controllers\Api\V1\TeamMemberController;
 use App\Http\Controllers\Api\V1\TestimonialController;
 use App\Http\Controllers\Api\V1\HomeController;
+use App\Http\Controllers\Api\V1\MetricController;
 use App\Http\Controllers\Api\V1\TripController;
 use Illuminate\Support\Facades\Route;
 
@@ -132,6 +133,9 @@ Route::prefix('v1')->group(function () {
     // Website Testimonials ("Loved by Explorers Worldwide")
     Route::get('/testimonials', [TestimonialController::class, 'index']);
     Route::post('/testimonials', [TestimonialController::class, 'store'])->middleware('throttle:10,1');
+
+    // RUM Web Vitals Telemetry (Rate Limited)
+    Route::post('/metrics/vitals', [MetricController::class, 'store'])->middleware('throttle:60,1');
 
     // Community & Users Stats
     Route::get('/community/stats', function () {
@@ -262,6 +266,9 @@ Route::prefix('v1')->group(function () {
 
         // Audit Logs
         Route::get('/audit-logs', [AdminAuditLogController::class, 'index']);
+
+        // RUM Performance Telemetry Report
+        Route::get('/metrics/vitals/report', [MetricController::class, 'report']);
     });
 });
 

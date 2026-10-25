@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import {
   BadgeDollarSign,
@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import api from "@/lib/axios";
 import { toast } from "@/store/toastStore";
+import { useDebounce } from "@/lib/useDebounce";
 
 const money = (value) => {
   const amount = Number(value || 0);
@@ -123,6 +124,7 @@ export const AdminBillingPage = () => {
 
   const [activeTab, setActiveTab] = useState("subscriptions");
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
   const [subscriptionStatus, setSubscriptionStatus] = useState("");
   const [requestStatus, setRequestStatus] = useState("pending");
   const [paymentStatus, setPaymentStatus] = useState("pending");
@@ -158,6 +160,7 @@ export const AdminBillingPage = () => {
 
   const [activateOpen, setActivateOpen] = useState(false);
   const [businessSearch, setBusinessSearch] = useState("");
+  const debouncedBusinessSearch = useDebounce(businessSearch, 300);
   const [activateForm, setActivateForm] = useState({
     business_id: "",
     business_label: "",
@@ -189,53 +192,57 @@ export const AdminBillingPage = () => {
       const res = await api.get("/admin/business/billing/plans");
       return res.data?.data || [];
     },
+    staleTime: 1000 * 60 * 60 * 24, // 24 hours
   });
 
   const subscriptionsQuery = useQuery({
-    queryKey: ["admin-billing", "subscriptions", subPage, search, subscriptionStatus],
+    queryKey: ["admin-billing", "subscriptions", subPage, debouncedSearch, subscriptionStatus],
     queryFn: async () => {
       const params = { page: subPage, per_page: 15 };
-      if (search.trim()) params.search = search.trim();
+      if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
       if (subscriptionStatus) params.status = subscriptionStatus;
       const res = await api.get("/admin/business/billing/subscriptions", { params });
       return res.data;
     },
     enabled: activeTab === "subscriptions",
+    placeholderData: keepPreviousData,
   });
 
   const requestsQuery = useQuery({
-    queryKey: ["admin-billing", "requests", requestPage, search, requestStatus],
+    queryKey: ["admin-billing", "requests", requestPage, debouncedSearch, requestStatus],
     queryFn: async () => {
       const params = { page: requestPage, per_page: 15 };
-      if (search.trim()) params.search = search.trim();
+      if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
       if (requestStatus) params.status = requestStatus;
       const res = await api.get("/admin/business/billing/subscription-requests", { params });
       return res.data;
     },
     enabled: activeTab === "requests",
+    placeholderData: keepPreviousData,
   });
 
   const paymentsQuery = useQuery({
-    queryKey: ["admin-billing", "payments", paymentPage, search, paymentStatus],
+    queryKey: ["admin-billing", "payments", paymentPage, debouncedSearch, paymentStatus],
     queryFn: async () => {
       const params = { page: paymentPage, per_page: 15 };
-      if (search.trim()) params.search = search.trim();
+      if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
       if (paymentStatus) params.status = paymentStatus;
       const res = await api.get("/admin/business/billing/payments", { params });
       return res.data;
     },
     enabled: activeTab === "payments",
+    placeholderData: keepPreviousData,
   });
 
   const businessSearchQuery = useQuery({
-    queryKey: ["admin-billing", "business-search", businessSearch],
+    queryKey: ["admin-billing", "business-search", debouncedBusinessSearch],
     queryFn: async () => {
       const res = await api.get("/admin/business/businesses", {
-        params: { search: businessSearch.trim(), per_page: 8 },
+        params: { search: debouncedBusinessSearch.trim(), per_page: 8 },
       });
       return res.data?.data || [];
     },
-    enabled: activateOpen && businessSearch.trim().length >= 2,
+    enabled: activateOpen && debouncedBusinessSearch.trim().length >= 2,
   });
 
   const plans = Array.isArray(plansQuery.data) ? plansQuery.data : [];

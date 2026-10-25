@@ -1,31 +1,37 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
+import { createIdbPersister } from "./lib/persister";
 import { queryClient, MAX_CACHE_AGE } from "./lib/queryClient";
 import "./locales/i18n";
 import "./index.css";
 import App from "./App";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
+import { initWebVitals } from "./lib/vitals";
 
-// Synchronous localStorage persister for instant repeat-visit dehydration
-const localStoragePersister = createSyncStoragePersister({
-  storage: typeof window !== "undefined" ? window.localStorage : undefined,
-  key: "KMT_QUERY_PERSIST_CACHE",
-});
+// Initialize Real User Monitoring (Web Vitals)
+initWebVitals();
+
+// IndexedDB persister with localStorage & memory fallbacks
+const idbPersister = createIdbPersister("CAMGO_TRAVEL_CACHE");
 
 const persistOptions = {
-  persister: localStoragePersister,
+  persister: idbPersister,
   maxAge: MAX_CACHE_AGE, // 24 hours
-  buster: "kmt-home-v1",
+  buster: "kmt-perf-v2",
   dehydrateOptions: {
-    // Only persist successful home queries so browser starts up instantly without bloat
+    // Only persist public non-sensitive queries; NEVER persist user/auth/tokens
     shouldDehydrateQuery: (query) => {
-      return (
-        query.state.status === "success" &&
-        Array.isArray(query.queryKey) &&
-        query.queryKey[0] === "home"
-      );
+      if (query.state.status !== "success" || !Array.isArray(query.queryKey)) {
+        return false;
+      }
+      const rootKey = query.queryKey[0];
+      const sensitiveKeys = ["user", "auth", "token", "profile", "password"];
+      if (sensitiveKeys.includes(rootKey)) {
+        return false;
+      }
+      const allowedRoots = ["home", "categories", "provinces", "destinations", "events", "blogs"];
+      return allowedRoots.includes(rootKey);
     },
   },
 };

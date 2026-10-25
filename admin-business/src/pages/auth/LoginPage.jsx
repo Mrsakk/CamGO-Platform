@@ -19,26 +19,30 @@ export const LoginPage = () => {
     try {
       await login({ email, password });
 
-      const { isAdmin } = useAuthStore.getState();
+      const { isAdmin, isBusinessOwner } = useAuthStore.getState();
 
-      if (!isAdmin) {
-        const ownerPortal =
-          import.meta.env.VITE_OWNER_PORTAL_URL || "http://localhost:5175";
+      if (!isAdmin && !isBusinessOwner) {
         useAuthStore.getState().logout();
         setError(
-          `This account is a business owner. Sign in at the owner portal: ${ownerPortal}/login`
+          "គណនីរបស់អ្នកមិនមានសិទ្ធិចូលប្រើប្រាស់ប្រព័ន្ធនេះទេ។ / This account does not have access permissions."
         );
         return;
       }
 
-      const attemptedPath = location.state?.from?.pathname;
-      const canReturnToAttempted =
-        attemptedPath && attemptedPath.startsWith("/admin");
-
       toast.success("ចូលប្រព័ន្ធបានជោគជ័យ / Successfully logged in");
-      navigate(canReturnToAttempted ? attemptedPath : "/admin", {
-        replace: true,
-      });
+
+      const attemptedPath = location.state?.from?.pathname;
+      if (isBusinessOwner && !isAdmin) {
+        navigate(attemptedPath && attemptedPath.startsWith("/owner") ? attemptedPath : "/owner", {
+          replace: true,
+        });
+      } else {
+        const canReturnToAttempted =
+          attemptedPath && (attemptedPath.startsWith("/admin") || attemptedPath.startsWith("/owner"));
+        navigate(canReturnToAttempted ? attemptedPath : "/admin", {
+          replace: true,
+        });
+      }
     } catch (err) {
       setError(
         err.response?.data?.message || "ព័ត៌មានចូលមិនត្រឹមត្រូវ ឬគណនីត្រូវបានផ្អាក។"

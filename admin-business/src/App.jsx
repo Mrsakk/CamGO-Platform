@@ -5,8 +5,10 @@ import { HelmetProvider, Helmet } from "react-helmet-async";
 import { queryClient } from "@/lib/queryClient";
 import { useAuthStore } from "@/store/authStore";
 import { AdminLayout } from "@/layouts/AdminLayout";
+import { OwnerLayout } from "@/layouts/OwnerLayout";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { AdminRoute } from "@/components/common/AdminRoute";
+import { OwnerRoute, OwnerCapabilityRoute } from "@/components/common/OwnerRoute";
 import { LoadingFallback } from "@/components/common/LoadingFallback";
 
 // 1. Auth Pages
@@ -59,11 +61,79 @@ const AdminBillingPage = lazy(() =>
   }))
 );
 
+// 3. Business Owner Pages (Code-split)
+const OwnerDashboardPage = lazy(() =>
+  import("@/pages/owner/OwnerDashboardPage").then((m) => ({
+    default: m.OwnerDashboardPage,
+  }))
+);
+const OwnerBusinessProfilePage = lazy(() =>
+  import("@/pages/owner/OwnerBusinessProfilePage").then((m) => ({
+    default: m.OwnerBusinessProfilePage,
+  }))
+);
+const OwnerKycPage = lazy(() =>
+  import("@/pages/owner/OwnerKycPage").then((m) => ({
+    default: m.OwnerKycPage,
+  }))
+);
+const OwnerLeadsPage = lazy(() =>
+  import("@/pages/owner/OwnerLeadsPage").then((m) => ({
+    default: m.OwnerLeadsPage,
+  }))
+);
+const OwnerReviewsPage = lazy(() =>
+  import("@/pages/owner/OwnerReviewsPage").then((m) => ({
+    default: m.OwnerReviewsPage,
+  }))
+);
+const OwnerNotificationsPage = lazy(() =>
+  import("@/pages/owner/OwnerNotificationsPage").then((m) => ({
+    default: m.OwnerNotificationsPage,
+  }))
+);
+const OwnerTeamPage = lazy(() =>
+  import("@/pages/owner/OwnerTeamPage").then((m) => ({
+    default: m.OwnerTeamPage,
+  }))
+);
+const OwnerSubscriptionPage = lazy(() =>
+  import("@/pages/owner/OwnerSubscriptionPage").then((m) => ({
+    default: m.OwnerSubscriptionPage,
+  }))
+);
+const OwnerHelpPage = lazy(() =>
+  import("@/pages/owner/OwnerHelpPage").then((m) => ({
+    default: m.OwnerHelpPage,
+  }))
+);
+const AcceptInvitePage = lazy(() =>
+  import("@/pages/owner/AcceptInvitePage").then((m) => ({
+    default: m.AcceptInvitePage,
+  }))
+);
+
+const OwnerPage = ({ capability, children }) => (
+  <Suspense fallback={<LoadingFallback />}>
+    {capability ? (
+      <OwnerCapabilityRoute capability={capability}>
+        {children}
+      </OwnerCapabilityRoute>
+    ) : (
+      children
+    )}
+  </Suspense>
+);
+
 const HomeRedirect = () => {
-  const { isAuthenticated, isAdmin } = useAuthStore();
+  const { isAuthenticated, isAdmin, isBusinessOwner } = useAuthStore();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (isBusinessOwner && !isAdmin) {
+    return <Navigate to="/owner" replace />;
   }
 
   return <Navigate to={isAdmin ? "/admin" : "/login"} replace />;
@@ -192,6 +262,98 @@ function App() {
                 }
               />
             </Route>
+
+            {/* Business Owner Portal */}
+            <Route
+              path="/owner"
+              element={
+                <OwnerRoute>
+                  <OwnerLayout />
+                </OwnerRoute>
+              }
+            >
+              <Route
+                index
+                element={
+                  <OwnerPage capability="stats.view">
+                    <OwnerDashboardPage />
+                  </OwnerPage>
+                }
+              />
+              <Route
+                path="my-business"
+                element={
+                  <OwnerPage capability="business.view">
+                    <OwnerBusinessProfilePage />
+                  </OwnerPage>
+                }
+              />
+              <Route
+                path="kyc"
+                element={
+                  <OwnerPage capability="kyc.manage">
+                    <OwnerKycPage />
+                  </OwnerPage>
+                }
+              />
+              <Route
+                path="leads"
+                element={
+                  <OwnerPage capability="leads.view">
+                    <OwnerLeadsPage />
+                  </OwnerPage>
+                }
+              />
+              <Route
+                path="reviews"
+                element={
+                  <OwnerPage capability="reviews.view">
+                    <OwnerReviewsPage />
+                  </OwnerPage>
+                }
+              />
+              <Route
+                path="notifications"
+                element={
+                  <OwnerPage capability="notifications.view">
+                    <OwnerNotificationsPage />
+                  </OwnerPage>
+                }
+              />
+              <Route
+                path="team"
+                element={
+                  <OwnerPage capability="team.manage">
+                    <OwnerTeamPage />
+                  </OwnerPage>
+                }
+              />
+              <Route
+                path="subscription"
+                element={
+                  <OwnerPage capability="billing.manage">
+                    <OwnerSubscriptionPage />
+                  </OwnerPage>
+                }
+              />
+              <Route
+                path="help"
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <OwnerHelpPage />
+                  </Suspense>
+                }
+              />
+            </Route>
+
+            <Route
+              path="/accept-invite/:token"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <AcceptInvitePage />
+                </Suspense>
+              }
+            />
 
             <Route path="*" element={<HomeRedirect />} />
           </Routes>

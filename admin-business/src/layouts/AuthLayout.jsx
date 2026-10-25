@@ -118,7 +118,7 @@ export const AuthLayout = () => {
             <p className="mt-2 text-sm text-muted dark:text-stone-400">
               {isSetup
                 ? "Finish setting up your business owner account."
-                : "Staff access only. Business owners use the CamGO Business portal."}
+                : "Staff & Business Owner portal access."}
             </p>
           </div>
 

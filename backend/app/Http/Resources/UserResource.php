@@ -32,10 +32,12 @@ class UserResource extends JsonResource
             'business_role' => $this->businessRole(),
             'business_capabilities' => $this->businessCapabilities(),
             'notification_preferences' => $this->notification_preferences,
-            'roles' => $this->getRoleNames(),
-            'permissions' => $this->getAllPermissions()->pluck('name'),
-            'favorites_count' => $this->favorites()->count(),
-            'reviews_count' => $this->reviews()->count(),
+            'roles' => $this->relationLoaded('roles') ? $this->roles->pluck('name') : $this->getRoleNames(),
+            'permissions' => $this->relationLoaded('roles')
+                ? $this->roles->flatMap(fn($r) => $r->permissions->pluck('name'))->unique()->values()
+                : ($this->relationLoaded('permissions') ? $this->permissions->pluck('name') : $this->getAllPermissions()->pluck('name')),
+            'favorites_count' => $this->favorites_count ?? ($this->relationLoaded('favorites') ? $this->favorites->count() : $this->favorites()->count()),
+            'reviews_count' => $this->reviews_count ?? ($this->relationLoaded('reviews') ? $this->reviews->count() : $this->reviews()->count()),
             'created_at' => $this->created_at?->toISOString(),
         ];
     }

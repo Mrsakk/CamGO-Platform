@@ -450,6 +450,15 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (Schema::hasTable('biz_payments')) {
+            try {
+                Schema::table('biz_payments', function (Blueprint $table) {
+                    $table->dropForeign(['invoice_id']);
+                });
+            } catch (\Throwable $e) {
+            }
+        }
+
         Schema::dropIfExists('biz_plan_entitlements');
         Schema::dropIfExists('biz_partner_requests');
         Schema::dropIfExists('biz_featured_slots');
@@ -462,33 +471,61 @@ return new class extends Migration
         Schema::dropIfExists('biz_invitations');
         Schema::dropIfExists('biz_business_users');
 
-        Schema::table('biz_leads', function (Blueprint $table) {
-            foreach (['name', 'phone', 'email', 'message', 'preferred_date', 'ip_hash', 'user_agent', 'party_size', 'user_id', 'handled_by', 'closed_at'] as $column) {
-                if (Schema::hasColumn('biz_leads', $column)) {
-                    $table->dropColumn($column);
+        if (Schema::hasTable('biz_leads')) {
+            Schema::table('biz_leads', function (Blueprint $table) {
+                try {
+                    $table->dropForeign(['user_id']);
+                } catch (\Throwable $e) {
                 }
-            }
-        });
-
-        Schema::table('biz_reviews', function (Blueprint $table) {
-            foreach (['user_id', 'title'] as $column) {
-                if (Schema::hasColumn('biz_reviews', $column)) {
-                    $table->dropColumn($column);
+                try {
+                    $table->dropForeign(['handled_by']);
+                } catch (\Throwable $e) {
                 }
-            }
-        });
-
-        Schema::table('biz_payments', function (Blueprint $table) {
-            $table->dropForeign(['invoice_id']);
-        });
-
-        Schema::table('biz_payments', function (Blueprint $table) {
-            foreach (['amount_cents', 'invoice_id', 'recorded_by', 'voided_at', 'void_reason'] as $column) {
-                if (Schema::hasColumn('biz_payments', $column)) {
-                    $table->dropColumn($column);
+            });
+            Schema::table('biz_leads', function (Blueprint $table) {
+                foreach (['name', 'phone', 'email', 'message', 'preferred_date', 'ip_hash', 'user_agent', 'party_size', 'user_id', 'handled_by', 'closed_at'] as $column) {
+                    if (Schema::hasColumn('biz_leads', $column)) {
+                        $table->dropColumn($column);
+                    }
                 }
-            }
-        });
+            });
+        }
+
+        if (Schema::hasTable('biz_reviews')) {
+            Schema::table('biz_reviews', function (Blueprint $table) {
+                try {
+                    $table->dropUnique(['business_id', 'user_id']);
+                } catch (\Throwable $e) {
+                }
+                try {
+                    $table->dropForeign(['user_id']);
+                } catch (\Throwable $e) {
+                }
+            });
+            Schema::table('biz_reviews', function (Blueprint $table) {
+                foreach (['user_id', 'title'] as $column) {
+                    if (Schema::hasColumn('biz_reviews', $column)) {
+                        $table->dropColumn($column);
+                    }
+                }
+            });
+        }
+
+        if (Schema::hasTable('biz_payments')) {
+            Schema::table('biz_payments', function (Blueprint $table) {
+                try {
+                    $table->dropForeign(['recorded_by']);
+                } catch (\Throwable $e) {
+                }
+            });
+            Schema::table('biz_payments', function (Blueprint $table) {
+                foreach (['amount_cents', 'invoice_id', 'recorded_by', 'voided_at', 'void_reason'] as $column) {
+                    if (Schema::hasColumn('biz_payments', $column)) {
+                        $table->dropColumn($column);
+                    }
+                }
+            });
+        }
 
         Schema::table('biz_subscriptions', function (Blueprint $table) {
             foreach (['billing_cycle', 'trial_starts_at', 'trial_ends_at', 'past_due_at', 'grace_ends_at'] as $column) {

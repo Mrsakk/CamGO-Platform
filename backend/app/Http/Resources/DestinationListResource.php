@@ -13,12 +13,22 @@ class DestinationListResource extends JsonResource
         $userId = Auth::guard('sanctum')->id();
         $isFavorited = false;
 
+        static $cachedUserId = null;
+        static $cachedFavoriteIds = null;
+
         if ($userId) {
-            // Check if favorites relation is loaded, or check directly
             if ($this->relationLoaded('favorites')) {
                 $isFavorited = $this->favorites->contains('user_id', $userId);
             } else {
-                $isFavorited = $this->favorites()->where('user_id', $userId)->exists();
+                if ($cachedUserId !== $userId) {
+                    $cachedUserId = $userId;
+                    $cachedFavoriteIds = array_flip(
+                        \App\Models\Favorite::where('user_id', $userId)
+                            ->pluck('destination_id')
+                            ->all()
+                    );
+                }
+                $isFavorited = isset($cachedFavoriteIds[$this->id]);
             }
         }
 

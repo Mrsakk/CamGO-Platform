@@ -55,7 +55,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/businesses', [PublicBusinessController::class, 'index']);
         Route::get('/businesses/{slug}', [PublicBusinessController::class, 'show']);
         Route::post('/businesses/{slug}/reviews', [PublicReviewController::class, 'store'])->middleware('throttle:10,1');
-        Route::post('/businesses/{slug}/events', [PublicEventController::class, 'store']);
+        Route::post('/businesses/{slug}/events', [PublicEventController::class, 'store'])->middleware('throttle:60,1');
     });
 
     // Canonical public directory routes (Prompt 2A-plus).

@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import {
   Plus,
   Search,
@@ -8,92 +9,101 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from "lucide-react";
 import { adminApi } from "@/lib/api/admin";
 import { provincesApi } from "@/lib/api/provinces";
 import { categoriesApi } from "@/lib/api/categories";
+import { queryKeys } from "@/lib/queryKeys";
+import { useDebounce } from "@/lib/useDebounce";
 import { toast } from "@/store/toastStore";
+
 const AdminDestinationsPage = () => {
   const navigate = useNavigate();
-  const [destinations, setDestinations] = useState([]);
-  const [meta, setMeta] = useState(null);
-  const [provinces, setProvinces] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const queryClient = useQueryClient();
+
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
   const [provinceId, setProvinceId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    provincesApi.getAll().then((res) => {
-      if (res.data) setProvinces(res.data);
-    });
-    categoriesApi.getAll().then((res) => {
-      if (res.data) setCategories(res.data);
-    });
-  }, []);
-  const fetchDestinations = async () => {
-    try {
-      setIsLoading(true);
-      const res = await adminApi.getDestinations({
-        search: search.trim() || void 0,
-        province_id: provinceId || void 0,
-        category_id: categoryId || void 0,
-        status: status || void 0,
-        page,
-        per_page: 15
-      });
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setDestinations(list);
-      if (res?.meta) setMeta(res.meta);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load destinations");
-    } finally {
-      setIsLoading(false);
-    }
+
+  // 1. Cached Provinces (24 hours)
+  const { data: provinces = [] } = useQuery({
+    queryKey: queryKeys.provinces.all(),
+    queryFn: async () => {
+      const res = await provincesApi.getAll();
+      return res?.data || [];
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  // 2. Cached Categories (24 hours)
+  const { data: categories = [] } = useQuery({
+    queryKey: queryKeys.categories.all(),
+    queryFn: async () => {
+      const res = await categoriesApi.getAll();
+      return res?.data || [];
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  // 3. Paginated Destinations Query with keepPreviousData for instant transitions
+  const destinationFilters = {
+    search: debouncedSearch.trim() || void 0,
+    province_id: provinceId || void 0,
+    category_id: categoryId || void 0,
+    status: status || void 0,
+    page,
+    per_page: 15,
   };
-  useEffect(() => {
-    fetchDestinations();
-  }, [search, provinceId, categoryId, status, page]);
+
+  const { data: res, isLoading, isFetching } = useQuery({
+    queryKey: queryKeys.destinations.list(destinationFilters),
+    queryFn: () => adminApi.getDestinations(destinationFilters),
+    placeholderData: keepPreviousData,
+  });
+
+  const destinations = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
+  const meta = res?.meta || null;
+
   const handleToggleFeatured = async (id) => {
     try {
-      const res = await adminApi.toggleDestinationFeatured(id);
-      if (res.data) {
-        setDestinations(
-          (prev) => prev.map((d) => d.id === id ? { ...d, is_featured: res.data.is_featured } : d)
-        );
+      const resp = await adminApi.toggleDestinationFeatured(id);
+      if (resp.data) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.destinations.all() });
         toast.success("Featured status updated");
       }
     } catch (err) {
       toast.error("Failed to toggle featured status");
     }
   };
+
   const handleToggleStatus = async (id) => {
     try {
-      const res = await adminApi.toggleDestinationStatus(id);
-      if (res.data) {
-        setDestinations(
-          (prev) => prev.map((d) => d.id === id ? { ...d, is_active: res.data.is_active } : d)
-        );
+      const resp = await adminApi.toggleDestinationStatus(id);
+      if (resp.data) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.destinations.all() });
         toast.success("Active status updated");
       }
     } catch (err) {
       toast.error("Failed to toggle status");
     }
   };
+
   const handleDelete = async (id, name) => {
     if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
     try {
       await adminApi.deleteDestination(id);
-      setDestinations((prev) => prev.filter((d) => d.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.destinations.all() });
       toast.success("Destination deleted successfully");
     } catch (err) {
       toast.error("Failed to delete destination");
     }
   };
+
   return <div className="space-y-6">
       {
     /* Header */

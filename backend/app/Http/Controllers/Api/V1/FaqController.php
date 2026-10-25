@@ -19,16 +19,16 @@ class FaqController extends ApiController
         $category = $request->input('category');
 
         $cacheKey = 'faqs_' . ($category ?? 'all');
-        $faqs = Cache::remember($cacheKey, 600, function () use ($category) {
+        $items = Cache::remember($cacheKey, 600, function () use ($category) {
             $query = Faq::query()->active()->ordered();
             if ($category) {
                 $query->where('category', $category);
             }
-            return $query->get();
+            return FaqResource::collection($query->get())->resolve();
         });
 
         return $this->successResponse([
-            'items' => FaqResource::collection($faqs),
+            'items' => $items,
         ]);
     }
 }

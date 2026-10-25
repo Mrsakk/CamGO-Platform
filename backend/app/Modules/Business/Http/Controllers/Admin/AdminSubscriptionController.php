@@ -15,6 +15,7 @@ use App\Modules\Business\Services\SubscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 
 class AdminSubscriptionController extends ApiController
 {
@@ -58,26 +59,30 @@ class AdminSubscriptionController extends ApiController
     {
         $this->authorize('manageBilling', Business::class);
 
-        $now = now();
+        $data = Cache::remember('admin:billing:stats', 30, function () {
+            $now = now();
 
-        return $this->successResponse([
-            'active_subscriptions' => Subscription::whereIn('status', ['active', 'trialing'])
-                ->where(function ($query) use ($now) {
-                    $query->whereNull('ends_at')->orWhere('ends_at', '>', $now);
-                })
-                ->count(),
-            'trial_subscriptions' => Subscription::where('status', 'trialing')->count(),
-            'expiring_soon' => Subscription::whereIn('status', ['active', 'trialing'])
-                ->whereBetween('ends_at', [$now, $now->copy()->addDays(7)])
-                ->count(),
-            'pending_requests' => SubscriptionRequestModel::where('status', 'pending')->count(),
-            'pending_payments' => Payment::where('status', 'pending')->count(),
-            'verified_revenue_30d' => (float) Payment::whereIn('status', ['recorded', 'verified'])
-                ->where('paid_at', '>=', $now->copy()->subDays(30))
-                ->sum('amount_usd'),
-            'verified_revenue_total' => (float) Payment::whereIn('status', ['recorded', 'verified'])->sum('amount_usd'),
-            'revenue_total_cents' => (int) Payment::whereIn('status', ['recorded', 'verified'])->sum('amount_cents'),
-        ], 'Billing statistics retrieved successfully');
+            return [
+                'active_subscriptions' => Subscription::whereIn('status', ['active', 'trialing'])
+                    ->where(function ($query) use ($now) {
+                        $query->whereNull('ends_at')->orWhere('ends_at', '>', $now);
+                    })
+                    ->count(),
+                'trial_subscriptions' => Subscription::where('status', 'trialing')->count(),
+                'expiring_soon' => Subscription::whereIn('status', ['active', 'trialing'])
+                    ->whereBetween('ends_at', [$now, $now->copy()->addDays(7)])
+                    ->count(),
+                'pending_requests' => SubscriptionRequestModel::where('status', 'pending')->count(),
+                'pending_payments' => Payment::where('status', 'pending')->count(),
+                'verified_revenue_30d' => (float) Payment::whereIn('status', ['recorded', 'verified'])
+                    ->where('paid_at', '>=', $now->copy()->subDays(30))
+                    ->sum('amount_usd'),
+                'verified_revenue_total' => (float) Payment::whereIn('status', ['recorded', 'verified'])->sum('amount_usd'),
+                'revenue_total_cents' => (int) Payment::whereIn('status', ['recorded', 'verified'])->sum('amount_cents'),
+            ];
+        });
+
+        return $this->successResponse($data, 'Billing statistics retrieved successfully');
     }
 
     public function payments(Request $request): JsonResponse

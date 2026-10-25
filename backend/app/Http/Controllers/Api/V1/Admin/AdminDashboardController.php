@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class AdminDashboardController extends ApiController
 {
@@ -28,95 +29,94 @@ class AdminDashboardController extends ApiController
         $sevenDaysAgo = $now->copy()->subDays(6)->startOfDay();
         $thirtyDaysAgo = $now->copy()->subDays(29)->startOfDay();
 
-        // 1. Summary counters
-        $totalUsers = User::count();
-        $newUsers30d = User::where('created_at', '>=', $thirtyDaysAgo)->count();
+        $payload = Cache::remember('admin:dashboard:stats', 30, function () use ($now, $thirtyDaysAgo) {
+            // 1. Summary counters
+            $totalUsers = User::count();
+            $newUsers30d = User::where('created_at', '>=', $thirtyDaysAgo)->count();
 
-        $totalDestinations = Destination::count();
-        $publishedDestinations = Destination::where('is_published', true)->count();
-        $featuredDestinations = Destination::where('is_featured', true)->count();
+            $totalDestinations = Destination::count();
+            $publishedDestinations = Destination::where('is_published', true)->count();
+            $featuredDestinations = Destination::where('is_featured', true)->count();
 
-        $totalReviews = Review::count();
-        $pendingReviews = Review::where('status', 'pending')->count();
-        $approvedReviews = Review::where('status', 'approved')->count();
-        $avgRating = Review::where('status', 'approved')->avg('rating') ?: 4.8;
+            $totalReviews = Review::count();
+            $pendingReviews = Review::where('status', 'pending')->count();
+            $approvedReviews = Review::where('status', 'approved')->count();
+            $avgRating = Review::where('status', 'approved')->avg('rating') ?: 4.8;
 
-        $totalInquiries = ContactMessage::count();
-        $unreadInquiries = ContactMessage::unread()->count();
-        $totalSubscribers = Subscriber::where('is_active', true)->count();
+            $totalInquiries = ContactMessage::count();
+            $unreadInquiries = ContactMessage::unread()->count();
+            $totalSubscribers = Subscriber::where('is_active', true)->count();
 
-        // 2. Registrations chart (last 7 days)
-        $dailyRegistrations7d = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $day = $now->copy()->subDays($i);
-            $dateStr = $day->format('Y-m-d');
-            $count = User::whereDate('created_at', $dateStr)->count();
-            $dailyRegistrations7d[] = [
-                'date' => $day->format('M d'),
-                'users' => $count,
-                'count' => $count,
+            // 2. Registrations chart (last 30 days, one grouped query)
+            $registrationCounts = User::query()
+                ->where('created_at', '>=', $thirtyDaysAgo)
+                ->selectRaw('DATE(created_at) as day, COUNT(*) as count')
+                ->groupByRaw('DATE(created_at)')
+                ->pluck('count', 'day');
+
+            $dailyRegistrations30d = [];
+            for ($i = 29; $i >= 0; $i--) {
+                $day = $now->copy()->subDays($i);
+                $dateStr = $day->format('Y-m-d');
+                $count = (int) ($registrationCounts[$dateStr] ?? 0);
+                $dailyRegistrations30d[] = [
+                    'date' => $day->format('M d'),
+                    'users' => $count,
+                    'count' => $count,
+                ];
+            }
+
+            $dailyRegistrations7d = array_slice($dailyRegistrations30d, -7);
+
+            // 4. Top visited destinations
+            $topDestinations = Destination::query()
+                ->with(['province', 'category'])
+                ->orderByDesc('view_count')
+                ->take(5)
+                ->get();
+
+            // 5. Recent audit activity
+            $recentAuditLogs = AuditLog::query()
+                ->with('user')
+                ->latest()
+                ->take(8)
+                ->get();
+
+            // 6. Recent reviews needing attention
+            $recentReviews = Review::query()
+                ->with(['user', 'reviewable'])
+                ->latest()
+                ->take(5)
+                ->get();
+
+            $counters = [
+                'total_users' => $totalUsers,
+                'new_users_30d' => $newUsers30d,
+                'total_destinations' => $totalDestinations,
+                'published_destinations' => $publishedDestinations,
+                'featured_destinations' => $featuredDestinations,
+                'total_reviews' => $totalReviews,
+                'pending_reviews' => $pendingReviews,
+                'approved_reviews' => $approvedReviews,
+                'avg_rating' => round((float) $avgRating, 2),
+                'total_inquiries' => $totalInquiries,
+                'unread_inquiries' => $unreadInquiries,
+                'total_subscribers' => $totalSubscribers,
             ];
-        }
 
-        // 3. Registrations chart (last 30 days)
-        $dailyRegistrations30d = [];
-        for ($i = 29; $i >= 0; $i--) {
-            $day = $now->copy()->subDays($i);
-            $dateStr = $day->format('Y-m-d');
-            $count = User::whereDate('created_at', $dateStr)->count();
-            $dailyRegistrations30d[] = [
-                'date' => $day->format('M d'),
-                'users' => $count,
-                'count' => $count,
-            ];
-        }
+            return array_merge($counters, [
+                'counters' => $counters,
+                'charts' => [
+                    'registrations_7d' => $dailyRegistrations7d,
+                    'registrations_30d' => $dailyRegistrations30d,
+                ],
+                'top_destinations' => DestinationListResource::collection($topDestinations)->resolve(),
+                'recent_activities' => AuditLogResource::collection($recentAuditLogs)->resolve(),
+                'recent_reviews' => ReviewResource::collection($recentReviews)->resolve(),
+            ]);
+        });
 
-        // 4. Top visited destinations
-        $topDestinations = Destination::query()
-            ->with(['province', 'category'])
-            ->orderByDesc('view_count')
-            ->take(5)
-            ->get();
-
-        // 5. Recent audit activity
-        $recentAuditLogs = AuditLog::query()
-            ->with('user')
-            ->latest()
-            ->take(8)
-            ->get();
-
-        // 6. Recent reviews needing attention
-        $recentReviews = Review::query()
-            ->with(['user', 'reviewable'])
-            ->latest()
-            ->take(5)
-            ->get();
-
-        $counters = [
-            'total_users' => $totalUsers,
-            'new_users_30d' => $newUsers30d,
-            'total_destinations' => $totalDestinations,
-            'published_destinations' => $publishedDestinations,
-            'featured_destinations' => $featuredDestinations,
-            'total_reviews' => $totalReviews,
-            'pending_reviews' => $pendingReviews,
-            'approved_reviews' => $approvedReviews,
-            'avg_rating' => round((float) $avgRating, 2),
-            'total_inquiries' => $totalInquiries,
-            'unread_inquiries' => $unreadInquiries,
-            'total_subscribers' => $totalSubscribers,
-        ];
-
-        return $this->successResponse(array_merge($counters, [
-            'counters' => $counters,
-            'charts' => [
-                'registrations_7d' => $dailyRegistrations7d,
-                'registrations_30d' => $dailyRegistrations30d,
-            ],
-            'top_destinations' => DestinationListResource::collection($topDestinations),
-            'recent_activities' => AuditLogResource::collection($recentAuditLogs),
-            'recent_reviews' => ReviewResource::collection($recentReviews),
-        ]), 'Dashboard statistics retrieved');
+        return $this->successResponse($payload, 'Dashboard statistics retrieved');
     }
 
     /**
@@ -128,11 +128,17 @@ class AdminDashboardController extends ApiController
         $days = in_array($days, [7, 14, 30, 90]) ? $days : 30;
         $now = Carbon::now();
 
+        $userCounts = User::query()
+            ->where('created_at', '>=', $now->copy()->subDays($days - 1)->startOfDay())
+            ->selectRaw('DATE(created_at) as day, COUNT(*) as count')
+            ->groupByRaw('DATE(created_at)')
+            ->pluck('count', 'day');
+
         $data = [];
         for ($i = $days - 1; $i >= 0; $i--) {
             $day = $now->copy()->subDays($i);
             $dateStr = $day->format('Y-m-d');
-            $count = User::whereDate('created_at', $dateStr)->count();
+            $count = (int) ($userCounts[$dateStr] ?? 0);
             $data[] = [
                 'date' => $day->format('M d'),
                 'users' => $count,

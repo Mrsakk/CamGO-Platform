@@ -16,11 +16,15 @@ import {
   Search,
   Filter
 } from "lucide-react";
+import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { RatingStars } from "@/components/common/RatingStars";
 import { adminApi } from "@/lib/api/admin";
+import { queryKeys } from "@/lib/queryKeys";
+import { useDebounce } from "@/lib/useDebounce";
 import { toast } from "@/store/toastStore";
 
 const AdminReviewsPage = ({ initialTab = "destinations" }) => {
+  const queryClient = useQueryClient();
   // Main view: 'destinations' | 'testimonials'
   const [activeTab, setActiveTab] = useState(initialTab);
 
@@ -29,81 +33,54 @@ const AdminReviewsPage = ({ initialTab = "destinations" }) => {
   }, [initialTab]);
 
   // Destination Reviews State
-  const [reviews, setReviews] = useState([]);
-  const [meta, setMeta] = useState(null);
-  const [counts, setCounts] = useState({ all: 0, pending: 0, approved: 0, rejected: 0 });
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Website Testimonials State ("Loved by Explorers Worldwide")
-  const [testimonials, setTestimonials] = useState([]);
-  const [testMeta, setTestMeta] = useState(null);
-  const [testCounts, setTestCounts] = useState({ all: 0, pending: 0, approved: 0, rejected: 0 });
   const [testStatus, setTestStatus] = useState("");
   const [testPage, setTestPage] = useState(1);
   const [testSearch, setTestSearch] = useState("");
-  const [isTestLoading, setIsTestLoading] = useState(true);
+  const debouncedTestSearch = useDebounce(testSearch, 300);
 
-  // Fetch Destination Reviews
-  const fetchReviews = async () => {
-    try {
-      setIsLoading(true);
-      const res = await adminApi.getReviews({
-        status: status || void 0,
-        page,
-        per_page: 15
-      });
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setReviews(list);
-      if (res?.data?.meta) setMeta(res.data.meta);
-      else if (res?.meta) setMeta(res.meta);
-      if (res?.data?.counts) setCounts(res.data.counts);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load destination reviews");
-    } finally {
-      setIsLoading(false);
-    }
+  // 1. Fetch Destination Reviews with Query Cache
+  const reviewFilters = {
+    status: status || void 0,
+    page,
+    per_page: 15,
   };
+  const { data: revRes, isLoading } = useQuery({
+    queryKey: queryKeys.reviews.list(reviewFilters),
+    queryFn: () => adminApi.getReviews(reviewFilters),
+    placeholderData: keepPreviousData,
+  });
 
-  // Fetch Website Testimonials
-  const fetchTestimonials = async () => {
-    try {
-      setIsTestLoading(true);
-      const res = await adminApi.getTestimonials({
-        status: testStatus || void 0,
-        search: testSearch.trim() || void 0,
-        page: testPage,
-        per_page: 15
-      });
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setTestimonials(list);
-      if (res?.data?.meta) setTestMeta(res.data.meta);
-      if (res?.data?.counts) setTestCounts(res.data.counts);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load website testimonials");
-    } finally {
-      setIsTestLoading(false);
-    }
+  const reviews = revRes?.data?.items || (Array.isArray(revRes?.data) ? revRes.data : []);
+  const meta = revRes?.data?.meta || revRes?.meta || null;
+  const counts = revRes?.data?.counts || { all: 0, pending: 0, approved: 0, rejected: 0 };
+
+  // 2. Fetch Website Testimonials with Query Cache
+  const testFilters = {
+    status: testStatus || void 0,
+    search: debouncedTestSearch.trim() || void 0,
+    page: testPage,
+    per_page: 15,
   };
+  const { data: testRes, isLoading: isTestLoading } = useQuery({
+    queryKey: queryKeys.testimonials.list(testFilters),
+    queryFn: () => adminApi.getTestimonials(testFilters),
+    placeholderData: keepPreviousData,
+  });
 
-  useEffect(() => {
-    if (activeTab === "destinations") {
-      fetchReviews();
-    } else {
-      fetchTestimonials();
-    }
-  }, [activeTab, status, page, testStatus, testPage]);
+  const testimonials = testRes?.data?.items || (Array.isArray(testRes?.data) ? testRes.data : []);
+  const testMeta = testRes?.data?.meta || testRes?.meta || null;
+  const testCounts = testRes?.data?.counts || { all: 0, pending: 0, approved: 0, rejected: 0 };
 
   // Destination Review Actions
   const handleApproveReview = async (id) => {
     try {
       await adminApi.approveReview(id);
-      setReviews((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, status: "approved" } : r))
-      );
+      queryClient.invalidateQueries({ queryKey: queryKeys.reviews.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.stats() });
       toast.success("Review approved and published");
     } catch (err) {
       toast.error("Failed to approve review");
@@ -113,9 +90,8 @@ const AdminReviewsPage = ({ initialTab = "destinations" }) => {
   const handleRejectReview = async (id) => {
     try {
       await adminApi.rejectReview(id);
-      setReviews((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, status: "rejected" } : r))
-      );
+      queryClient.invalidateQueries({ queryKey: queryKeys.reviews.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.stats() });
       toast.info("Review rejected");
     } catch (err) {
       toast.error("Failed to reject review");
@@ -126,7 +102,8 @@ const AdminReviewsPage = ({ initialTab = "destinations" }) => {
     if (!window.confirm("Delete this review permanently?")) return;
     try {
       await adminApi.deleteReview(id);
-      setReviews((prev) => prev.filter((r) => r.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.reviews.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.stats() });
       toast.success("Review deleted");
     } catch (err) {
       toast.error("Failed to delete review");
@@ -137,14 +114,7 @@ const AdminReviewsPage = ({ initialTab = "destinations" }) => {
   const handleApproveTestimonial = async (id) => {
     try {
       await adminApi.approveTestimonial(id);
-      setTestimonials((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, status: "approved" } : t))
-      );
-      setTestCounts((c) => ({
-        ...c,
-        pending: Math.max(0, c.pending - 1),
-        approved: c.approved + 1
-      }));
+      queryClient.invalidateQueries({ queryKey: queryKeys.testimonials.all() });
       toast.success("Testimonial approved! It is now live on the homepage marquee.");
     } catch (err) {
       toast.error("Failed to approve testimonial");
@@ -154,14 +124,7 @@ const AdminReviewsPage = ({ initialTab = "destinations" }) => {
   const handleRejectTestimonial = async (id) => {
     try {
       await adminApi.rejectTestimonial(id);
-      setTestimonials((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, status: "rejected" } : t))
-      );
-      setTestCounts((c) => ({
-        ...c,
-        pending: Math.max(0, c.pending - 1),
-        rejected: c.rejected + 1
-      }));
+      queryClient.invalidateQueries({ queryKey: queryKeys.testimonials.all() });
       toast.info("Testimonial rejected from public display.");
     } catch (err) {
       toast.error("Failed to reject testimonial");
@@ -172,7 +135,7 @@ const AdminReviewsPage = ({ initialTab = "destinations" }) => {
     if (!window.confirm("Permanently delete this website testimonial?")) return;
     try {
       await adminApi.deleteTestimonial(id);
-      setTestimonials((prev) => prev.filter((t) => t.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.testimonials.all() });
       toast.success("Testimonial deleted successfully.");
     } catch (err) {
       toast.error("Failed to delete testimonial");

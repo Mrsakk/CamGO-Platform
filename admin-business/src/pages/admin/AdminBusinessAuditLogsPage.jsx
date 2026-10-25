@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import {
   ShieldCheck,
@@ -36,6 +36,7 @@ export const AdminBusinessAuditLogsPage = () => {
       const res = await api.get("/admin/business/audit-logs", { params });
       return res.data;
     },
+    placeholderData: keepPreviousData,
   });
 
   const payload = logsData?.data || logsData || {};
@@ -80,7 +81,7 @@ export const AdminBusinessAuditLogsPage = () => {
 
       {/* Audit Log Table */}
       <div className="portal-surface overflow-hidden">
-        {isLoading ? (
+        {isLoading && logs.length === 0 ? (
           <div className="p-12 text-center">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-amber-500 mb-3" />
             <p className="text-sm text-stone-500 dark:text-stone-400">

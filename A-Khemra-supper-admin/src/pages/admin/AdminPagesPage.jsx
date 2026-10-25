@@ -1,17 +1,34 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Layers, Users, Plus, Edit, Trash2, X, Save, Loader2,
   Upload, CheckCircle2, Eye, EyeOff, User
 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
+import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
 
 const AdminPagesPage = () => {
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("pages"); // "pages" | "team"
 
+  // 1. Static Pages Query
+  const { data: pagesRes, isLoading: isLoadingPages } = useQuery({
+    queryKey: queryKeys.pages.all(),
+    queryFn: () => adminApi.getPages(),
+  });
+
+  const pages = pagesRes?.data?.items || (Array.isArray(pagesRes?.data) ? pagesRes.data : []);
+
+  // 2. Team Members Query
+  const { data: teamRes, isLoading: isLoadingTeam } = useQuery({
+    queryKey: ["admin", "team-members"],
+    queryFn: () => adminApi.getTeamMembers(),
+  });
+
+  const teamMembers = teamRes?.data?.items || (Array.isArray(teamRes?.data) ? teamRes.data : []);
+
   // Static Pages State
-  const [pages, setPages] = useState([]);
-  const [isLoadingPages, setIsLoadingPages] = useState(true);
   const [isPageModalOpen, setIsPageModalOpen] = useState(false);
   const [editingPage, setEditingPage] = useState(null);
   const [pageFormData, setPageFormData] = useState({
@@ -23,8 +40,6 @@ const AdminPagesPage = () => {
   const [isSubmittingPage, setIsSubmittingPage] = useState(false);
 
   // Team Members State
-  const [teamMembers, setTeamMembers] = useState([]);
-  const [isLoadingTeam, setIsLoadingTeam] = useState(true);
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [teamFormData, setTeamFormData] = useState({
@@ -38,41 +53,6 @@ const AdminPagesPage = () => {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isSubmittingTeam, setIsSubmittingTeam] = useState(false);
-
-  // Fetch Static Pages
-  const fetchPages = async () => {
-    try {
-      setIsLoadingPages(true);
-      const res = await adminApi.getPages();
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setPages(list);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load static pages");
-    } finally {
-      setIsLoadingPages(false);
-    }
-  };
-
-  // Fetch Team Members
-  const fetchTeamMembers = async () => {
-    try {
-      setIsLoadingTeam(true);
-      const res = await adminApi.getTeamMembers();
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setTeamMembers(list);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load team members");
-    } finally {
-      setIsLoadingTeam(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPages();
-    fetchTeamMembers();
-  }, []);
 
   // Page Modal Handlers
   const openEditPageModal = (p) => {
@@ -94,7 +74,7 @@ const AdminPagesPage = () => {
       await adminApi.updatePage(editingPage.id, pageFormData);
       toast.success("Page content updated");
       setIsPageModalOpen(false);
-      fetchPages();
+      queryClient.invalidateQueries({ queryKey: queryKeys.pages.all() });
     } catch (err) {
       toast.error("Failed to update page");
     } finally {
@@ -137,7 +117,7 @@ const AdminPagesPage = () => {
     if (!window.confirm(`Delete team member "${name}"?`)) return;
     try {
       await adminApi.deleteTeamMember(id);
-      setTeamMembers((prev) => prev.filter((m) => m.id !== id));
+      queryClient.invalidateQueries({ queryKey: ["admin", "team-members"] });
       toast.success("Team member deleted");
     } catch (err) {
       toast.error("Failed to delete team member");
@@ -169,7 +149,7 @@ const AdminPagesPage = () => {
       }
 
       setIsTeamModalOpen(false);
-      fetchTeamMembers();
+      queryClient.invalidateQueries({ queryKey: ["admin", "team-members"] });
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save team member");
     } finally {

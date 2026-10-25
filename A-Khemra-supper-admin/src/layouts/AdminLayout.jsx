@@ -29,13 +29,19 @@ import {
   Store,
   CreditCard
 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/authStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useAdminSettingsStore } from "@/store/settingsStore";
+import { queryKeys } from "@/lib/queryKeys";
+import { adminApi } from "@/lib/api/admin";
+import { provincesApi } from "@/lib/api/provinces";
+import { categoriesApi } from "@/lib/api/categories";
 import { ToastContainer } from "@/components/common/ToastContainer";
 import { toast } from "@/store/toastStore";
 
 const AdminLayout = () => {
+  const queryClient = useQueryClient();
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -44,6 +50,160 @@ const AdminLayout = () => {
   const { settings, fetchSettings } = useAdminSettingsStore();
   const [logoImgError, setLogoImgError] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handlePrefetch = (to) => {
+    try {
+      switch (to) {
+        case "/admin":
+          import("@/pages/admin/AdminDashboardPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.stats(),
+            queryFn: async () => {
+              const res = await adminApi.getStats();
+              return res?.data || res;
+            },
+            staleTime: 60 * 1000,
+          });
+          break;
+        case "/admin/destinations":
+          import("@/pages/admin/AdminDestinationsPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.destinations.list({ page: 1, per_page: 15 }),
+            queryFn: () => adminApi.getDestinations({ page: 1, per_page: 15 }),
+          });
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.provinces.all(),
+            queryFn: async () => {
+              const res = await provincesApi.getAll();
+              return res?.data || [];
+            },
+            staleTime: 1000 * 60 * 60 * 24,
+          });
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.categories.all(),
+            queryFn: async () => {
+              const res = await categoriesApi.getAll();
+              return res?.data || [];
+            },
+            staleTime: 1000 * 60 * 60 * 24,
+          });
+          break;
+        case "/admin/provinces":
+          import("@/pages/admin/AdminProvincesPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.provinces.all(),
+            queryFn: async () => {
+              const res = await provincesApi.getAll();
+              return res?.data || [];
+            },
+            staleTime: 1000 * 60 * 60 * 24,
+          });
+          break;
+        case "/admin/categories":
+          import("@/pages/admin/AdminCategoriesPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.categories.all(),
+            queryFn: async () => {
+              const res = await categoriesApi.getAll();
+              return res?.data || [];
+            },
+            staleTime: 1000 * 60 * 60 * 24,
+          });
+          break;
+        case "/admin/reviews":
+          import("@/pages/admin/AdminReviewsPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.reviews.list({ page: 1, per_page: 15 }),
+            queryFn: () => adminApi.getReviews({ page: 1, per_page: 15 }),
+          });
+          break;
+        case "/admin/testimonials":
+          import("@/pages/admin/AdminReviewsPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.testimonials.list({ page: 1, per_page: 15 }),
+            queryFn: () => adminApi.getTestimonials({ page: 1, per_page: 15 }),
+          });
+          break;
+        case "/admin/users":
+          import("@/pages/admin/AdminUsersPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.users.list({ page: 1, per_page: 15 }),
+            queryFn: () => adminApi.getUsers({ page: 1, per_page: 15 }),
+          });
+          break;
+        case "/admin/events":
+          import("@/pages/admin/AdminEventsPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.events.list({ per_page: 50 }),
+            queryFn: () => adminApi.getEvents({ per_page: 50 }),
+          });
+          break;
+        case "/admin/blog":
+          import("@/pages/admin/AdminBlogPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.blog.list(),
+            queryFn: () => adminApi.getBlogPosts(),
+          });
+          break;
+        case "/admin/banners":
+          import("@/pages/admin/AdminBannersPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.banners.all(),
+            queryFn: () => adminApi.getBanners(),
+          });
+          break;
+        case "/admin/faqs":
+          import("@/pages/admin/AdminFaqsPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.faqs.all(),
+            queryFn: () => adminApi.getFaqs(),
+          });
+          break;
+        case "/admin/pages":
+          import("@/pages/admin/AdminPagesPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.pages.all(),
+            queryFn: () => adminApi.getPages(),
+          });
+          break;
+        case "/admin/contacts":
+          import("@/pages/admin/AdminContactPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.contactMessages.all(),
+            queryFn: () => adminApi.getContacts(),
+          });
+          break;
+        case "/admin/subscribers":
+          import("@/pages/admin/AdminSubscribersPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.subscribers.all(),
+            queryFn: () => adminApi.getSubscribers(),
+          });
+          break;
+        case "/admin/roles":
+          import("@/pages/admin/AdminRolesPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.roles(),
+            queryFn: () => adminApi.getRoles(),
+          });
+          break;
+        case "/admin/audit-logs":
+          import("@/pages/admin/AdminAuditLogsPage");
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.auditLogs.list({ page: 1, per_page: 20 }),
+            queryFn: () => adminApi.getAuditLogs({ page: 1, per_page: 20 }),
+          });
+          break;
+        case "/admin/settings":
+          import("@/pages/admin/AdminSettingsPage");
+          break;
+        default:
+          break;
+      }
+    } catch (e) {
+      // Ignore prefetch errors
+    }
+  };
 
   useEffect(() => {
     fetchSettings();
@@ -185,6 +345,7 @@ const AdminLayout = () => {
                     key={item.to}
                     to={item.to}
                     end={item.end}
+                    onPointerEnter={() => handlePrefetch(item.to)}
                     onClick={() => setSidebarOpen(false)}
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-3 py-2 rounded-xl text-small font-medium transition-all ${

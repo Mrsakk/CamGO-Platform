@@ -5,4 +5,4 @@ Disallow: /profile
 Disallow: /favorites
 Disallow: /my-reviews
 
-Sitemap: http://localhost:5173/sitemap.xml
+Sitemap: /sitemap.xml

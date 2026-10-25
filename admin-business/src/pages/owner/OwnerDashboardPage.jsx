@@ -1,5 +1,5 @@
-﻿import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -64,6 +64,7 @@ export const OwnerDashboardPage = () => {
       const res = await api.get(`/business/owner/stats?range=${range}`);
       return res.data?.data || res.data;
     },
+    placeholderData: keepPreviousData,
   });
 
   const {
@@ -79,7 +80,7 @@ export const OwnerDashboardPage = () => {
     },
   });
 
-  if (bizLoading || statsLoading) {
+  if ((bizLoading && !business) || (statsLoading && !statsData)) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />

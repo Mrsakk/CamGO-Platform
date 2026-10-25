@@ -43,6 +43,7 @@ export const AdminBusinessCategoriesPage = () => {
       const res = await api.get("/admin/business/categories");
       return res.data;
     },
+    staleTime: 1000 * 60 * 60 * 24, // 24 hours
   });
 
   const rawCategories = categoriesData?.data || (Array.isArray(categoriesData) ? categoriesData : []);
@@ -160,7 +161,7 @@ export const AdminBusinessCategoriesPage = () => {
 
       {/* Categories Table */}
       <div className="portal-surface overflow-hidden">
-        {isLoading ? (
+        {isLoading && categories.length === 0 ? (
           <div className="p-12 text-center">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-amber-500 mb-3" />
             <p className="text-sm text-stone-500 dark:text-stone-400">

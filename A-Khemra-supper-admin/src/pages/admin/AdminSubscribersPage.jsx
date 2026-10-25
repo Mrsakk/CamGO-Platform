@@ -1,27 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Download, Trash2, Mail } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/lib/api/admin";
+import { queryKeys } from "@/lib/queryKeys";
 import { toast } from "@/store/toastStore";
+
 const AdminSubscribersPage = () => {
-  const [subscribers, setSubscribers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [isExporting, setIsExporting] = useState(false);
-  const fetchSubscribers = async () => {
-    try {
-      setIsLoading(true);
-      const res = await adminApi.getSubscribers();
-      const list = res?.data?.items || (Array.isArray(res?.data) ? res.data : []);
-      setSubscribers(list);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load subscribers");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchSubscribers();
-  }, []);
+
+  const { data: subsRes, isLoading } = useQuery({
+    queryKey: queryKeys.subscribers.all(),
+    queryFn: () => adminApi.getSubscribers(),
+  });
+
+  const subscribers = subsRes?.data?.items || (Array.isArray(subsRes?.data) ? subsRes.data : []);
+
   const handleExportCsv = async () => {
     try {
       setIsExporting(true);
@@ -44,7 +38,7 @@ const AdminSubscribersPage = () => {
     if (!window.confirm("Delete subscriber?")) return;
     try {
       await adminApi.deleteSubscriber(id);
-      setSubscribers((prev) => prev.filter((s) => s.id !== id));
+      queryClient.invalidateQueries({ queryKey: queryKeys.subscribers.all() });
       toast.success("Subscriber removed");
     } catch (err) {
       toast.error("Failed to remove subscriber");
