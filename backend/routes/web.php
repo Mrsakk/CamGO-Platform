@@ -18,11 +18,45 @@ Route::get('/', function () {
 });
 
 Route::get('/media/{path}', function (string $path) {
-    $disk = Storage::disk('public');
+    $candidates = [
+        base_path('storage/app/public/'.$path),
+        storage_path('app/public/'.$path),
+        public_path('storage/'.$path),
+    ];
 
-    abort_unless($disk->exists($path), 404);
+    foreach ($candidates as $file) {
+        if (file_exists($file) && is_file($file)) {
+            $mime = mime_content_type($file) ?: 'application/octet-stream';
+            return response()->file($file, [
+                'Content-Type' => $mime,
+                'Cache-Control' => 'public, max-age=31536000, immutable',
+                'Access-Control-Allow-Origin' => '*',
+            ]);
+        }
+    }
 
-    return $disk->response($path);
+    abort(404);
+})->where('path', '.*');
+
+Route::get('/storage/{path}', function (string $path) {
+    $candidates = [
+        base_path('storage/app/public/'.$path),
+        storage_path('app/public/'.$path),
+        public_path('storage/'.$path),
+    ];
+
+    foreach ($candidates as $file) {
+        if (file_exists($file) && is_file($file)) {
+            $mime = mime_content_type($file) ?: 'application/octet-stream';
+            return response()->file($file, [
+                'Content-Type' => $mime,
+                'Cache-Control' => 'public, max-age=31536000, immutable',
+                'Access-Control-Allow-Origin' => '*',
+            ]);
+        }
+    }
+
+    abort(404);
 })->where('path', '.*');
 
 Route::get('/sitemap.xml', function () {

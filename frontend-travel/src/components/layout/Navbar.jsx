@@ -235,12 +235,18 @@ export const Navbar = () => {
 
             {/* Brand Logo & Wordmark */}
             <Link to="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group py-1">
-              {settings.logo_url && !logoImgError ? (
+              {(settings.logo_url || !logoImgError) ? (
                 <img
-                  src={resolveAssetUrl(settings.logo_url)}
+                  src={resolveAssetUrl(settings.logo_url || "/logo.png")}
                   alt={settings.site_name_en || "Logo"}
                   className="h-10 sm:h-12 w-auto max-w-[170px] sm:max-w-[220px] object-contain group-hover:scale-105 transition-transform duration-200 drop-shadow-xs"
-                  onError={() => setLogoImgError(true)}
+                  onError={(e) => {
+                    if (!e.currentTarget.src.endsWith('/logo.png')) {
+                      e.currentTarget.src = '/logo.png';
+                    } else {
+                      setLogoImgError(true);
+                    }
+                  }}
                 />
               ) : (
                 <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-laterite-600 text-white flex items-center justify-center font-heading font-black text-xl tracking-wider shadow-sm group-hover:bg-laterite-500 transition-colors shrink-0">
@@ -670,12 +676,18 @@ export const Navbar = () => {
             {/* Drawer Header */}
             <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800 shrink-0">
               <div className="flex items-center gap-2.5">
-                {settings.logo_url && !logoImgError ? (
+                {(settings.logo_url || !logoImgError) ? (
                   <img
-                    src={resolveAssetUrl(settings.logo_url)}
+                    src={resolveAssetUrl(settings.logo_url || "/logo.png")}
                     alt={settings.site_name_en || "Logo"}
                     className="h-10 sm:h-12 w-auto max-w-[140px] object-contain rounded-lg shadow-xs"
-                    onError={() => setLogoImgError(true)}
+                    onError={(e) => {
+                      if (!e.currentTarget.src.endsWith('/logo.png')) {
+                        e.currentTarget.src = '/logo.png';
+                      } else {
+                        setLogoImgError(true);
+                      }
+                    }}
                   />
                 ) : (
                   <div className="h-10 px-2.5 rounded-xl bg-laterite-600 text-white flex items-center justify-center font-heading font-bold text-lg shadow-sm shrink-0">

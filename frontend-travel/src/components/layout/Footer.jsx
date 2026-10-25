@@ -110,12 +110,18 @@ export const Footer = () => {
           <div className="lg:col-span-4 space-y-5">
             {/* Logo Brand Header */}
             <Link to="/" className="inline-flex items-center gap-3 group">
-              {settings.logo_url && !logoImgError ? (
+              {(settings.logo_url || !logoImgError) ? (
                 <img
-                  src={resolveAssetUrl(settings.logo_url)}
+                  src={resolveAssetUrl(settings.logo_url || "/logo.png")}
                   alt={settings.site_name_en || "Logo"}
                   className="h-11 sm:h-12 w-auto max-w-[180px] object-contain rounded-xl shadow-xs group-hover:scale-105 transition-all duration-200"
-                  onError={() => setLogoImgError(true)}
+                  onError={(e) => {
+                    if (!e.currentTarget.src.endsWith('/logo.png')) {
+                      e.currentTarget.src = '/logo.png';
+                    } else {
+                      setLogoImgError(true);
+                    }
+                  }}
                 />
               ) : (
                 <div className="h-11 w-11 rounded-2xl bg-laterite-600 text-white flex items-center justify-center font-heading font-black text-xl tracking-wider shadow-sm group-hover:bg-laterite-500 transition-colors shrink-0">

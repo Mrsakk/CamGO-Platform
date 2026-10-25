@@ -1,30 +1,20 @@
 /**
- * home.js – Home aggregated query definition using native fetch().
+ * home.js – Home aggregated query definition using api client.
  *
- * Uses fetch() with the same URL so it can reuse the resource loaded via:
- * <link rel="preload" href="/api/v1/home" as="fetch" crossorigin="anonymous">
+ * Uses axios client configured with VITE_API_URL so it properly connects
+ * to the deployed backend on Vercel in production or localhost in development.
  */
+
+import api from "../axios";
 
 export const HOME_QUERY_KEY = ["home", "v1"];
 
 /**
- * Native fetch handler for the aggregated home payload.
- * Runs against same-origin /api/v1/home (proxied by Nginx/Vite).
+ * Fetch handler for the aggregated home payload.
  */
 export async function fetchHome() {
-  const response = await fetch("/api/v1/home", {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch home payload: ${response.status} ${response.statusText}`);
-  }
-
-  const json = await response.json();
-  return json.data;
+  const response = await api.get("/home");
+  return response.data?.data || response.data;
 }
 
 export const homeQuery = {

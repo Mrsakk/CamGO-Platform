@@ -32,7 +32,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/authStore";
 import { useThemeStore } from "@/store/themeStore";
-import { useAdminSettingsStore } from "@/store/settingsStore";
+import { useAdminSettingsStore, resolveAssetUrl } from "@/store/settingsStore";
 import { queryKeys } from "@/lib/queryKeys";
 import { adminApi } from "@/lib/api/admin";
 import { provincesApi } from "@/lib/api/provinces";
@@ -301,12 +301,18 @@ const AdminLayout = () => {
         {/* Brand Header */}
         <div className="h-14 px-5 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between shrink-0">
           <Link to="/admin" className="flex items-center gap-2.5 min-w-0 py-0.5">
-            {settings.logo_url && !logoImgError ? (
+            {(settings.logo_url || !logoImgError) ? (
               <img
-                src={settings.logo_url}
+                src={resolveAssetUrl(settings.logo_url || "/logo.png")}
                 alt={settings.site_name_en || "Logo"}
                 className="h-9 sm:h-10 w-auto max-w-[110px] object-contain rounded-lg p-0.5 shadow-xs shrink-0"
-                onError={() => setLogoImgError(true)}
+                onError={(e) => {
+                  if (!e.currentTarget.src.endsWith('/logo.png')) {
+                    e.currentTarget.src = '/logo.png';
+                  } else {
+                    setLogoImgError(true);
+                  }
+                }}
               />
             ) : (
               <div className="w-9 h-9 rounded-lg bg-laterite-600 flex items-center justify-center text-white font-bold text-sm tracking-wider shadow-xs shrink-0">

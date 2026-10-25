@@ -8,14 +8,14 @@ const DEFAULT_SETTINGS = {
   site_tagline_en: "Trusted Local. Direct Connection.",
   site_tagline_km: "ទំនុកចិត្តក្នុងស្រុក ទំនាក់ទំនងផ្ទាល់",
   logo_badge_text: "CG",
-  logo_url: "",
+  logo_url: "/logo.png",
   favicon_url: "/favicon.svg",
   contact_email: "contact@camgo.com",
   contact_phone: "+855 23 888 777",
 };
 
 export const resolveAssetUrl = (url) => {
-  if (!url) return "";
+  if (!url) return "/logo.png";
   if (
     url.startsWith("http://") ||
     url.startsWith("https://") ||
@@ -24,7 +24,15 @@ export const resolveAssetUrl = (url) => {
   ) {
     return url;
   }
-  return url.startsWith("/") ? url : `/${url}`;
+  if (url === "/logo.png" || url === "logo.png") {
+    return "/logo.png";
+  }
+  const storageBase =
+    import.meta.env.VITE_STORAGE_URL ||
+    import.meta.env.VITE_API_URL?.replace(/\/api\/v1\/?$/, "") ||
+    "";
+  const cleanPath = url.startsWith("/") ? url : `/${url}`;
+  return storageBase ? `${storageBase.replace(/\/+$/, "")}${cleanPath}` : cleanPath;
 };
 
 export const updateFavicon = (url) => {

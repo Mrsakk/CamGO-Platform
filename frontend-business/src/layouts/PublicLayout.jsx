@@ -82,16 +82,22 @@ export const PublicLayout = () => {
       <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur-xl dark:border-white/10 dark:bg-stone-900/90">
         <div className="mx-auto flex h-[72px] max-w-content items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <Link to="/" className="group flex shrink-0 items-center gap-3 py-1">
-            {settings.logo_url && !logoImgError ? (
+            {(settings.logo_url || !logoImgError) ? (
               <img
-                src={resolveAssetUrl(settings.logo_url)}
+                src={resolveAssetUrl(settings.logo_url || "/logo.png")}
                 alt={
                   isKm
                     ? `${settings.site_name_km || "CamGO"} អាជីវកម្ម`
                     : `${settings.site_name_en || "CamGO"} Business`
                 }
                 className="h-11 w-auto max-w-[190px] object-contain transition-transform duration-300 group-hover:scale-[1.02] sm:h-12 sm:max-w-[220px]"
-                onError={() => setLogoImgError(true)}
+                onError={(e) => {
+                  if (!e.currentTarget.src.endsWith('/logo.png')) {
+                    e.currentTarget.src = '/logo.png';
+                  } else {
+                    setLogoImgError(true);
+                  }
+                }}
               />
             ) : (
               <>
@@ -226,16 +232,22 @@ export const PublicLayout = () => {
           <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
             <div className="space-y-4 md:col-span-5">
               <Link to="/" className="group flex items-center gap-2.5">
-                {settings.logo_url && !logoImgError ? (
+                {(settings.logo_url || !logoImgError) ? (
                   <img
-                    src={resolveAssetUrl(settings.logo_url)}
+                    src={resolveAssetUrl(settings.logo_url || "/logo.png")}
                     alt={
                       isKm
                         ? `${settings.site_name_km || "CamGO"} អាជីវកម្ម`
                         : `${settings.site_name_en || "CamGO"} Business`
                     }
                     className="h-11 w-auto max-w-[190px] object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                    onError={() => setLogoImgError(true)}
+                    onError={(e) => {
+                      if (!e.currentTarget.src.endsWith('/logo.png')) {
+                        e.currentTarget.src = '/logo.png';
+                      } else {
+                        setLogoImgError(true);
+                      }
+                    }}
                   />
                 ) : (
                   <>
