@@ -7,9 +7,11 @@ use App\Http\Resources\DestinationListResource;
 use App\Http\Resources\ReviewResource;
 use App\Http\Resources\UserResource;
 use App\Models\AuditLog;
+use App\Services\StorageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
@@ -37,13 +39,17 @@ class ProfileController extends ApiController
             'phone' => 'nullable|string|max:50',
             'country' => 'nullable|string|max:100',
             'bio' => 'nullable|string|max:1000',
-            'avatar' => 'nullable|string|url|max:500',
+            'avatar' => 'nullable|string|max:1000',
         ]);
 
         $oldValues = $user->only(['name', 'phone', 'country', 'bio', 'avatar']);
         $user->update($validated);
 
-        AuditLog::record('profile_updated', $user, $oldValues, $user->only(['name', 'phone', 'country', 'bio', 'avatar']));
+        try {
+            AuditLog::record('profile_updated', $user, $oldValues, $user->only(['name', 'phone', 'country', 'bio', 'avatar']));
+        } catch (\Throwable $e) {
+            Log::warning('AuditLog profile_updated error: '.$e->getMessage());
+        }
 
         return $this->successResponse([
             'user' => new UserResource($user),
@@ -66,7 +72,11 @@ class ProfileController extends ApiController
             'must_change_password' => false,
         ]);
 
-        AuditLog::record('password_changed', $user);
+        try {
+            AuditLog::record('password_changed', $user);
+        } catch (\Throwable $e) {
+            Log::warning('AuditLog password_changed error: '.$e->getMessage());
+        }
 
         return $this->successResponse(null, 'Password updated successfully');
     }
@@ -77,17 +87,21 @@ class ProfileController extends ApiController
     public function uploadAvatar(Request $request): JsonResponse
     {
         $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,webp|max:3072', // 3MB max
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,webp|max:4096', // 4MB max
         ]);
 
         $user = $request->user();
 
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $url = Storage::url($path);
+            $url = StorageService::upload($request->file('avatar'), 'avatars', 'user_'.$user->id);
 
             $user->update(['avatar' => $url]);
-            AuditLog::record('avatar_uploaded', $user);
+
+            try {
+                AuditLog::record('avatar_uploaded', $user);
+            } catch (\Throwable $e) {
+                Log::warning('AuditLog avatar_uploaded error: '.$e->getMessage());
+            }
 
             return $this->successResponse([
                 'avatar_url' => $url,

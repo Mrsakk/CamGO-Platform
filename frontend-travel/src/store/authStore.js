@@ -63,7 +63,13 @@ const useAuthStore = create((set, get) => ({
   updateUser: (updatedFields) => {
     set((state) => {
       if (!state.user) return state;
-      const newUser = { ...state.user, ...updatedFields };
+      const actualFields = updatedFields?.user || updatedFields;
+      const avatarUrl = updatedFields?.avatar_url || actualFields?.avatar;
+      const newUser = {
+        ...state.user,
+        ...actualFields,
+        ...(avatarUrl ? { avatar: avatarUrl } : {})
+      };
       localStorage.setItem("km_travel_user", JSON.stringify(newUser));
       return {
         user: newUser,

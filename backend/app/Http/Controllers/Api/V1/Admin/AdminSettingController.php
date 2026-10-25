@@ -59,8 +59,7 @@ class AdminSettingController extends ApiController
 
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
-            $path = $file->store('settings', 'public');
-            $url = Storage::url($path);
+            $url = \App\Services\StorageService::upload($file, 'settings', 'logo');
 
             Setting::set('logo_url', $url, 'general');
 
@@ -69,7 +68,9 @@ class AdminSettingController extends ApiController
             Cache::forget('all_settings');
             Cache::flush();
 
-            AuditLog::record('logo_uploaded', 'Setting', null, ['logo_url' => $url]);
+            try {
+                AuditLog::record('logo_uploaded', 'Setting', null, ['logo_url' => $url]);
+            } catch (\Throwable $e) {}
 
             return $this->successResponse([
                 'logo_url' => $url,
@@ -90,8 +91,7 @@ class AdminSettingController extends ApiController
 
         if ($request->hasFile('favicon')) {
             $file = $request->file('favicon');
-            $path = $file->store('settings', 'public');
-            $url = Storage::url($path);
+            $url = \App\Services\StorageService::upload($file, 'settings', 'favicon');
 
             Setting::set('favicon_url', $url, 'general');
 
@@ -100,7 +100,9 @@ class AdminSettingController extends ApiController
             Cache::forget('all_settings');
             Cache::flush();
 
-            AuditLog::record('favicon_uploaded', 'Setting', null, ['favicon_url' => $url]);
+            try {
+                AuditLog::record('favicon_uploaded', 'Setting', null, ['favicon_url' => $url]);
+            } catch (\Throwable $e) {}
 
             return $this->successResponse([
                 'favicon_url' => $url,

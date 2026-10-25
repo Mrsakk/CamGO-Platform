@@ -52,7 +52,7 @@ return [
             'report' => false,
         ] : [
             'driver' => 'local',
-            'root' => env('STORAGE_PUBLIC_ROOT', storage_path('app/public')),
+            'root' => (getenv('VERCEL') || env('VERCEL')) ? '/tmp/storage/app/public' : env('STORAGE_PUBLIC_ROOT', storage_path('app/public')),
             'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/media',
             'visibility' => 'public',
             'throw' => false,

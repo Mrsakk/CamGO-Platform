@@ -78,3 +78,7 @@ ehthumbs.db
 # Exclude markdown files per user instruction
 *.md
 **/*.md
+
+# Vercel Project Metadata
+.vercel/
+

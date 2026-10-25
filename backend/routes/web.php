@@ -41,6 +41,7 @@ Route::get('/media/{path}', function (string $path) {
     $candidates = [
         base_path('storage/app/public/'.$path),
         storage_path('app/public/'.$path),
+        '/tmp/storage/app/public/'.$path,
         public_path('storage/'.$path),
     ];
 
@@ -62,6 +63,7 @@ Route::get('/storage/{path}', function (string $path) {
     $candidates = [
         base_path('storage/app/public/'.$path),
         storage_path('app/public/'.$path),
+        '/tmp/storage/app/public/'.$path,
         public_path('storage/'.$path),
     ];
 

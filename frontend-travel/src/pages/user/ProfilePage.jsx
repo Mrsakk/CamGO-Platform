@@ -109,7 +109,10 @@ export const ProfilePage = () => {
         headers: { "Content-Type": "multipart/form-data" }
       });
       if (res.data?.data) {
-        updateUser(res.data.data);
+        const payload = res.data.data;
+        const updatedUser = payload.user || payload;
+        const avatarUrl = payload.avatar_url || updatedUser.avatar;
+        updateUser({ ...updatedUser, avatar: avatarUrl });
         toast.success(km ? "បានផ្លាស់ប្តូររូបភាព Profile ជោគជ័យ!" : "Avatar updated!");
       }
     } catch (err) {
