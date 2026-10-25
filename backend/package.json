@@ -3,8 +3,8 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
-        "dev": "vite"
+        "build": "echo 'No frontend build needed for API backend'",
+        "vercel-build": "echo 'Vercel backend API build ready'"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",

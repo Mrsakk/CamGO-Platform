@@ -49,9 +49,27 @@ foreach ($runtimePaths as $key => $value) {
     }
 }
 
+if ((isset($_SERVER['HTTP_X_DEBUG_TRACE']) && $_SERVER['HTTP_X_DEBUG_TRACE'] === 'camgo-debug') || (isset($_GET['debug_trace']) && $_GET['debug_trace'] === 'camgo-debug')) {
+    putenv('APP_DEBUG=true');
+    $_ENV['APP_DEBUG'] = 'true';
+    $_SERVER['APP_DEBUG'] = 'true';
+}
+
 unset($_SERVER['PATH_INFO']);
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 $_SERVER['PHP_SELF'] = '/index.php';
 $_SERVER['SCRIPT_FILENAME'] = __DIR__.'/../public/index.php';
 
-require __DIR__.'/../public/index.php';
+try {
+    require __DIR__.'/../public/index.php';
+} catch (\Throwable $e) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'error' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine(),
+        'trace' => array_slice(explode("\n", $e->getTraceAsString()), 0, 10),
+    ]);
+}
+

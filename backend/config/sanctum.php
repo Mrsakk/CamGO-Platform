@@ -20,7 +20,9 @@ return [
 
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
         '%s%s',
-        'localhost,localhost:3000,localhost:5173,localhost:5174,localhost:5175,localhost:5176,127.0.0.1,127.0.0.1:8000,127.0.0.1:5173,127.0.0.1:5174,127.0.0.1:5175,127.0.0.1:5176,::1',
+        'localhost,localhost:3000,localhost:5173,localhost:5174,localhost:5175,localhost:5176,127.0.0.1,127.0.0.1:8000,127.0.0.1:5173,127.0.0.1:5174,127.0.0.1:5175,127.0.0.1:5176,::1,' .
+        'camgo.com,www.camgo.com,camgobooking.com,www.camgobooking.com,admintravel.com,www.admintravel.com,adminbusiness.com,www.adminbusiness.com,' .
+        'camgo-rho.vercel.app,camgo-business.vercel.app,camgoadminbusiness.vercel.app,camgo-supperadmin.vercel.app',
         Sanctum::currentApplicationUrlWithPort(),
         // Sanctum::currentRequestHost(),
     ))),
