@@ -632,10 +632,10 @@ const HomePage = () => {
                               {categoryName}
                             </span>
                           )}
-                          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-stone-950/80 backdrop-blur-md border border-white/20 text-white text-xs font-bold shadow-xs ml-auto">
+                          {/* <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-stone-950/80 backdrop-blur-md border border-white/20 text-white text-xs font-bold shadow-xs ml-auto">
                             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                             <span>{rating}</span>
-                          </div>
+                          </div> */}
                         </div>
 
                         {/* Bottom Floating Province Badge */}

@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Search, X, Calendar, Sparkles, MapPin, Compass, ArrowRight } from "lucide-react";
@@ -25,23 +26,18 @@ const staggerContainer = {
 export const EventsPage = () => {
   const { i18n } = useTranslation();
   const km = i18n.language === "km";
-  const [events, setEvents] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    setIsLoading(true);
-    contentApi
-      .getEvents({ per_page: 24 })
-      .then((res) => {
-        const items = res.data?.items || res.data || [];
-        if (Array.isArray(items)) setEvents(items);
-      })
-      .catch((err) => {
-        console.error("Failed to load events", err);
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
+  const { data: eventsResponse, isLoading } = useQuery({
+    queryKey: ["events-all", 24],
+    queryFn: () => contentApi.getEvents({ per_page: 24 }),
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const events = useMemo(() => {
+    const items = eventsResponse?.data?.items || eventsResponse?.data || [];
+    return Array.isArray(items) ? items : [];
+  }, [eventsResponse]);
 
   const filteredEvents = useMemo(() => {
     if (!search.trim()) return events;

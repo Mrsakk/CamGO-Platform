@@ -1,0 +1,15 @@
+{
+  "name": "khemara-morodok-platform",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npm --prefix frontend-travel run dev",
+    "dev:host": "npm --prefix frontend-travel run dev",
+    "dev:travel": "npm --prefix frontend-travel run dev",
+    "dev:business": "npm --prefix frontend-business run dev",
+    "build": "npm --prefix frontend-travel run build",
+    "build:travel": "npm --prefix frontend-travel run build",
+    "build:business": "npm --prefix frontend-business run build"
+  }
+}
+

@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -26,25 +27,18 @@ const staggerContainer = {
 export const BlogPage = () => {
   const { i18n } = useTranslation();
   const km = i18n.language === "km";
-  const [posts, setPosts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    setIsLoading(true);
-    contentApi
-      .getBlogPosts({ per_page: 20 })
-      .then((res) => {
-        if (res.data) {
-          const items = res.data?.items || res.data || [];
-          setPosts(Array.isArray(items) ? items : []);
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to load blog posts", err);
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
+  const { data: blogResponse, isLoading } = useQuery({
+    queryKey: ["blogs-all", 20],
+    queryFn: () => contentApi.getBlogPosts({ per_page: 20 }),
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const posts = useMemo(() => {
+    const items = blogResponse?.data?.items || blogResponse?.data || [];
+    return Array.isArray(items) ? items : [];
+  }, [blogResponse]);
 
   const filteredPosts = useMemo(() => {
     if (!search.trim()) return posts;

@@ -273,7 +273,7 @@ const AngkorSacredAxisWatermark = () => (
 export const KhmerBackgroundDecor = memo(function KhmerBackgroundDecor() {
   return (
     <div
-      className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden"
+      className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden transform-gpu [contain:paint]"
       aria-hidden="true"
       role="presentation"
     >

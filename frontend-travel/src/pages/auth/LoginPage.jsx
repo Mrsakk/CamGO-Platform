@@ -66,13 +66,13 @@ const LoginPage = () => {
             {t("auth.email", "Email Address")}
           </label>
           <div className="relative">
-            <Mail className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Mail className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full h-11 pl-10 pr-3.5 rounded-xl input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600"
+              className="w-full h-11 !pl-11 pr-3.5 rounded-xl input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600"
               required
             />
           </div>
@@ -91,13 +91,13 @@ const LoginPage = () => {
             </Link>
           </div>
           <div className="relative">
-            <Lock className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Lock className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full h-11 pl-10 pr-3.5 rounded-xl input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600"
+              className="w-full h-11 !pl-11 pr-3.5 rounded-xl input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600"
               required
             />
           </div>

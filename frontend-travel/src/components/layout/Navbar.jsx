@@ -7,6 +7,10 @@ import { useFavoriteStore } from "@/store/favoriteStore";
 import { useSettingsStore, resolveAssetUrl } from "@/store/settingsStore";
 import { toast } from "@/store/toastStore";
 import { destinationsApi } from "@/lib/api/destinations";
+import { provincesApi } from "@/lib/api/provinces";
+import { categoriesApi } from "@/lib/api/categories";
+import { contentApi } from "@/lib/api/content";
+import { queryClient } from "@/lib/queryClient";
 import {
   Menu,
   X,
@@ -26,6 +30,72 @@ import {
 
 const toKm = (n) => (n === null || n === undefined ? "0" : String(n));
 
+// Smart Hover Prefetching for instantaneous navigation
+    const handlePrefetch = (to) => {
+      if (!to) return;
+      try {
+        if (to === "/destinations") {
+          import("@/pages/public/DestinationsPage");
+          queryClient.prefetchQuery({
+            queryKey: ["destinations", { page: 1, per_page: 12, sort_by: "popular" }],
+            queryFn: () => destinationsApi.getAll({ page: 1, per_page: 12, sort_by: "popular" }),
+            staleTime: 1000 * 60 * 5,
+          });
+          queryClient.prefetchQuery({
+            queryKey: ["provinces-all"],
+            queryFn: () => provincesApi.getAll(),
+            staleTime: 1000 * 60 * 10,
+          });
+          queryClient.prefetchQuery({
+            queryKey: ["categories-all"],
+            queryFn: () => categoriesApi.getAll(),
+            staleTime: 1000 * 60 * 10,
+          });
+        } else if (to === "/provinces") {
+          import("@/pages/public/ProvincesPage");
+          queryClient.prefetchQuery({
+            queryKey: ["provinces-all"],
+            queryFn: () => provincesApi.getAll(),
+            staleTime: 1000 * 60 * 10,
+          });
+        } else if (to === "/categories") {
+          import("@/pages/public/CategoriesPage");
+          queryClient.prefetchQuery({
+            queryKey: ["categories-all"],
+            queryFn: () => categoriesApi.getAll(),
+            staleTime: 1000 * 60 * 10,
+          });
+        } else if (to === "/events") {
+          import("@/pages/public/EventsPage");
+          queryClient.prefetchQuery({
+            queryKey: ["events-all", 24],
+            queryFn: () => contentApi.getEvents({ per_page: 24 }),
+            staleTime: 1000 * 60 * 5,
+          });
+        } else if (to === "/blog") {
+          import("@/pages/public/BlogPage");
+          queryClient.prefetchQuery({
+            queryKey: ["blogs-all", 20],
+            queryFn: () => contentApi.getBlogPosts({ per_page: 20 }),
+            staleTime: 1000 * 60 * 5,
+          });
+        } else if (to === "/faq") {
+          import("@/pages/public/FaqPage");
+          queryClient.prefetchQuery({
+            queryKey: ["faqs-all"],
+            queryFn: () => contentApi.getFaqs(),
+            staleTime: 1000 * 60 * 10,
+          });
+        } else if (to === "/map") {
+          import("@/pages/public/MapExplorerPage");
+        } else if (to === "/trip-planner") {
+          import("@/pages/public/TripPlannerPage");
+        }
+      } catch {
+        // non-critical prefetch error
+      }
+    };
+
 const UserAvatar = ({ user, size = "w-6 h-6", textSize = "text-[11px]" }) => {
   const [imgError, setImgError] = useState(false);
   const avatarUrl =
@@ -37,6 +107,8 @@ const UserAvatar = ({ user, size = "w-6 h-6", textSize = "text-[11px]" }) => {
   const initial = (user?.name || user?.email || "U").charAt(0).toUpperCase();
 
   if (avatarUrl && !imgError) {
+    
+
     return (
       <img
         src={avatarUrl}
@@ -179,7 +251,7 @@ export const Navbar = () => {
   };
 
   const primaryLinks = [
-    { to: "/", label: km ? "ទំព័រដើម" : "Home" },
+
     { to: "/destinations", label: km ? "គោលដៅទេសចរណ៍" : "Destinations", isDest: true },
 
     { to: "/events", label: km ? "ព្រឹត្តិការណ៍" : "Events" },
@@ -196,7 +268,6 @@ export const Navbar = () => {
   ];
 
   const drawerLinks = [
-    { to: "/", label: km ? "ទំព័រដើម" : "Home" },
     { to: "/destinations", label: km ? "តំបន់ទេសចរណ៍ទាំងអស់" : "All Destinations" },
     { to: "/provinces", label: km ? "ខេត្ត-រាជធានីទាំង 25" : "25 Provinces Atlas" },
     { to: "/categories", label: km ? "ប្រភេទទេសចរណ៍" : "Categories" },
@@ -296,8 +367,7 @@ export const Navbar = () => {
                     key={link.to}
                     id="destination-menu-container"
                     className="relative"
-                    onMouseEnter={() => setDestDropdownOpen(true)}
-                    onMouseLeave={() => setDestDropdownOpen(false)}
+                    onMouseEnter={() => handlePrefetch("/destinations")}
                   >
                     <button
                       type="button"
@@ -321,6 +391,7 @@ export const Navbar = () => {
                           <Link
                             key={item.to}
                             to={item.to}
+                            onMouseEnter={() => handlePrefetch(item.to)}
                             onClick={() => setDestDropdownOpen(false)}
                             className="flex items-center justify-between px-4 py-2.5 text-small font-sans font-semibold hover:text-laterite-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                           >

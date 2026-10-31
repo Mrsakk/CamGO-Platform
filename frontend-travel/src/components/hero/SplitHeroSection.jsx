@@ -325,45 +325,71 @@ export const SplitHeroSection = ({
           {/* LEFT COLUMN: Grand Bold Editorial Narrative & Live Stat Cards       */}
           {/* =================================================================== */}
           <div className="lg:col-span-7 xl:col-span-6 flex flex-col space-y-6">
-            {/* Grand Bold Editorial Headline */}
+            {/* Grand Bold Editorial Headline & Narrative */}
             <motion.div
-              initial={{ opacity: 0, y: 14 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="space-y-4"
+              transition={{ duration: 0.55, delay: 0.1 }}
+              className="space-y-4 sm:space-y-5"
             >
+              {/* Luminous Top Badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-laterite-500/10 via-amber-500/10 to-laterite-500/10 dark:from-amber-400/15 dark:via-orange-500/15 dark:to-amber-400/15 border border-laterite-500/25 dark:border-amber-400/30 backdrop-blur-md shadow-2xs w-fit">
+                <Sparkles className="w-3.5 h-3.5 text-laterite-600 dark:text-amber-400 animate-pulse shrink-0" />
+                <span className="font-sans text-xs sm:text-sm font-bold tracking-wider uppercase text-laterite-700 dark:text-amber-300">
+                  {L("រុករកព្រះរាជាណាចក្រកម្ពុជា", "EXPLORE CAMBODIA • KINGDOM OF WONDER")}
+                </span>
+              </div>
+
+              {/* Grand Editorial Headline with Gradient Accent */}
               {km ? (
-                <h1
-                  className="font-heading font-black text-stone-950 dark:text-white tracking-tight font-khmer"
-                  style={{ fontSize: "40px", lineHeight: "1.35" }}
-                >
-                  «សច្ចារក្សាដី ភក្តីការពារជាតិ{" "}
-                  <span className="text-laterite-600 dark:text-laterite-400">
-                    រក្សាវប្បធម៌ឲ្យនៅរស់រវើក ជាតិមិនសាបសូន្យ»
+                <h1 className="font-heading font-black text-stone-950 dark:text-white tracking-tight font-khmer leading-[1.35]"
+                  style={{ fontSize: "50px" }}>
+                  <span className="block text-stone-950 dark:text-stone-100">
+                    « ស្វែងរកដំណើរកម្សាន្ត
+                  </span>
+                  <span className="block mt-1 sm:mt-1.5 bg-gradient-to-r from-laterite-600 via-amber-600 to-laterite-500 dark:from-amber-400 dark:via-amber-300 dark:to-orange-400 bg-clip-text text-transparent">
+                    នៅប្រទេសកម្ពុជា »
                   </span>
                 </h1>
               ) : (
-                <h1
-                  className="font-heading font-black text-stone-950 dark:text-white tracking-tight font-khmer"
-                  style={{ fontSize: "30px", lineHeight: "1.35" }}
-                >
-                  &ldquo;Committed to the land, loyal to the nation;{" "}
-                  <span className="text-laterite-600 dark:text-laterite-400">
-                    Preserve the culture, guard against its loss.&rdquo;
+                <h1 className="font-heading font-black text-stone-950 dark:text-white tracking-tight uppercase font-sans leading-[1.25]"
+                  style={{ fontSize: "60px" }}>
+                  <span className="block text-stone-950 dark:text-stone-100">
+                    &ldquo;Discover
+                  </span>
+                  <span className="block mt-1 bg-gradient-to-r from-laterite-600 via-amber-600 to-laterite-500 dark:from-amber-400 dark:via-amber-300 dark:to-orange-400 bg-clip-text text-transparent">
+                    New Places&rdquo;
                   </span>
                 </h1>
               )}
 
-              {/* Subheading Narrative */}
-              <p className="text-stone-600 dark:text-stone-300 max-w-xl leading-relaxed font-sans text-sm sm:text-base font-normal">
+              {/* Subheading Narrative with Left Accent Rail */}
+              <p className="text-stone-600 dark:text-stone-300 max-w-xl text-sm sm:text-base lg:text-[16.5px] leading-relaxed font-sans font-normal border-l-2 border-laterite-500/50 dark:border-amber-400/50 pl-3.5 sm:pl-4 py-0.5">
                 {L(
-                  "បុព្វបុរសបានកសាងមហាអរិយធម៌ដោយញើសឈាម បញ្ញា និងជំនឿមុតមាំ។ ក្នុងនាមជាកូនចៅជំនាន់ក្រោយ ការថែរក្សា និងលើកស្ទួយអត្តសញ្ញាណជាតិ មិនមែនជាជម្រើសនោះទេ តែជាកាតព្វកិច្ចពិសិដ្ឋដែលត្រូវបន្តដុតបំភ្លឺកុំឱ្យរលត់ជាដាច់ខាត។",
-                  "Our ancestors forged a great civilization through sweat, blood, profound wisdom, and unyielding faith. As the inheritors of this legacy, safeguarding and elevating our national identity is not merely a choice—it is a sacred duty to keep this flame burning eternally."
+                  "ដំណើរកម្សាន្តក្នុងក្តីស្រមៃរបស់អ្នក នៅជិតត្រឹមតែមួយចុចប៉ុណ្ណោះ។ ស្វែងរកគោលដៅទេសចរណ៍ដ៏អស្ចារ្យ បទពិសោធន៍ដែលត្រូវបានជ្រើសរើសយ៉ាងយកចិត្តទុកដាក់ និងពេលវេលាដែលមិនអាចបំភ្លេចបាន ជាមួយ CamGO។",
+                  "Your dream vacation is just a click away. Explore breathtaking destinations, handpicked experiences, and unforgettable moments with CamGO."
                 )}
               </p>
+
+              {/* Dual Action CTA Buttons */}
+              <div className="pt-1 flex flex-wrap items-center gap-3 sm:gap-3.5">
+                <Link
+                  to="/destinations"
+                  className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-laterite-600 via-laterite-600 to-laterite-700 hover:from-laterite-500 hover:to-laterite-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-laterite-600/20 hover:shadow-lg hover:shadow-laterite-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 group cursor-pointer"
+                >
+                  <span>{L("រុករកគោលដៅទេសចរណ៍", "Explore Destinations")}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+
+                <Link
+                  to="/map"
+                  className="inline-flex items-center justify-center gap-2 px-4.5 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-stone-100 hover:bg-stone-200/80 dark:bg-stone-800/80 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-100 font-bold text-xs sm:text-sm border border-stone-200 dark:border-stone-700 shadow-2xs hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 group cursor-pointer"
+                >
+                  <Compass className="w-4 h-4 text-laterite-600 dark:text-amber-400 group-hover:rotate-45 transition-transform duration-300" />
+                  <span>{L("ផែនទីទេសចរណ៍", "Interactive Map")}</span>
+                </Link>
+              </div>
             </motion.div>
-
-
 
             {/* Live Editorial Metrics Row (Elevated Khmer-Crafted Modern Stat Dock) */}
             <motion.div
@@ -571,8 +597,8 @@ export const SplitHeroSection = ({
                           aria-label={`Go to slide ${idx + 1}`}
                           onClick={() => setActiveIndex(idx)}
                           className={`transition-all duration-300 cursor-pointer rounded-full ${isActive
-                              ? "w-6 h-1.5 bg-amber-400 shadow-xs"
-                              : "w-1.5 h-1.5 bg-white/40 hover:bg-white/80"
+                            ? "w-6 h-1.5 bg-amber-400 shadow-xs"
+                            : "w-1.5 h-1.5 bg-white/40 hover:bg-white/80"
                             }`}
                         />
                       );

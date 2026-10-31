@@ -70,13 +70,13 @@ const RegisterPage = () => {
             {t("auth.full_name", "Full Name")} *
           </label>
           <div className="relative">
-            <User className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <User className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g. Sokha Chan"
-              className="w-full h-11 pl-10 pr-3.5 rounded-xl input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600"
+              className="w-full h-11 !pl-11 pr-3.5 rounded-xl input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600"
               required
             />
           </div>
@@ -88,13 +88,13 @@ const RegisterPage = () => {
             {t("auth.email", "Email Address")} *
           </label>
           <div className="relative">
-            <Mail className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Mail className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               placeholder="you@example.com"
-              className="w-full h-11 pl-10 pr-3.5 rounded-xl input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600"
+              className="w-full h-11 !pl-11 pr-3.5 rounded-xl input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600"
               required
             />
           </div>
@@ -107,13 +107,13 @@ const RegisterPage = () => {
               {t("auth.password", "Password")} *
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
               <input
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="••••••••"
-                className="w-full h-11 pl-10 pr-3.5 rounded-xl input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600"
+                className="w-full h-11 !pl-11 pr-3.5 rounded-xl input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600"
                 required
                 minLength={8}
               />
@@ -125,13 +125,13 @@ const RegisterPage = () => {
               Confirm *
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
               <input
                 type="password"
                 value={formData.password_confirmation}
                 onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
                 placeholder="••••••••"
-                className="w-full h-11 pl-10 pr-3.5 rounded-xl input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600"
+                className="w-full h-11 !pl-11 pr-3.5 rounded-xl input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600"
                 required
                 minLength={8}
               />

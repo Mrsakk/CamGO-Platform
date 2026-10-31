@@ -83,7 +83,7 @@ const SearchBar = ({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={km ? "ស្វែងរកប្រាសាទ កោះ ឆ្នេរ ទឹកធ្លាក់..." : "Search temples, islands, waterfalls..."}
-            className="w-full h-12 pl-10 pr-9 rounded-control input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 font-km"
+            className="w-full h-12 !pl-11 !pr-9 rounded-control input-carved text-body text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 font-km"
           />
           {search && (
             <button

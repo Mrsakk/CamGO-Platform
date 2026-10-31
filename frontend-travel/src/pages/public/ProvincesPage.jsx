@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -26,25 +27,18 @@ const staggerContainer = {
 const ProvincesPage = () => {
   const { t, i18n } = useTranslation();
   const km = i18n.language === "km";
-  const [provinces, setProvinces] = useState([]);
   const [search, setSearch] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    setIsLoading(true);
-    provincesApi
-      .getAll()
-      .then((res) => {
-        if (res.data) {
-          const items = Array.isArray(res.data) ? res.data : res.data.items || [];
-          setProvinces(items);
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to load provinces", err);
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
+  const { data: provincesResponse, isLoading } = useQuery({
+    queryKey: ["provinces-all"],
+    queryFn: () => provincesApi.getAll(),
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const provinces = useMemo(() => {
+    const raw = provincesResponse?.data;
+    return Array.isArray(raw) ? raw : raw?.items || [];
+  }, [provincesResponse]);
 
   const filteredProvinces = useMemo(() => {
     if (!search.trim()) return provinces;

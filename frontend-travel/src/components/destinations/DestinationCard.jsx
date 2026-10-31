@@ -159,14 +159,6 @@ export const DestinationCard = ({
             />
           </button>
 
-          {/* Floating Star Rating Overlay (Bottom-Left of Media) */}
-          <div className="absolute bottom-2.5 left-2.5 z-10 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-stone-950/75 text-white text-[10px] sm:text-[11px] font-bold backdrop-blur-md border border-white/20 shadow-xs pointer-events-none">
-            <Star className="w-3 h-3 fill-amber-400 text-amber-400 shrink-0" />
-            <span>{ratingScore > 0 ? ratingScore.toFixed(1) : "5.0"}</span>
-            {reviewsCount > 0 && (
-              <span className="text-stone-300 font-normal text-[10px]">({reviewsCount})</span>
-            )}
-          </div>
 
           {/* Admission Fee Tag (Bottom-Right of Media) */}
           {(destination.is_free || destination.entrance_fee_usd) && (

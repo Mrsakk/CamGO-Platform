@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -59,11 +60,6 @@ const DestinationsPage = () => {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   // Data & Modal States
-  const [destinations, setDestinations] = useState([]);
-  const [meta, setMeta] = useState(null);
-  const [provinces, setProvinces] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [quickViewDest, setQuickViewDest] = useState(null);
 
   // Debounce search input by 300ms
@@ -74,29 +70,43 @@ const DestinationsPage = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Load provinces and categories
-  useEffect(() => {
-    Promise.allSettled([provincesApi.getAll(), categoriesApi.getAll()]).then(([provRes, catRes]) => {
-      if (provRes.status === "fulfilled" && provRes.value?.data) {
-        const provList = Array.isArray(provRes.value.data) ? provRes.value.data : provRes.value.data.items || [];
-        setProvinces(provList);
-        if (provinceId && isNaN(Number(provinceId))) {
-          const matched = provList.find((p) => p.slug === provinceId || p.code === provinceId);
-          if (matched) setProvinceId(String(matched.id));
-        }
-      }
-      if (catRes.status === "fulfilled" && catRes.value?.data) {
-        const catList = Array.isArray(catRes.value.data) ? catRes.value.data : catRes.value.data.items || [];
-        setCategories(catList);
-        if (categoryId && isNaN(Number(categoryId))) {
-          const matched = catList.find((c) => c.slug === categoryId);
-          if (matched) setCategoryId(String(matched.id));
-        }
-      }
-    });
-  }, []);
+  // Load provinces and categories with TanStack Query caching
+  const { data: provResponse } = useQuery({
+    queryKey: ["provinces-all"],
+    queryFn: () => provincesApi.getAll(),
+    staleTime: 1000 * 60 * 10,
+  });
+  const provinces = useMemo(() => {
+    const raw = provResponse?.data;
+    return Array.isArray(raw) ? raw : raw?.items || [];
+  }, [provResponse]);
 
-  // Fetch destinations
+  const { data: catResponse } = useQuery({
+    queryKey: ["categories-all"],
+    queryFn: () => categoriesApi.getAll(),
+    staleTime: 1000 * 60 * 10,
+  });
+  const categories = useMemo(() => {
+    const raw = catResponse?.data;
+    return Array.isArray(raw) ? raw : raw?.items || [];
+  }, [catResponse]);
+
+  // Match slug to ID if URL params use slugs
+  useEffect(() => {
+    if (provinceId && isNaN(Number(provinceId)) && provinces.length > 0) {
+      const matched = provinces.find((p) => p.slug === provinceId || p.code === provinceId);
+      if (matched) setProvinceId(String(matched.id));
+    }
+  }, [provinceId, provinces]);
+
+  useEffect(() => {
+    if (categoryId && isNaN(Number(categoryId)) && categories.length > 0) {
+      const matched = categories.find((c) => c.slug === categoryId);
+      if (matched) setCategoryId(String(matched.id));
+    }
+  }, [categoryId, categories]);
+
+  // Sync searchParams with filter states
   useEffect(() => {
     const params = {};
     if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
@@ -107,33 +117,36 @@ const DestinationsPage = () => {
     if (sortBy) params.sort_by = sortBy;
     if (page > 1) params.page = String(page);
     if (viewMode !== "grid") params.view = viewMode;
-
     setSearchParams(params, { replace: true });
+  }, [debouncedSearch, provinceId, categoryId, minRating, isFree, sortBy, page, viewMode, setSearchParams]);
 
-    setIsLoading(true);
-    destinationsApi
-      .getAll({
-        search: debouncedSearch.trim() || undefined,
-        province_id: provinceId || undefined,
-        category_id: categoryId || undefined,
-        min_rating: minRating ? Number(minRating) : undefined,
-        is_free: isFree === "1" ? true : isFree === "0" ? false : undefined,
-        sort_by: sortBy,
-        page,
-        per_page: viewMode === "map" ? 60 : 12,
-      })
-      .then((res) => {
-        if (res.data) {
-          const items = Array.isArray(res.data) ? res.data : res.data.items || [];
-          setDestinations(items);
-        }
-        if (res.meta) setMeta(res.meta);
-        if (res.data && res.data.meta) setMeta(res.data.meta);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [debouncedSearch, provinceId, categoryId, minRating, isFree, sortBy, page, viewMode]);
+  const queryParams = useMemo(() => ({
+    search: debouncedSearch.trim() || undefined,
+    province_id: provinceId || undefined,
+    category_id: categoryId || undefined,
+    min_rating: minRating ? Number(minRating) : undefined,
+    is_free: isFree === "1" ? true : isFree === "0" ? false : undefined,
+    sort_by: sortBy,
+    page,
+    per_page: viewMode === "map" ? 60 : 12,
+  }), [debouncedSearch, provinceId, categoryId, minRating, isFree, sortBy, page, viewMode]);
+
+  // Fetch destinations with TanStack Query caching
+  const { data: destinationsResponse, isLoading } = useQuery({
+    queryKey: ["destinations", queryParams],
+    queryFn: () => destinationsApi.getAll(queryParams),
+    staleTime: 1000 * 60 * 5,
+    keepPreviousData: true,
+  });
+
+  const destinations = useMemo(() => {
+    const raw = destinationsResponse?.data;
+    return Array.isArray(raw) ? raw : raw?.items || [];
+  }, [destinationsResponse]);
+
+  const meta = useMemo(() => {
+    return destinationsResponse?.meta || destinationsResponse?.data?.meta || null;
+  }, [destinationsResponse]);
 
   // Reset all filters
   const handleResetFilters = () => {

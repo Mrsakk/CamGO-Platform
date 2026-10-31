@@ -21,10 +21,14 @@ export default defineConfig({
           'vendor-query': ['@tanstack/react-query', 'axios', 'zustand'],
           'vendor-charts': ['recharts'],
         },
+
       },
+
     },
+
   },
   server: {
+    host: true,
     port: 5173,
     proxy: {
       '/api': {

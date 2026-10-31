@@ -82,3 +82,7 @@ ehthumbs.db
 # Vercel Project Metadata
 .vercel/
 
+# Performance docs and temporary copies
+docs/perf/
+**/assets copy/
+

@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -72,25 +73,18 @@ const staggerContainer = {
 const CategoriesPage = () => {
   const { t, i18n } = useTranslation();
   const km = i18n.language === "km";
-  const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    setIsLoading(true);
-    categoriesApi
-      .getAll()
-      .then((res) => {
-        if (res.data) {
-          const items = Array.isArray(res.data) ? res.data : res.data.items || [];
-          setCategories(items);
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to load categories", err);
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
+  const { data: categoriesResponse, isLoading } = useQuery({
+    queryKey: ["categories-all"],
+    queryFn: () => categoriesApi.getAll(),
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const categories = useMemo(() => {
+    const raw = categoriesResponse?.data;
+    return Array.isArray(raw) ? raw : raw?.items || [];
+  }, [categoriesResponse]);
 
   const filteredCategories = useMemo(() => {
     if (!search.trim()) return categories;

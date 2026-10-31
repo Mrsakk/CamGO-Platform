@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -123,24 +124,21 @@ export const FaqPage = () => {
   const { i18n } = useTranslation();
   const km = i18n.language === "km";
 
-  const [faqs, setFaqs] = useState(DEFAULT_FAQS);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [openId, setOpenId] = useState(1); // open first by default
 
-  useEffect(() => {
-    contentApi
-      .getFaqs()
-      .then((res) => {
-        const items = res?.data?.items || res?.data || res?.items;
-        if (Array.isArray(items) && items.length > 0) {
-          setFaqs(items);
-        }
-      })
-      .catch(() => {
-        // Fallback to DEFAULT_FAQS
-      });
-  }, []);
+  const { data: faqResponse } = useQuery({
+    queryKey: ["faqs-all"],
+    queryFn: () => contentApi.getFaqs(),
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const faqs = useMemo(() => {
+    const items = faqResponse?.data?.items || faqResponse?.data || faqResponse?.items;
+    if (Array.isArray(items) && items.length > 0) return items;
+    return DEFAULT_FAQS;
+  }, [faqResponse]);
 
   const categories = useMemo(() => {
     return [

@@ -213,8 +213,8 @@ const DestinationDetailPage = () => {
   const reviewsList = Array.isArray(destination.reviews)
     ? destination.reviews
     : Array.isArray(destination.reviews?.data)
-    ? destination.reviews.data
-    : [];
+      ? destination.reviews.data
+      : [];
 
   const myReview = reviewsList.find((r) => r.user_id === user?.id);
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destination.latitude || 13.4125},${destination.longitude || 103.867}`;
@@ -232,82 +232,36 @@ const DestinationDetailPage = () => {
       />
 
       <PageContainer className="space-y-8">
-        {/* =================================================================== */}
-        {/* 1. BREADCRUMBS & TOP STATUS ROW                                     */}
-        {/* =================================================================== */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-stone-200/80 dark:border-stone-800">
-          <Breadcrumbs
-            items={[
-              { label: km ? "ទំព័រដើម" : "Home", to: "/" },
-              { label: t("nav.destinations", "Destinations"), to: "/destinations" },
-              ...(destination.province
-                ? [{ label: provinceName, to: `/provinces/${destination.province.slug}` }]
-                : []),
-              { label: name }
-            ]}
-          />
 
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            {destination.is_featured && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 text-xs font-bold font-sans uppercase">
-                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>{km ? "គោលដៅពិសេស" : "Featured Landmark"}</span>
-              </span>
-            )}
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100 dark:bg-stone-800/80 text-stone-600 dark:text-stone-400 text-xs font-mono font-bold border border-stone-200 dark:border-stone-700">
-              <Eye className="w-3.5 h-3.5 text-stone-400" />
-              <span>{toKm(viewCount)} {km ? "ទស្សនា" : "views"}</span>
-            </span>
-          </div>
-        </div>
 
-        {/* =================================================================== */}
-        {/* 2. ANGKOR SANDSTONE DESTINATION HERO BANNER                         */}
-        {/* =================================================================== */}
+
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="relative rounded-3xl sm:rounded-[36px] border border-stone-200/90 dark:border-stone-800 bg-white dark:bg-stone-900 p-6 sm:p-10 lg:p-12 shadow-sm overflow-hidden space-y-4"
         >
-          {/* Layered Ambient Glow Orbs */}
-          <div className="absolute -top-24 -left-24 w-80 sm:w-96 h-80 sm:h-96 bg-laterite-600/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 w-80 sm:w-96 h-80 sm:h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Rotating Rumduol Flower Watermark */}
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 200, repeat: Infinity, ease: "linear" }}
-            className="absolute -right-16 -top-16 opacity-[0.035] dark:opacity-[0.025] pointer-events-none select-none"
-          >
-            <RumduolFlower size={420} className="text-laterite-600" />
-          </motion.div>
-
-          <div className="relative z-10 space-y-4">
-            <div className="flex flex-wrap items-center gap-2.5">
 
 
-              {categoryName && (
-                <Link
-                  to={`/categories/${destination.category?.slug}`}
-                  className="px-3 py-1 rounded-full bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 text-xs font-sans font-bold hover:border-laterite-600 transition-colors"
-                >
-                  {categoryName}
-                </Link>
-              )}
 
-              {provinceName && (
-                <Link
-                  to={`/provinces/${destination.province?.slug}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 text-xs font-sans font-bold hover:border-laterite-600 transition-colors"
-                >
-                  <MapPin className="w-3 h-3 text-laterite-600" />
-                  <span>{provinceName}</span>
-                </Link>
-              )}
-            </div>
+
+          <div className="relative z-10 space-y-4 ">
 
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pt-1">
+
+              <div className="flex flex-col sm:flex-row sm:items-center   ">
+                <Breadcrumbs
+                  items={[
+                    { label: t("nav.destinations", "Destinations"), to: "/destinations" },
+                    ...(destination.province && provinceName
+                      ? [{ label: provinceName, to: `/provinces/${destination.province.slug}` }]
+                      : []),
+                    { label: name }
+                  ]}
+                />
+              </div>
+
+
               <div className="space-y-1 max-w-3xl">
                 <h1 className="font-heading font-black text-3xl sm:text-5xl lg:text-6xl text-stone-900 dark:text-stone-100 leading-tight tracking-tight">
                   {name}
@@ -319,28 +273,14 @@ const DestinationDetailPage = () => {
                 )}
               </div>
 
-              {/* Quick Ratings & Review Count Pill */}
-              <div className="flex items-center gap-3 shrink-0">
-                <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-stone-100 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700 shadow-2xs">
-                  <Star className="w-5 h-5 fill-amber-500 text-amber-500" />
-                  <span className="font-mono font-bold text-lg text-stone-900 dark:text-stone-100">
-                    {ratingScore}
-                  </span>
-                  <span className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-                    / 5.0 ({toKm(reviewsCount)} {km ? "ការវាយតម្លៃ" : "reviews"})
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
         </motion.div>
 
-        {/* =================================================================== */}
-        {/* 3. LUXURY EDITORIAL PHOTO MOSAIC GALLERY                            */}
-        {/* =================================================================== */}
+
         <div className="w-full bg-stone-950 overflow-hidden rounded-3xl sm:rounded-[36px] border border-stone-200/90 dark:border-stone-800 shadow-md">
           {allImages.length === 1 ? (
-            // Single Hero View
+
             <div className="relative aspect-[16/9] sm:aspect-[21/9] w-full overflow-hidden group">
               <img
                 src={allImages[0]}
@@ -447,6 +387,7 @@ const DestinationDetailPage = () => {
             </div>
           )}
         </div>
+
 
         {/* =================================================================== */}
         {/* 4. SANCTUARY CODEX: QUICK TRAVEL MATRIX CARDS                       */}
